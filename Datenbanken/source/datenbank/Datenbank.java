@@ -88,7 +88,7 @@ public class Datenbank {
                         db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
       System.out.println("cmd: " + db2_statement);
-      String cmd = "db2cmd.exe -c -w db2 -tvf " + db2_command_file;
+      String cmd = "db2cmd.exe -w db2 -tvf " + db2_command_file;
       Process p = Runtime.getRuntime().exec(cmd);
       p.waitFor();
     } catch (IOException e) {
