@@ -6,18 +6,28 @@ import datenbank.TabellenDef;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
-
-	  Datenbank db = new Datenbank(args);
+		
+		if (args.length != 8)
+			throw new Exception("parameter in eclipse hinzufügen!");
+		
+		String dbName = args[0];
+		String dbUser = args[1];
+		String dbPwd = args[2];
+		String dbSchemaName = args[3];
+		String dbCommandFile = args[4];
+		
+	  Datenbank db = new Datenbank(dbName, dbUser, dbPwd, dbSchemaName, dbCommandFile);
 //	  System.out.println(Datenbank.kSchemaName);
 //	  TabellenDef td = new TabellenDef(Datenbank.kSchemaName);
 //	  db.executeDB2(td.buildCreateTableStatement());
 	  
-	  CsvParser csv_parser = new CsvParser(db, "H:\\stimmen.csv");
+	  String parserStimmenFile = args[5];
+	  String parserDataFolder = args[6];
+	  String logFile = args[7];
+	  
+	  CsvParser csv_parser = new CsvParser(db, parserStimmenFile);
 
-	  final String kDatenordner =
-	    "H:\\MasterSE\\1.Semester\\Datenbanken\\se-aufgaben\\Datenbanken\\Daten\\";
-	  final String kMessagePfad = "H:\\Desktop\\db2_progress_messages";
-	  csv_parser.runImports(kDatenordner, kMessagePfad);
+	  csv_parser.runImports(parserDataFolder, logFile);
 	  //csv_parser.parseVotes(kDatenordner + "Wahlergebnisse.csv");
 	}
 }
