@@ -5,7 +5,8 @@ import datenbank.Datenbank;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
-	  Datenbank db = new Datenbank();
+
+	  Datenbank db = new Datenbank(args);
 	  CsvParser csv_parser = new CsvParser(db);
 	  final String kDatenordner =
 	    "H:\\MasterSE\\1.Semester\\Datenbanken\\se-aufgaben\\Datenbanken\\Daten\\";

@@ -3,45 +3,56 @@ package datenbank;
 import java.sql.*;
 
 public class Datenbank {
+	
   private String datenbank_name = "jdbc:db2:FIRSTDAY";
   private String user = "pascal_db2";
   private String pwd = "Datenbanken";
-  private String db2_treiber_name = "com.ibm.db2.jcc.DB2Driver";
+  private static String kSchemaName = "Pascal";
+  
   private Connection connection;
-  public static String kSchemaName = "Pascal";
   
   // Tabellen
-  final public static String kWahlkreis = tabellenName("Wahlkreis");
-  final public static String kWahlkreisID = "WahlkreisID";
-  final public static String kWahlkreisName = "WahlkreisName";
+  public final static String kWahlkreis = tabellenName("Wahlkreis");
+  public final static String kWahlkreisID = "WahlkreisID";
+  public final static String kWahlkreisName = "WahlkreisName";
   
-  final public static String kBundesland = tabellenName("Bundesland");
-  final public static String kBundeslandID = "BundeslandID";
-  final public static String kBundeslandName = "BundeslandName";
+  public final static String kBundesland = tabellenName("Bundesland");
+  public final static String kBundeslandID = "BundeslandID";
+  public final static String kBundeslandName = "BundeslandName";
   
-  final public static String kPartei = tabellenName("Partei");
-  final public static String kParteiID = "ParteiID";
-  final public static String kParteiKuerzel = "ParteiKuerzel";
-  final public static String kParteiName = "ParteiName";
+  public final static String kPartei = tabellenName("Partei");
+  public final static String kParteiID = "ParteiID";
+  public final static String kParteiKuerzel = "ParteiKuerzel";
+  public final static String kParteiName = "ParteiName";
   
-  final public static String kKandidat = tabellenName("Kandidat");
-  final public static String kKandidatID = "KandidatID";
-  final public static String kNachname = "Nachname";
-  final public static String kVorname = "Vorname";
-  final public static String kListenplatz = "Listenplatz";
+  public final static String kKandidat = tabellenName("Kandidat");
+  public final static String kKandidatID = "KandidatID";
+  public final static String kNachname = "Nachname";
+  public final static String kVorname = "Vorname";
+  public final static String kListenplatz = "Listenplatz";
   
   public static String tabellenName(String kurzname) {
     return kSchemaName + "." + kurzname;
   }
 
-  public Datenbank() {
+  public Datenbank(String[] args) {
     try {
-      Class.forName(db2_treiber_name);
+    	if (args.length != 4)
+    		throw new Exception("parameter in eclipse hinzufügen!");
+    	
+    	this.datenbank_name = "jdbc:db2:" + args[0];
+    	this.user = args[1];
+    	this.pwd = args[2];
+    	Datenbank.kSchemaName = args[3];
+    	
+      Class.forName("com.ibm.db2.jcc.DB2Driver");
       connection = DriverManager.getConnection(datenbank_name, user, pwd);
     } catch (SQLException e) {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
+    } catch (Exception e) {
+    	e.printStackTrace();
     }
   }
 
@@ -58,7 +69,7 @@ public class Datenbank {
     statement.close();
   }
   
-  public void executeDB2()
+
 
   public Connection getConnection() {
     return connection;
