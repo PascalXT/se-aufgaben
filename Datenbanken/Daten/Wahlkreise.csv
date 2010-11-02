@@ -1,0 +1,299 @@
+1;Flensburg - Schleswig;15
+2;Nordfriesland - Dithmarschen Nord;15
+3;Steinburg - Dithmarschen Süd;15
+4;Rendsburg-Eckernförde;15
+5;Kiel;15
+6;Plön - Neumünster;15
+7;Pinneberg;15
+8;Segeberg - Stormarn-Nord;15
+9;Ostholstein;15
+10;Herzogtum Lauenburg - Stormarn-Süd;15
+11;Lübeck;15
+12;Wismar - Nordwestmecklenburg - Parchim;8
+13;Schwerin - Ludwigslust;8
+14;Rostock;8
+15;Stralsund - Nordvorpommern - Rügen;8
+16;Greifswald - Demmin - Ostvorpommern;8
+17;Bad Doberan - Güstrow - Müritz;8
+18;Neubrandenburg - Mecklenburg-Strelitz - Uecker-Randow;8
+19;Hamburg-Mitte;6
+20;Hamburg-Altona;6
+21;Hamburg-Eimsbüttel;6
+22;Hamburg-Nord;6
+23;Hamburg-Wandsbek;6
+24;Hamburg-Bergedorf - Harburg;6
+25;Aurich - Emden;9
+26;Unterems;9
+27;Friesland - Wilhelmshaven;9
+28;Oldenburg - Ammerland;9
+29;Delmenhorst - Wesermarsch - Oldenburg-Land;9
+30;Cuxhaven - Stade II;9
+31;Stade I - Rotenburg II;9
+32;Mittelems;9
+33;Cloppenburg - Vechta;9
+34;Diepholz - Nienburg I;9
+35;Osterholz - Verden;9
+36;Rotenburg I - Soltau-Fallingbostel;9
+37;Harburg;9
+38;Lüchow-Dannenberg - Lüneburg;9
+39;Osnabrück-Land;9
+40;Stadt Osnabrück;9
+41;Nienburg II - Schaumburg;9
+42;Stadt Hannover I;9
+43;Stadt Hannover II;9
+44;Hannover-Land I;9
+45;Celle - Uelzen;9
+46;Gifhorn - Peine;9
+47;Hameln-Pyrmont - Holzminden;9
+48;Hannover-Land II;9
+49;Hildesheim;9
+50;Salzgitter - Wolfenbüttel;9
+51;Braunschweig;9
+52;Helmstedt - Wolfsburg;9
+53;Goslar - Northeim - Osterode;9
+54;Göttingen;9
+55;Bremen I;5
+56;Bremen II - Bremerhaven;5
+57;Prignitz - Ostprignitz-Ruppin - Havelland I;4
+58;Uckermark - Barnim I;4
+59;Oberhavel - Havelland II;4
+60;Märkisch-Oderland - Barnim II;4
+61;Brandenburg an der Havel - Potsdam-Mittelmark I - Havelland III - Teltow-Fläming I;4
+62;Potsdam - Potsdam-Mittelmark II - Teltow-Fläming II;4
+63;Dahme-Spreewald - Teltow-Fläming III - Oberspreewald-Lausitz I;4
+64;Frankfurt (Oder) - Oder-Spree;4
+65;Cottbus - Spree-Neiße;4
+66;Elbe-Elster - Oberspreewald-Lausitz II;4
+67;Altmark;14
+68;Börde - Jerichower Land;14
+69;Harz;14
+70;Magdeburg;14
+71;Dessau - Wittenberg;14
+72;Anhalt;14
+73;Halle;14
+74;Burgenland - Saalekreis;14
+75;Mansfeld;14
+76;Berlin-Mitte;3
+77;Berlin-Pankow;3
+78;Berlin-Reinickendorf;3
+79;Berlin-Spandau - Charlottenburg Nord;3
+80;Berlin-Steglitz - Zehlendorf;3
+81;Berlin-Charlottenburg - Wilmersdorf;3
+82;Berlin-Tempelhof - Schöneberg;3
+83;Berlin-Neukölln;3
+84;Berlin-Friedrichshain - Kreuzberg - Prenzlauer Berg Ost;3
+85;Berlin-Treptow - Köpenick;3
+86;Berlin-Marzahn - Hellersdorf;3
+87;Berlin-Lichtenberg;3
+88;Aachen;10
+89;Kreis Aachen;10
+90;Heinsberg;10
+91;Düren;10
+92;Erftkreis I;10
+93;Euskirchen - Erftkreis II;10
+94;Köln I;10
+95;Köln II;10
+96;Köln III;10
+97;Bonn;10
+98;Rhein-Sieg-Kreis I;10
+99;Rhein-Sieg-Kreis II;10
+100;Oberbergischer Kreis;10
+101;Rheinisch-Bergischer Kreis;10
+102;Leverkusen - Köln IV;10
+103;Wuppertal I;10
+104;Solingen - Remscheid - Wuppertal II;10
+105;Mettmann I;10
+106;Mettmann II;10
+107;Düsseldorf I;10
+108;Düsseldorf II;10
+109;Neuss I;10
+110;Mönchengladbach;10
+111;Krefeld I - Neuss II;10
+112;Viersen;10
+113;Kleve;10
+114;Wesel I;10
+115;Krefeld II - Wesel II;10
+116;Duisburg I;10
+117;Duisburg II;10
+118;Oberhausen - Wesel III;10
+119;Mülheim - Essen I;10
+120;Essen II;10
+121;Essen III;10
+122;Recklinghausen I;10
+123;Recklinghausen II;10
+124;Gelsenkirchen;10
+125;Steinfurt I - Borken I;10
+126;Bottrop - Recklinghausen III;10
+127;Borken II;10
+128;Coesfeld - Steinfurt II;10
+129;Steinfurt III;10
+130;Münster;10
+131;Warendorf;10
+132;Gütersloh;10
+133;Bielefeld;10
+134;Herford - Minden-Lübbecke II;10
+135;Minden-Lübbecke I;10
+136;Lippe I;10
+137;Höxter - Lippe II;10
+138;Paderborn;10
+139;Hagen - Ennepe-Ruhr-Kreis I;10
+140;Ennepe-Ruhr-Kreis II;10
+141;Bochum I;10
+142;Herne - Bochum II;10
+143;Dortmund I;10
+144;Dortmund II;10
+145;Unna I;10
+146;Hamm - Unna II;10
+147;Soest;10
+148;Hochsauerlandkreis;10
+149;Siegen-Wittgenstein;10
+150;Olpe - Märkischer Kreis I;10
+151;Märkischer Kreis II;10
+152;Nordsachsen;13
+153;Leipzig I;13
+154;Leipzig II;13
+155;Leipzig-Land;13
+156;Meißen;13
+157;Bautzen I;13
+158;Görlitz;13
+159;Sächsische Schweiz - Osterzgebirge;13
+160;Dresden I;13
+161;Dresden II - Bautzen II;13
+162;Mittelsachsen;13
+163;Chemnitz;13
+164;Chemnitzer Umland - Erzgebirgskreis II;13
+165;Erzgebirgskreis I;13
+166;Zwickau;13
+167;Vogtlandkreis;13
+168;Waldeck;7
+169;Kassel;7
+170;Werra-Meißner - Hersfeld-Rotenburg;7
+171;Schwalm-Eder;7
+172;Marburg;7
+173;Lahn-Dill;7
+174;Gießen;7
+175;Fulda;7
+176;Hochtaunus;7
+177;Wetterau;7
+178;Rheingau-Taunus - Limburg;7
+179;Wiesbaden;7
+180;Hanau;7
+181;Main-Taunus;7
+182;Frankfurt am Main I;7
+183;Frankfurt am Main II;7
+184;Groß-Gerau;7
+185;Offenbach;7
+186;Darmstadt;7
+187;Odenwald;7
+188;Bergstraße;7
+189;Eichsfeld - Nordhausen - Unstrut-Hainich-Kreis I;16
+190;Eisenach - Wartburgkreis - Unstrut-Hainich-Kreis II;16
+191;Kyffhäuserkreis - Sömmerda - Weimarer Land I;16
+192;Gotha - Ilm-Kreis;16
+193;Erfurt - Weimar - Weimarer Land II;16
+194;Gera - Jena - Saale-Holzland-Kreis;16
+195;Greiz - Altenburger Land;16
+196;Sonneberg - Saalfeld-Rudolstadt - Saale-Orla-Kreis;16
+197;Suhl - Schmalkalden-Meiningen - Hildburghausen;16
+198;Neuwied;11
+199;Ahrweiler;11
+200;Koblenz;11
+201;Mosel/Rhein-Hunsrück;11
+202;Kreuznach;11
+203;Bitburg;11
+204;Trier;11
+205;Montabaur;11
+206;Mainz;11
+207;Worms;11
+208;Ludwigshafen/Frankenthal;11
+209;Neustadt - Speyer;11
+210;Kaiserslautern;11
+211;Pirmasens;11
+212;Südpfalz;11
+213;Altötting;2
+214;Erding - Ebersberg;2
+215;Freising;2
+216;Fürstenfeldbruck;2
+217;Ingolstadt;2
+218;München-Nord;2
+219;München-Ost;2
+220;München-Süd;2
+221;München-West/Mitte;2
+222;München-Land;2
+223;Rosenheim;2
+224;Starnberg;2
+225;Traunstein;2
+226;Weilheim;2
+227;Deggendorf;2
+228;Landshut;2
+229;Passau;2
+230;Rottal-Inn;2
+231;Straubing;2
+232;Amberg;2
+233;Regensburg;2
+234;Schwandorf;2
+235;Weiden;2
+236;Bamberg;2
+237;Bayreuth;2
+238;Coburg;2
+239;Hof;2
+240;Kulmbach;2
+241;Ansbach;2
+242;Erlangen;2
+243;Fürth;2
+244;Nürnberg-Nord;2
+245;Nürnberg-Süd;2
+246;Roth;2
+247;Aschaffenburg;2
+248;Bad Kissingen;2
+249;Main-Spessart;2
+250;Schweinfurt;2
+251;Würzburg;2
+252;Augsburg-Stadt;2
+253;Augsburg-Land;2
+254;Donau-Ries;2
+255;Neu-Ulm;2
+256;Oberallgäu;2
+257;Ostallgäu;2
+258;Stuttgart I;1
+259;Stuttgart II;1
+260;Böblingen;1
+261;Esslingen;1
+262;Nürtingen;1
+263;Göppingen;1
+264;Waiblingen;1
+265;Ludwigsburg;1
+266;Neckar-Zaber;1
+267;Heilbronn;1
+268;Schwäbisch Hall - Hohenlohe;1
+269;Backnang - Schwäbisch Gmünd;1
+270;Aalen - Heidenheim;1
+271;Karlsruhe-Stadt;1
+272;Karlsruhe-Land;1
+273;Rastatt;1
+274;Heidelberg;1
+275;Mannheim;1
+276;Odenwald - Tauber;1
+277;Rhein-Neckar;1
+278;Bruchsal - Schwetzingen;1
+279;Pforzheim;1
+280;Calw;1
+281;Freiburg;1
+282;Lörrach - Müllheim;1
+283;Emmendingen - Lahr;1
+284;Offenburg;1
+285;Rottweil - Tuttlingen;1
+286;Schwarzwald-Baar;1
+287;Konstanz;1
+288;Waldshut;1
+289;Reutlingen;1
+290;Tübingen;1
+291;Ulm;1
+292;Biberach;1
+293;Bodensee;1
+294;Ravensburg;1
+295;Zollernalb - Sigmaringen;1
+296;Saarbrücken;12
+297;Saarlouis;12
+298;St. Wendel;12
+299;Homburg;12
