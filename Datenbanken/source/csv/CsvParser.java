@@ -108,31 +108,32 @@ public class CsvParser {
 		final int kSpaltenNummern = 1;
 		final int kSpaltenNamen = 2;
 		final String[][] kImportTripel = {
+        {
+          "Bundeslaender.csv",
+          "(1, 2)",
+          Datenbank.kBundesland + " (" + Datenbank.kBundeslandID + ", "
+              + Datenbank.kBundeslandName + ")" },
 		    {
-		        "Wahlkreise.csv",
-		        "(1, 2, 3)",
-		        Datenbank.kWahlkreis + " (" + Datenbank.kWahlkreisID + ", "
-		            + Datenbank.kWahlkreisName + ", " + Datenbank.kBundeslandID
-		            + ")" },
+	        "Wahlkreise.csv",
+	        "(1, 2, 3)",
+	        Datenbank.kWahlkreis + " (" + Datenbank.kWahlkreisID + ", " +
+	            Datenbank.kWahlkreisName + ", " +
+	            Datenbank.kWahlkreisBundeslandID + ")" },
 		    {
-		        "Bundeslaender.csv",
-		        "(1, 2)",
-		        Datenbank.kBundesland + " (" + Datenbank.kBundeslandID + ", "
-		            + Datenbank.kBundeslandName + ")" },
+	        "Parteien.csv",
+	        "(3, 1, 2)",
+	        Datenbank.kPartei + " (" + Datenbank.kParteiID + ", "
+	            + Datenbank.kParteiKuerzel + ", " + Datenbank.kParteiName + 
+	            ")"},
 		    {
-		        "Parteien.csv",
-		        "(3, 1, 2)",
-		        Datenbank.kPartei + " (" + Datenbank.kParteiID + ", "
-		            + Datenbank.kParteiKuerzel + ", " + Datenbank.kParteiName + ")" },
-		    {
-		        "Kandidaten.cvs",
-		        "(1, 2, 3, 4, 5, 6)",
-		        Datenbank.kKandidat + " (" + Datenbank.kNachname + ", "
-		            + Datenbank.kVorname + ", " + Datenbank.kParteiID + ", "
-		            + Datenbank.kBundeslandID + ", " + Datenbank.kListenplatz
-		            + ", " + ")" }, };
+	        "Kandidaten.cvs",
+	        "(1, 2, 3, 4, 5, 6)",
+	        Datenbank.kKandidat + " (" + Datenbank.kKandidatNachname + ", "
+	            + Datenbank.kKandidatVorname + ", " + Datenbank.kKandidatParteiID
+	            + ", " + Datenbank.kKandidatBundeslandID + ", " +
+	            Datenbank.kKandidatListenplatz + ", " + ")" }, };
 
-		for (int i = 0; i < kImportTripel.length; i++) {
+		for (int i = 0; i < Math.min(4, kImportTripel.length); i++) {
 			System.out.println("Import: " + kImportTripel[i][kDatei]);
 			final String datei_pfad = datenordner + kImportTripel[i][kDatei];
 			String sql = "IMPORT FROM \"" + datei_pfad

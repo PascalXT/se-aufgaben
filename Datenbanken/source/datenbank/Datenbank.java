@@ -18,23 +18,26 @@ public class Datenbank {
   
   // Tabellen
   public final static String kWahlkreis = tabellenName("Wahlkreis");
-  public final static String kWahlkreisID = "WahlkreisID";
-  public final static String kWahlkreisName = "WahlkreisName";
+  public final static String kWahlkreisID = "ID";
+  public final static String kWahlkreisName = "Name";
+  public final static String kWahlkreisBundeslandID = "BundeslandID";
   
   public final static String kBundesland = tabellenName("Bundesland");
-  public final static String kBundeslandID = "BundeslandID";
-  public final static String kBundeslandName = "BundeslandName";
+  public final static String kBundeslandID = "ID";
+  public final static String kBundeslandName = "Name";
   
   public final static String kPartei = tabellenName("Partei");
-  public final static String kParteiID = "ParteiID";
-  public final static String kParteiKuerzel = "ParteiKuerzel";
-  public final static String kParteiName = "ParteiName";
+  public final static String kParteiID = "ID";
+  public final static String kParteiKuerzel = "Kuerzel";
+  public final static String kParteiName = "Name";
   
   public final static String kKandidat = tabellenName("Kandidat");
-  public final static String kKandidatID = "KandidatID";
-  public final static String kNachname = "Nachname";
-  public final static String kVorname = "Vorname";
-  public final static String kListenplatz = "Listenplatz";
+  public final static String kKandidatID = "ID";
+  public final static String kKandidatParteiID = "ParteiID";
+  public final static String kKandidatNachname = "Nachname";
+  public final static String kKandidatVorname = "Vorname";
+  public final static String kKandidatListenplatz = "Listenplatz";
+  public final static String kKandidatBundeslandID = "BundeslandID";
   
   public static String tabellenName(String kurzname) {
     return kSchemaName + "." + kurzname;
@@ -88,7 +91,7 @@ public class Datenbank {
                         db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
       System.out.println("cmd: " + db2_statement);
-      String cmd = "db2cmd.exe -c -w db2 -tvf " + db2_command_file;
+      String cmd = "db2cmd.exe -w db2 -tvf " + db2_command_file;
       Process p = Runtime.getRuntime().exec(cmd);
       p.waitFor();
     } catch (IOException e) {
