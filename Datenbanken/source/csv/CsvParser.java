@@ -1,6 +1,8 @@
 package csv;
 
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.sql.*;
@@ -8,13 +10,20 @@ import java.sql.*;
 import datenbank.Datenbank;
 
 public class CsvParser {
+
 	final int kAktuellesJahr = 2009;
 	final int kMaxBewohnerProBezirk = 2500;
+	String stimmen_datei = "H:\\stimmen.csv";
 
 	private Datenbank datenbank;
 
 	public CsvParser(Datenbank datenbank) {
 		this.datenbank = datenbank;
+	}
+
+	public CsvParser(Datenbank datenbank, String stimmen_datei) {
+		this.datenbank = datenbank;
+		this.stimmen_datei = stimmen_datei;
 	}
 
 	private int getKandidat(int wahlkreis_ID, int partei_ID) throws SQLException {
@@ -36,7 +45,18 @@ public class CsvParser {
 
 	private void einzelneErststimme(int wahlkreis_ID, int bezirk_ID,
 	    int kandidat_ID) {
-		System.out.println(wahlkreis_ID + ";" + bezirk_ID + ";" + kandidat_ID);
+		String csv_zeile = wahlkreis_ID + ";" + bezirk_ID + ";" + kandidat_ID;
+		File file = new File(stimmen_datei);
+		FileWriter file_writer;
+		try {
+			file_writer = new FileWriter(file);
+			file_writer.write(csv_zeile);
+			file_writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		System.out.println(csv_zeile);
 	}
 
 	private void insertErststimmen(int wahlkreis_ID, int partei_ID,
@@ -54,7 +74,7 @@ public class CsvParser {
 		}
 	}
 
-	public void parseVotes(String tabelle, String csv_datei) throws IOException {
+	public void parseVotes(String csv_datei) throws IOException {
 		final int kSpalteWahlkreisID = 1;
 		final int kSpalteParteiID = 2;
 		final int kSpalteErststimmen = 3;
@@ -115,17 +135,13 @@ public class CsvParser {
 		for (int i = 0; i < kImportTripel.length; i++) {
 			System.out.println("Import: " + kImportTripel[i][kDatei]);
 			final String datei_pfad = datenordner + kImportTripel[i][kDatei];
-			try {
-				String sql = "IMPORT FROM \"" + datei_pfad
-				    + "\" OF DEL MODIFIED BY COLDEL; METHOD P "
-				    + kImportTripel[i][kSpaltenNummern] + " MESSAGES \"" + message_pfad
-				    + "\" INSERT INTO " + kImportTripel[i][kSpaltenNamen];
-				System.out.println(sql);
-				datenbank.executeUpdate(sql);
-			} catch (SQLException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+			String sql = "IMPORT FROM \"" + datei_pfad
+			    + "\" OF DEL MODIFIED BY COLDEL; METHOD P "
+			    + kImportTripel[i][kSpaltenNummern] + " MESSAGES \"" + message_pfad
+			    + "\" INSERT INTO " + kImportTripel[i][kSpaltenNamen];
+			System.out.println(sql);
+			datenbank.executeDB2(sql);
 		}
 	}
+
 }
