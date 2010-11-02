@@ -1,10 +1,15 @@
 package datenbank;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 
 public class Datenbank {
-  private String datenbank_name = "jdbc:db2:FIRSTDAY";
+  private String datenbank_kurzname = "FIRSTDAY";
+  private String datenbank_name = "jdbc:db2:" + datenbank_kurzname;
   private String user = "pascal_db2";
+  private String db2_command_file = "H:\\db2_commands.txt";
   private String pwd = "Datenbanken";
   private String db2_treiber_name = "com.ibm.db2.jcc.DB2Driver";
   private Connection connection;
@@ -58,7 +63,29 @@ public class Datenbank {
     statement.close();
   }
   
-  public void executeDB2()
+  public void executeDB2(String db2_statement) {
+    File file = new File(db2_command_file);
+    if(file.exists()){
+        file.delete();
+    }
+    FileWriter file_writer;
+    try {
+      file_writer = new FileWriter(file);
+      file_writer.write("CONNECT TO " + datenbank_kurzname + ";\n" +
+                        db2_statement + ";\nCONNECT RESET;");
+      file_writer.flush();
+      System.out.println("cmd: " + db2_statement);
+      String cmd = "db2cmd.exe -c -w db2 -tvf " + db2_command_file;
+      Process p = Runtime.getRuntime().exec(cmd);
+      p.waitFor();
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(1);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+  }
 
   public Connection getConnection() {
     return connection;

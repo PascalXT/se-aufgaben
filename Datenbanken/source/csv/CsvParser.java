@@ -116,17 +116,12 @@ public class CsvParser {
     for (int i = 0; i < kImportTripel.length; i++) {
       System.out.println("Import: " + kImportTripel[i][kDatei]);
       final String datei_pfad = datenordner + kImportTripel[i][kDatei];
-      try {
-        String sql = "IMPORT FROM \"" + datei_pfad + 
-          "\" OF DEL MODIFIED BY COLDEL; METHOD P " +
-          kImportTripel[i][kSpaltenNummern] + " MESSAGES \"" + message_pfad +
-          "\" INSERT INTO " + kImportTripel[i][kSpaltenNamen];
-        System.out.println(sql);
-        datenbank.executeUpdate(sql);
-      } catch (SQLException e) {
-        e.printStackTrace();
-        System.exit(1);
-      }
+      String sql = "IMPORT FROM \"" + datei_pfad + 
+        "\" OF DEL MODIFIED BY COLDEL; METHOD P " +
+        kImportTripel[i][kSpaltenNummern] + " MESSAGES \"" + message_pfad +
+        "\" INSERT INTO " + kImportTripel[i][kSpaltenNamen];
+      System.out.println(sql);
+      datenbank.executeDB2(sql);
     }
   }
 }
