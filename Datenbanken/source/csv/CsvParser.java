@@ -126,12 +126,12 @@ public class CsvParser {
 	            + Datenbank.kParteiKuerzel + ", " + Datenbank.kParteiName + 
 	            ")"},
 		    {
-	        "Kandidaten.cvs",
+	        "Kandidaten.csv",
 	        "(1, 2, 3, 4, 5, 6)",
 	        Datenbank.kKandidat + " (" + Datenbank.kKandidatNachname + ", "
 	            + Datenbank.kKandidatVorname + ", " + Datenbank.kKandidatParteiID
 	            + ", " + Datenbank.kKandidatBundeslandID + ", " +
-	            Datenbank.kKandidatListenplatz + ", " + ")" }, };
+	            Datenbank.kKandidatListenplatz + ")" }, };
 
 		for (int i = 0; i < Math.min(4, kImportTripel.length); i++) {
 			System.out.println("Import: " + kImportTripel[i][kDatei]);
