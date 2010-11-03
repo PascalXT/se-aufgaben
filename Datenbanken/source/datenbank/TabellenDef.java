@@ -51,7 +51,7 @@ public class TabellenDef {
 		    "CREATE TABLE "
 		        + schemaName
 		        + ".PARTEI ( ID BIGINT  NOT NULL , "
-		        + "NAME VARCHAR (255)  NOT NULL , "
+		        + "NAME VARCHAR (255) , "
 		        + "KUERZEL VARCHAR (63)  NOT NULL  , "
 		        + "BUNDESLANDID BIGINT  NOT NULL  , "
 		        + "CONSTRAINT CC1288606983948 PRIMARY KEY ( ID) ,"
@@ -78,8 +78,8 @@ public class TabellenDef {
 		    "CREATE TABLE "
 		        + schemaName
 		        + ".KANDIDAT ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
-		        + "PARTEIID BIGINT  NOT NULL , "
-		        + "BUNDESLANDID BIGINT  NOT NULL ,"
+		        + "PARTEIID BIGINT , "
+		        + "BUNDESLANDID BIGINT ,"
 		        + "NACHNAME VARCHAR (255)  NOT NULL , "
 		        + "VORNAME VARCHAR (255)  NOT NULL , "
 		        + "BERUF VARCHAR (255) , "

@@ -43,17 +43,15 @@ public class Datenbank {
     return kSchemaName + "." + kurzname;
   }
 
-  public Datenbank(String[] args) {
+  public Datenbank(String name, String user, String pwd, String schemaName, String commandFile) {
     try {
-    	if (args.length != 5)
-    		throw new Exception("parameter in eclipse hinzufügen!");
-    	
-    	this.datenbank_kurzname = args[0];
-    	this.datenbank_name = "jdbc:db2:" + args[0];
-    	this.user = args[1];
-    	this.pwd = args[2];
-    	Datenbank.kSchemaName = args[3];
-    	this.db2_command_file = args[4];
+
+    	this.datenbank_kurzname = name;
+    	this.datenbank_name = "jdbc:db2:" + name;
+    	this.user = user;
+    	this.pwd = pwd;
+    	Datenbank.kSchemaName = schemaName; System.out.println(schemaName);
+    	this.db2_command_file = commandFile;
     	
       Class.forName("com.ibm.db2.jcc.DB2Driver");
       connection = DriverManager.getConnection(datenbank_name, user, pwd);
@@ -61,8 +59,6 @@ public class Datenbank {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
-    } catch (Exception e) {
-    	e.printStackTrace();
     }
   }
 
