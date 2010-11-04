@@ -8,6 +8,10 @@ public class Flags {
   final private int kFlagExplanationPos = 2;
   final String kFlagStart = "--";
   final String kFlagNameDelimiter = "=";
+  final public static String kTrue = "true";
+  
+  //In fact, everything different to kTrue is considered false.
+  final public static String kFalse = "false";
   
   /** 
    * @throws FlagErrorException 
@@ -72,5 +76,9 @@ public class Flags {
       }
     }
     throw new FlagErrorException("Flag " + flagName + " has not been defined");
+  }
+  
+  public boolean isTrue(String flagName) throws FlagErrorException {
+    return getFlagValue(flagName).equals(kTrue);
   }
 }
