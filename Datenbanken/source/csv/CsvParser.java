@@ -153,6 +153,10 @@ public class CsvParser {
 		  Datenbank.kErststimmeWahlbezirkID + ", " +
 		  Datenbank.kErststimmeKandidatID + ")";
 		
+		System.out.println(importErststimmenStmt);
+    datenbank.executeDB2(importErststimmenStmt);
+		System.out.println("Erststimmen have been imported to the database");
+		
 		final String importZweitstimmenStmt =
       "IMPORT FROM \"" + zweitStimmenDatei + "\" OF DEL MODIFIED BY COLDEL; " +
       "METHOD P (1, 2, 3) COMMITCOUNT 10000 MESSAGES \"" + messagePfad + "\" " +
@@ -160,6 +164,10 @@ public class CsvParser {
       Datenbank.kZweitstimmeWahlkreisID + ", " +
       Datenbank.kZweitstimmeWahlbezirkID + ", " +
       Datenbank.kZweitstimmeParteiID + ")";
+		
+    System.out.println(importZweitstimmenStmt);
+    datenbank.executeDB2(importZweitstimmenStmt);
+		System.out.println("Zweitstimmen have been imported to the database");
 	}
 
 	public void runImports(String datenordner, String messagePfad) {
