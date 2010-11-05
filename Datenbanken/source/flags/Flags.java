@@ -2,12 +2,16 @@ package flags;
 
 
 public class Flags { 
-  private String[][] flag_definition;
-  final private int kFlagNamePos = 0;
-  final private int kFlagValuePos = 1;
-  final private int kFlagExplanationPos = 2;
-  final String kFlagStart = "--";
-  final String kFlagNameDelimiter = "=";
+  private static String[][] flag_definition;
+  final private static int kFlagNamePos = 0;
+  final private static int kFlagValuePos = 1;
+  final private static int kFlagExplanationPos = 2;
+  final static String kFlagStart = "--";
+  final static String kFlagNameDelimiter = "=";
+  final public static String kTrue = "true";
+  
+  //In fact, everything different to kTrue is considered false.
+  final public static String kFalse = "false";
   
   /** 
    * @throws FlagErrorException 
@@ -15,13 +19,13 @@ public class Flags {
    *                         {"Flagname", "Default value"/null, "Explanation"}
    * @Param args: argument flags of the main method.
    */
-  public Flags(String[][] flag_definition, String[] args)
+  public static void setFlags(String[][] flag_definition, String[] args)
       throws FlagErrorException {
-    this.flag_definition = flag_definition;
+    Flags.flag_definition = flag_definition;
     parseArguments(args);
   }
   
-  private void parseArguments(String[] args) throws FlagErrorException {
+  private static void parseArguments(String[] args) throws FlagErrorException {
     // Search for flags in argument array.
     for (int i = 0; i < args.length; i++) {
       final int flag_delimiter_pos = args[i].indexOf(kFlagNameDelimiter);
@@ -65,12 +69,16 @@ public class Flags {
     }
   }
   
-  public String getFlagValue(String flagName) throws FlagErrorException {
+  public static String getFlagValue(String flagName) throws FlagErrorException {
     for (int i = 0; i < flag_definition.length; i++) {
       if (flag_definition[i][kFlagNamePos].equals(flagName)) {
         return flag_definition[i][kFlagValuePos];
       }
     }
     throw new FlagErrorException("Flag " + flagName + " has not been defined");
+  }
+  
+  public static boolean isTrue(String flagName) throws FlagErrorException {
+    return getFlagValue(flagName).equals(kTrue);
   }
 }

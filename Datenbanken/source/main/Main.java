@@ -3,63 +3,47 @@ package main;
 import csv.CsvParser;
 import datenbank.Datenbank;
 import datenbank.TabellenDef;
-import flags.Flags;
+import flags.*;
 
-public class Main {
-  // Example arguments:
-  // --dbName=WahlSys --dbUser=pascal_db2 --dbPwd=Datenbanken 
-  // --dbSchemaName=Pascal --dbCommandFile=H:\db2_commands.txt 
-  // --parserStimmenFile=C:\Stimmen.csv
-  // --parserDataFolder=C:\se-aufgaben\Datenbanken\Daten\
-  // --logFile=C:\db2_progress_messages.txt
-  final static String kFlagDbName = "dbName";
-  final static String kFlagDbUser = "dbUser";
-  final static String kFlagDbPwd = "dbPwd";
-  final static String kFlagDbSchemaName = "dbSchemaName";
-  final static String kFlagDbCommandFile = "dbCommandFile";
-  final static String kFlagParserStimmenFile = "parserStimmenFile";
-  final static String kFlagParserDataFolder = "parserDataFolder";
-  final static String kFlagLogFile = "logFile";
-  final static String[][] kFlagDefinition = {
-      {kFlagDbName, "WahlSys", "Name of the db2 database."},
-      {kFlagDbUser, null, "Username for the db2 database."},
-      {kFlagDbPwd, null, "Password of the user for the db2 database"},
-      {kFlagDbSchemaName, null, "Name of the schema created in db2"},
-      {kFlagDbCommandFile,
-        null, 
-        "Path of a temporary file used for db2 commands"},
-      {kFlagParserStimmenFile, 
-        null,
-        "Path of the file used for storing the single votes created in the " +
-          "parser. This file will be loaded by a db2 import."},
-      {kFlagParserDataFolder,
-        null,
-        "Folder in which the csv source files are stored."},
-      {kFlagLogFile,
-        null,
-        "Path of the file, where log messages of db2 commands are stored."}
-  };
-  
+public class Main {  
 	public static void main(String[] args) throws Exception {		
-		Flags flags = new Flags(kFlagDefinition, args);
-		String dbName = flags.getFlagValue(kFlagDbName);
-		String dbUser = flags.getFlagValue(kFlagDbUser);
-		String dbPwd = flags.getFlagValue(kFlagDbPwd);
-		String dbSchemaName = flags.getFlagValue(kFlagDbSchemaName);
-		String dbCommandFile = flags.getFlagValue(kFlagDbCommandFile);
+		Flags.setFlags(FlagDefinition.kFlagDefinition, args);
+		final String dbName = Flags.getFlagValue(FlagDefinition.kFlagDbName);
+		final String dbUser = Flags.getFlagValue(FlagDefinition.kFlagDbUser);
+		final String dbPwd = Flags.getFlagValue(FlagDefinition.kFlagDbPwd);
+		final String dbSchemaName =
+		  Flags.getFlagValue(FlagDefinition.kFlagDbSchemaName);
+		final String dbCommandFile =
+		  Flags.getFlagValue(FlagDefinition.kFlagDbCommandFile);
+		final String dbCommandFlags =
+		  Flags.getFlagValue(FlagDefinition.kFlagDbCommandFlags);
 		
-	  Datenbank db = new Datenbank(dbName, dbUser, dbPwd, dbSchemaName, dbCommandFile);
-	  TabellenDef td = new TabellenDef(db.schemaName);
-	  //db.executeDB2(td.buildCreateTableStatement());
+	  Datenbank db =
+	    new Datenbank(dbName, dbUser, dbPwd, dbSchemaName, dbCommandFile, 
+	                  dbCommandFlags);
 	  
-	  String parserStimmenFile = flags.getFlagValue(kFlagParserStimmenFile);
-	  String parserDataFolder = flags.getFlagValue(kFlagParserDataFolder);
-	  String logFile = flags.getFlagValue(kFlagLogFile);
+	  if (Flags.isTrue(FlagDefinition.kFlagCreateTables)) {
+  	  TabellenDef td = new TabellenDef(db.schemaName);
+  	  db.executeDB2(td.buildCreateTableStatement());
+	  }
 	  
-	  CsvParser csv_parser = new CsvParser(db, parserStimmenFile);
+    final String parserErststimmenFile =
+      Flags.getFlagValue(FlagDefinition.kFlagParserErststimmenFile);
+    final String parserZweitstimmenFile =
+      Flags.getFlagValue(FlagDefinition.kFlagParserZweitstimmenFile);
+	  final String parserDataFolder =
+	    Flags.getFlagValue(FlagDefinition.kFlagParserDataFolder);
+	  final String logFile = Flags.getFlagValue(FlagDefinition.kFlagLogFile);
+	  
+	  CsvParser csvParser =
+	    new CsvParser(db, parserErststimmenFile, parserZweitstimmenFile);
 
-	  //csv_parser.runImports(parserDataFolder, logFile);
-	  csv_parser.parseVotes(parserDataFolder + "Wahlergebnisse.csv");
+	  if (Flags.isTrue(FlagDefinition.kImportCsvFiles))
+	    csvParser.runImports(parserDataFolder, logFile);
+	  if (Flags.isTrue(FlagDefinition.kFlagCreateVotes))
+	    csvParser.parseVotes(parserDataFolder + "Wahlergebnisse.csv", logFile);
+	  if (Flags.isTrue(FlagDefinition.kFlagImportVotes))
+	    csvParser.importVotes(logFile);
 
 	}
 }

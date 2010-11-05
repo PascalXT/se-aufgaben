@@ -13,6 +13,7 @@ public class Datenbank {
   private String db2_command_file = "H:\\db2_commands.txt";
   private String pwd = "Datenbanken";
   public String schemaName;
+  private String dbCommandFlags;
   
   private Connection connection;
   private Statement statement = null;
@@ -42,21 +43,36 @@ public class Datenbank {
   public final static String kKandidatDMParteiID = "DMParteiID";
   public final static String kKandidatDMWahlkreisID = "DMWahlkreisID";
   
+  public String erststimme;
+  public final static String kErststimmeID = "ID";
+  public final static String kErststimmeKandidatID = "KandidatID";
+  public final static String kErststimmeWahlbezirkID = "WahlbezirkID";
+  public final static String kErststimmeWahlkreisID = "WahlkreisID";
+  
+  public String zweitstimme;
+  public final static String kZweitstimmeID = "ID";
+  public final static String kZweitstimmeParteiID = "ParteiID";
+  public final static String kZweitstimmeWahlbezirkID = "WahlbezirkID";
+  public final static String kZweitstimmeWahlkreisID = "WahlkreisID";
+  
   public String tabellenName(String kurzname) {
     return schemaName + "." + kurzname;
   }
 
-  public Datenbank(String name, String user, String pwd, String schemaName, String commandFile) {
+  public Datenbank(String name, String user, String pwd, String schemaName,
+                   String commandFile, String dbCommandFlags) {
     this.datenbank_kurzname = name;
     this.datenbank_name = "jdbc:db2:" + name;
     this.user = user;
     this.pwd = pwd;
     this.db2_command_file = commandFile;
+    this.dbCommandFlags = dbCommandFlags;
     this.schemaName = schemaName;
     this.bundesland = tabellenName("Bundesland");
     this.wahlkreis = tabellenName("Wahlkreis");
     this.kandidat = tabellenName("Kandidat");
     this.partei = tabellenName("Partei");
+    this.erststimme = tabellenName("Erststimme");
     try {
       Class.forName("com.ibm.db2.jcc.DB2Driver");
       connection = DriverManager.getConnection(datenbank_name, user, pwd);
@@ -108,7 +124,7 @@ public class Datenbank {
                         db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
       System.out.println("cmd: " + db2_statement);
-      String cmd = "db2cmd.exe -c -w db2 -tvf " + db2_command_file;
+      String cmd = "db2cmd.exe " + dbCommandFlags + " " + db2_command_file;
       Process p = Runtime.getRuntime().exec(cmd);
       p.waitFor();
     } catch (IOException e) {

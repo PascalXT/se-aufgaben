@@ -13,7 +13,8 @@ public class CsvParser {
 
 	final int kAktuellesJahr = 2009;
 	final int kMaxBewohnerProBezirk = 2500;
-	String stimmenDatei = "H:\\stimmen.csv";
+	String erstStimmenDatei;
+	String zweitStimmenDatei;
 
 	private Datenbank datenbank;
 
@@ -21,9 +22,12 @@ public class CsvParser {
 		this.datenbank = datenbank;
 	}
 
-	public CsvParser(Datenbank datenbank, String stimmenDatei) {
+	public CsvParser(Datenbank datenbank,
+	                 String erstStimmenDatei,
+	                 String zweitStimmenDatei) {
 		this.datenbank = datenbank;
-		this.stimmenDatei = stimmenDatei;
+		this.erstStimmenDatei = erstStimmenDatei;
+		this.zweitStimmenDatei = zweitStimmenDatei;
 	}
 
 	private int getKandidat(int wahlkreisID, int parteiID) throws SQLException {
@@ -46,11 +50,11 @@ public class CsvParser {
     return result;
 	}
 
-	private void einzelneErststimme(int wahlkreisID, int bezirkID,
-	    int kandidatID, FileWriter fileWriter) {
-		String csv_zeile = wahlkreisID + ";" + bezirkID + ";" + kandidatID;
+	private void einzelneStimme(int wahlkreisID, int bezirkID,
+	    int votedForID, FileWriter fileWriter) {
+		String csvLine = wahlkreisID + ";" + bezirkID + ";" + votedForID;
 	  try {
-      fileWriter.write(csv_zeile + "\n");
+      fileWriter.write(csvLine + "\n");
     } catch (IOException e) {
       e.printStackTrace();
       System.exit(1);
@@ -71,7 +75,7 @@ public class CsvParser {
         System.out.println(wahlkreisID + ";" + i + ";" + kandidatID + ":" +
             anzahlErststimmenBezirk);
   			for (int j = 0; j < anzahlErststimmenBezirk; j++) {
-  			  einzelneErststimme(wahlkreisID, i, kandidatID, fileWriter);
+  			  einzelneStimme(wahlkreisID, i, kandidatID, fileWriter);
   			}
   		}
     } catch (SQLException e) {
@@ -80,41 +84,97 @@ public class CsvParser {
     }
 	}
 
-	public void parseVotes(String csv_datei) throws IOException {
+	 private void insertZweitstimmen(int wahlkreisID, int parteiID,
+	      int anzahlZweitstimmen, int anzahlWahlbezirke, FileWriter fileWriter) {
+	    if (anzahlZweitstimmen == 0) return;
+	    for (int i = 0; i < anzahlWahlbezirke; i++) {
+        int anzahlZweitstimmenBezirk = kMaxBewohnerProBezirk;
+        if (i == anzahlWahlbezirke) {
+          anzahlZweitstimmenBezirk = 
+            anzahlZweitstimmen -
+            kMaxBewohnerProBezirk * (anzahlWahlbezirke - 1);
+        }
+        System.out.println(wahlkreisID + ";" + i + ";" + parteiID + ":" +
+            anzahlZweitstimmenBezirk);
+        for (int j = 0; j < anzahlZweitstimmenBezirk; j++) {
+          einzelneStimme(wahlkreisID, i, parteiID, fileWriter);
+        }
+      }
+	  }
+	
+	public void parseVotes(String csvDatei, String messagePfad)
+	    throws IOException {
 		final int kSpalteWahlkreisID = 0;
 		final int kSpalteParteiID = 1;
 		final int kSpalteErststimmen = 2;
 		final int kSpalteZweitstimmen = 3;
 		final int kSpalteJahr = 4;
 
-		FileReader file_reader = new FileReader(csv_datei);
-    FileWriter fileWriter = new FileWriter(stimmenDatei);
-		LineNumberReader line_number_reader = new LineNumberReader(file_reader);
+		FileReader fileReader = new FileReader(csvDatei);
+    FileWriter fileWriterErststimmen = new FileWriter(erstStimmenDatei);
+    FileWriter fileWriterZweitstimmen = new FileWriter(zweitStimmenDatei);
+		LineNumberReader line_number_reader = new LineNumberReader(fileReader);
 		String next_line = line_number_reader.readLine();  // Skip Header line.
 		while ((next_line = line_number_reader.readLine()) != null) {
 			String[] tokens = next_line.split(";");
 			assert (tokens.length == 5);
 
 			if (Integer.parseInt(tokens[kSpalteJahr]) == kAktuellesJahr) {
-				final int anzahl_erststimmen = Integer
+				final int anzahlErststimmen = Integer
 				    .parseInt("0" + tokens[kSpalteErststimmen]);
-				final int anzahl_zweitstimmen = Integer
+				final int anzahlZweitstimmen = Integer
 				    .parseInt("0" + tokens[kSpalteZweitstimmen]);
-				final int anzahl_wahlbezirke = Math.max(anzahl_erststimmen,
-				    anzahl_zweitstimmen)
+				final int anzahlWahlbezirke = Math.max(anzahlErststimmen,
+				    anzahlZweitstimmen)
 				    / kMaxBewohnerProBezirk;
-				insertErststimmen(Integer.parseInt(tokens[kSpalteWahlkreisID]),
-				    Integer.parseInt(tokens[kSpalteParteiID]),
-				    anzahl_erststimmen,
-				    anzahl_wahlbezirke,
-				    fileWriter);
-				fileWriter.flush();
+        insertErststimmen(Integer.parseInt(tokens[kSpalteWahlkreisID]),
+            Integer.parseInt(tokens[kSpalteParteiID]),
+            anzahlErststimmen,
+            anzahlWahlbezirke,
+            fileWriterErststimmen);
+        insertZweitstimmen(Integer.parseInt(tokens[kSpalteWahlkreisID]),
+            Integer.parseInt(tokens[kSpalteParteiID]),
+            anzahlZweitstimmen,
+            anzahlWahlbezirke,
+            fileWriterZweitstimmen);
+				fileWriterErststimmen.flush();
+				fileWriterZweitstimmen.flush();
 			}
 		}
-		fileWriter.close();
+		fileWriterErststimmen.close();
+		fileWriterZweitstimmen.close();
+		System.out.println("Erststimmen and Zweitstimmen files have been created.");
+	}
+	
+	public void importVotes(String messagePfad) {
+	   final String importErststimmenStmt =
+	      "IMPORT FROM \"" + erstStimmenDatei + "\" OF DEL MODIFIED BY COLDEL; " +
+	      "METHOD P (1, 2, 3) COMMITCOUNT 10000 " +
+	      "MESSAGES \"" + messagePfad + "\" " +
+	      "INSERT INTO " + datenbank.erststimme + " (" +
+	      Datenbank.kErststimmeWahlkreisID + ", " +
+	      Datenbank.kErststimmeWahlbezirkID + ", " +
+	      Datenbank.kErststimmeKandidatID + ")";
+	    
+	    System.out.println(importErststimmenStmt);
+	    datenbank.executeDB2(importErststimmenStmt);
+	    System.out.println("Erststimmen have been imported to the database");
+	    
+	    final String importZweitstimmenStmt =
+	      "IMPORT FROM \"" + zweitStimmenDatei + "\" OF DEL MODIFIED BY COLDEL; " +
+	      "METHOD P (1, 2, 3) COMMITCOUNT 10000 " +
+	      "MESSAGES \"" + messagePfad + "\" " +
+	      "INSERT INTO " + datenbank.zweitstimme + " (" +
+	      Datenbank.kZweitstimmeWahlkreisID + ", " +
+	      Datenbank.kZweitstimmeWahlbezirkID + ", " +
+	      Datenbank.kZweitstimmeParteiID + ")";
+	    
+	    System.out.println(importZweitstimmenStmt);
+	    datenbank.executeDB2(importZweitstimmenStmt);
+	    System.out.println("Zweitstimmen have been imported to the database");
 	}
 
-	public void runImports(String datenordner, String message_pfad) {
+	public void runImports(String datenordner, String messagePfad) {
 		final int kDatei = 0;
 		final int kSpaltenNummern = 1;
 		final int kSpaltenNamen = 2;
@@ -154,10 +214,10 @@ public class CsvParser {
 			String sql = "IMPORT FROM \"" + datei_pfad
 			    + "\" OF DEL MODIFIED BY COLDEL; METHOD P "
 			    + kImportTripel[i][kSpaltenNummern] + " SKIPCOUNT 1 MESSAGES \""
-			    + message_pfad + "\" INSERT INTO " + kImportTripel[i][kSpaltenNamen];
+			    + messagePfad + "\" INSERT INTO " + kImportTripel[i][kSpaltenNamen];
 			System.out.println(sql);
 			datenbank.executeDB2(sql);
 		}
+		System.out.println("Import has been completed.");
 	}
-
 }
