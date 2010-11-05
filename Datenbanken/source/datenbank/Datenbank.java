@@ -75,7 +75,7 @@ public class Datenbank {
     try {
       result_set = statement.executeQuery(sql_statement + "\n");
     } catch (SQLException e) {
-      if (e.getErrorCode() == 551) {
+      if (e.getErrorCode() == -551) {
         System.out.println("User " + user + " does not have the necessary " +
         		"priveleges to perform this action. You can change the priveleges" +
         		" using this command: " + 

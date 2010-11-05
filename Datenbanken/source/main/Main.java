@@ -60,5 +60,6 @@ public class Main {
 
 	  //csv_parser.runImports(parserDataFolder, logFile);
 	  csv_parser.parseVotes(parserDataFolder + "Wahlergebnisse.csv");
+
 	}
 }
