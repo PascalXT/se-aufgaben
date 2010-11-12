@@ -82,7 +82,11 @@ public class Datenbank {
       e.printStackTrace();
     }
   }
-
+  
+  public ResultSet truncate(String table) throws SQLException {
+  	return executeSQL("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
+  }
+  
   public ResultSet executeSQL(String sql_statement) throws SQLException {
     System.out.println(sql_statement);
     if (statement != null) statement.close();

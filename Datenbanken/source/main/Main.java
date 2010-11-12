@@ -37,11 +37,13 @@ public class Main {
 	  
 	  CsvParser csvParser =
 	    new CsvParser(db, parserErststimmenFile, parserZweitstimmenFile);
-
+	  
+	  String bundesland = "Bayern";
+	  
 	  if (Flags.isTrue(FlagDefinition.kImportCsvFiles))
 	    csvParser.runImports(parserDataFolder, logFile);
 	  if (Flags.isTrue(FlagDefinition.kFlagCreateVotes))
-	    csvParser.parseVotes(parserDataFolder + "Wahlergebnisse.csv", logFile);
+	    csvParser.parseVotes(parserDataFolder + "Wahlergebnisse.csv", bundesland, logFile);
 	  if (Flags.isTrue(FlagDefinition.kFlagImportVotes))
 	    csvParser.importVotes(logFile);
 
