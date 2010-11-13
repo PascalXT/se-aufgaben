@@ -7,7 +7,8 @@ import java.sql.*;
 
 public class Datenbank {
 
-  private String datenbank_name = "jdbc:db2:FIRSTDAY";
+  
+	private String datenbank_name = "jdbc:db2:FIRSTDAY";
   private String datenbank_kurzname = "FIRSTDAY";
   private String user = "pascal_db2";
   private String db2_command_file = "H:\\db2_commands.txt";
@@ -45,15 +46,31 @@ public class Datenbank {
   
   public String erststimme;
   public final static String kErststimmeID = "ID";
+  public final static String kErststimmeJahr = "Jahr";
   public final static String kErststimmeKandidatID = "KandidatID";
   public final static String kErststimmeWahlbezirkID = "WahlbezirkID";
   public final static String kErststimmeWahlkreisID = "WahlkreisID";
   
   public String zweitstimme;
   public final static String kZweitstimmeID = "ID";
+  public final static String kZweitstimmeJahr = "Jahr";
   public final static String kZweitstimmeParteiID = "ParteiID";
   public final static String kZweitstimmeWahlbezirkID = "WahlbezirkID";
   public final static String kZweitstimmeWahlkreisID = "WahlkreisID";
+  
+  public String wahlergebnis1;
+  public final static String kWahlergebnis1ID = "ID";
+  public final static String kWahlergebnis1Anzahl = "Anzahl";
+  public final static String kWahlergebnis1Jahr = "Jahr";
+  public final static String kWahlergebnis1WahlkreisID = "WahlkreisID";
+  public final static String kWahlergebnis1KandidatID = "KandidatID";
+  
+  public String wahlergebnis2;
+  public final static String kWahlergebnis2ID = "ID";
+  public final static String kWahlergebnis2Anzahl = "Anzahl";
+  public final static String kWahlergebnis2Jahr = "Jahr";
+  public final static String kWahlergebnis2WahlkreisID = "WahlkreisID";
+  public final static String kWahlergebnis2ParteiID = "ParteiID";
   
   public String tabellenName(String kurzname) {
     return schemaName + "." + kurzname;
@@ -73,6 +90,9 @@ public class Datenbank {
     this.kandidat = tabellenName("Kandidat");
     this.partei = tabellenName("Partei");
     this.erststimme = tabellenName("Erststimme");
+    this.zweitstimme = tabellenName("Zweitstimme");
+    this.wahlergebnis1 = tabellenName("Wahlergebnis1");
+    this.wahlergebnis2 = tabellenName("Wahlergebnis2");
     try {
       Class.forName("com.ibm.db2.jcc.DB2Driver");
       connection = DriverManager.getConnection(datenbank_name, user, pwd);
@@ -83,14 +103,14 @@ public class Datenbank {
     }
   }
   
-  public ResultSet truncate(String table) throws SQLException {
-  	return executeSQL("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
+  public void truncate(String table) throws SQLException {
+  	executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
   }
   
   public ResultSet executeSQL(String sql_statement) throws SQLException {
     System.out.println(sql_statement);
     if (statement != null) statement.close();
-    statement = connection.createStatement();
+    statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     ResultSet result_set;
     try {
       result_set = statement.executeQuery(sql_statement + "\n");
@@ -143,5 +163,5 @@ public class Datenbank {
   public Connection getConnection() {
     return connection;
   }
-
+   
 }

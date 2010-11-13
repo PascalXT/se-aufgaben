@@ -46,6 +46,9 @@ public class Main {
 	    csvParser.parseVotes(parserDataFolder + "Wahlergebnisse.csv", bundesland, logFile);
 	  if (Flags.isTrue(FlagDefinition.kFlagImportVotes))
 	    csvParser.importVotes(logFile);
+	  if (Flags.isTrue(FlagDefinition.kFlagConvertToWahlergebnis))
+	  	csvParser.convertToWahlergebnis();
 
 	}
+
 }

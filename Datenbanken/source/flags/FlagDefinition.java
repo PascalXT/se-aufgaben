@@ -22,6 +22,7 @@ public class FlagDefinition {
   final public static String kFlagCreateVotes = "createVotes";
   final public static String kFlagDbCommandFlags = "dbCommandFlags";
   final public static String kFlagImportVotes = "importVotes";
+  final public static String kFlagConvertToWahlergebnis = "convertToWahlergebnis";
   final public static String[][] kFlagDefinition = {
       {kFlagDbName, "WahlSys", "Name of the db2 database."},
       {kFlagDbUser, null, "Username for the db2 database."},
@@ -60,9 +61,14 @@ public class FlagDefinition {
         Flags.kFalse,
         "If true, the csv files containing the votes will be generated."
       },
+      {kFlagConvertToWahlergebnis,
+      	Flags.kFalse,
+      	"If true, the database votes will be converted into Wahlergebnisse"
+      },
       {kFlagDbCommandFlags,
         "-w db2 -tvf",
         "The flags that are added to db2cmd.exe in executeDB2."
       }
   };
+	
 }
