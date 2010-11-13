@@ -73,6 +73,7 @@ public class Datenbank {
     this.kandidat = tabellenName("Kandidat");
     this.partei = tabellenName("Partei");
     this.erststimme = tabellenName("Erststimme");
+    this.zweitstimme = tabellenName("Zweitstimme");
     try {
       Class.forName("com.ibm.db2.jcc.DB2Driver");
       connection = DriverManager.getConnection(datenbank_name, user, pwd);
