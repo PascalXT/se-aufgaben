@@ -8,16 +8,15 @@ import java.sql.*;
 public class Datenbank {
 
   
-	private String datenbank_name = "jdbc:db2:FIRSTDAY";
-  private String datenbank_kurzname = "FIRSTDAY";
-  private String user = "pascal_db2";
-  private String db2_command_file = "H:\\db2_commands.txt";
-  private String pwd = "Datenbanken";
+	private String datenbank_name;
+  private String datenbank_kurzname;
+  private String user;
+  private String db2_command_file;
   public String schemaName;
   private String dbCommandFlags;
   
   private Connection connection;
-  private Statement statement = null;
+  private Statement statement;
   
   // Tabellen
   public String wahlkreis;
@@ -44,19 +43,14 @@ public class Datenbank {
   public final static String kKandidatDMParteiID = "DMParteiID";
   public final static String kKandidatDMWahlkreisID = "DMWahlkreisID";
   
-  public String erststimme;
-  public final static String kErststimmeID = "ID";
-  public final static String kErststimmeJahr = "Jahr";
-  public final static String kErststimmeKandidatID = "KandidatID";
-  public final static String kErststimmeWahlbezirkID = "WahlbezirkID";
-  public final static String kErststimmeWahlkreisID = "WahlkreisID";
-  
-  public String zweitstimme;
-  public final static String kZweitstimmeID = "ID";
-  public final static String kZweitstimmeJahr = "Jahr";
-  public final static String kZweitstimmeParteiID = "ParteiID";
-  public final static String kZweitstimmeWahlbezirkID = "WahlbezirkID";
-  public final static String kZweitstimmeWahlkreisID = "WahlkreisID";
+  public String stimme;
+  public final static String kStimmeID = "ID";
+  public final static String kStimmeJahr = "Jahr";
+  public final static String kStimmeWahlkreisID = "WahlkreisID";
+  public final static String kStimmeWahlbezirkID = "WahlbezirkID";
+  public final static String kStimmeParteiID = "ParteiID";
+  public final static String kStimmeKandidatID = "KandidatID";
+
   
   public String wahlergebnis1;
   public final static String kWahlergebnis1ID = "ID";
@@ -81,7 +75,6 @@ public class Datenbank {
     this.datenbank_kurzname = name;
     this.datenbank_name = "jdbc:db2:" + name;
     this.user = user;
-    this.pwd = pwd;
     this.db2_command_file = commandFile;
     this.dbCommandFlags = dbCommandFlags;
     this.schemaName = schemaName;
@@ -89,8 +82,7 @@ public class Datenbank {
     this.wahlkreis = tabellenName("Wahlkreis");
     this.kandidat = tabellenName("Kandidat");
     this.partei = tabellenName("Partei");
-    this.erststimme = tabellenName("Erststimme");
-    this.zweitstimme = tabellenName("Zweitstimme");
+    this.stimme = tabellenName("Stimme");
     this.wahlergebnis1 = tabellenName("Wahlergebnis1");
     this.wahlergebnis2 = tabellenName("Wahlergebnis2");
     try {

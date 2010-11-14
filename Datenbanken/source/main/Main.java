@@ -22,16 +22,16 @@ public class Main {
 			db.executeDB2(td.buildCreateTableStatement());
 		}
 
-		final String parserErststimmenFile = Flags.getFlagValue(FlagDefinition.kFlagParserErststimmenFile);
-		final String parserZweitstimmenFile = Flags.getFlagValue(FlagDefinition.kFlagParserZweitstimmenFile);
+		final String parserStimmenFile = Flags.getFlagValue(FlagDefinition.kFlagParserStimmenFile);
 		final String parserErststimmenAggregiertFile = Flags.getFlagValue(FlagDefinition.kFlagParserErststimmenAggregiertFile);
 		final String parserZweitstimmenAggregiertFile = Flags.getFlagValue(FlagDefinition.kFlagParserZweitstimmenAggregiertFile);
 		final String parserDataFolder = Flags.getFlagValue(FlagDefinition.kFlagParserDataFolder);
 		final String logFile = Flags.getFlagValue(FlagDefinition.kFlagLogFile);
 
-		CsvParser csvParser = new CsvParser(db, parserErststimmenFile, parserZweitstimmenFile, parserErststimmenAggregiertFile, parserZweitstimmenAggregiertFile);
+		CsvParser csvParser = new CsvParser(db, parserStimmenFile, parserErststimmenAggregiertFile, parserZweitstimmenAggregiertFile);
 
-		String bundesland = "Bayern";
+		String bundesland = Flags.getFlagValue(FlagDefinition.kFlagOnlyVotesForBundesland);
+		if (bundesland.isEmpty()) bundesland = null;
 
 		if (Flags.isTrue(FlagDefinition.kImportCsvFiles))
 			csvParser.runImports(parserDataFolder, logFile);

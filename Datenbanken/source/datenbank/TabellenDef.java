@@ -16,8 +16,9 @@ public class TabellenDef {
 	}
 
 	private String[] getStatements() {
+    final String autoIncrementID = "BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE )";
 		return new String[] {
-				
+		    				
 			// Bundesland
 		    "CREATE TABLE " + schemaName + ".BUNDESLAND ( ID BIGINT  NOT NULL , "
 		        + "NAME VARCHAR (255)  NOT NULL  , "
@@ -39,7 +40,7 @@ public class TabellenDef {
 		    // Wahlbezirk
 		    "CREATE TABLE "
 		        + schemaName
-		        + ".WAHLBEZIRK ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
+		        + ".WAHLBEZIRK " + "( ID " + autoIncrementID + " , "
 		        + "WAHLKREISID BIGINT  NOT NULL  , "
 		        + "CONSTRAINT CC1288606788792 PRIMARY KEY ( ID, WAHLKREISID) , "
 		        + "CONSTRAINT CC1288606799462 FOREIGN KEY (WAHLKREISID) REFERENCES "
@@ -58,7 +59,7 @@ public class TabellenDef {
 		    // Direktmandat
 		    "CREATE TABLE "
 		        + schemaName
-		        + ".DIREKTMANDAT ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
+		        + ".DIREKTMANDAT " + "( ID " + autoIncrementID + " , "
 		        + "PARTEIID BIGINT  NOT NULL , "
 		        + "WAHLKREISID BIGINT  NOT NULL  , "
 		        + "CONSTRAINT CC1288607225718 PRIMARY KEY ( ID) , "
@@ -72,7 +73,7 @@ public class TabellenDef {
 		    // Kandidat
 		    "CREATE TABLE "
 		        + schemaName
-		        + ".KANDIDAT ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
+		        + ".KANDIDAT " + "( ID " + autoIncrementID + " , "
 		        + "PARTEIID BIGINT , "
 		        + "BUNDESLANDID BIGINT ,"
 		        + "DMWAHLKREISID BIGINT,"
@@ -99,45 +100,29 @@ public class TabellenDef {
 		        + ".BUNDESLAND (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
 		        + "ORGANIZE BY DIMENSIONS ( PARTEIID, BUNDESLANDID) ;\n",
 		    
-		    // Erststimme
+		    // Stimme
 		    "CREATE TABLE "
 		        + schemaName
-		        + ".ERSTSTIMME ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
-		        + "KANDIDATID BIGINT NOT NULL , "
-		        + "WAHLBEZIRKID BIGINT  NOT NULL , "
-		        + "WAHLKREISID BIGINT NOT NULL , "
-		        + "JAHR INTEGER , "
-		        + "CONSTRAINT CC1288610679447 PRIMARY KEY ( ID) , "
-		        + "CONSTRAINT CC1288610689165 FOREIGN KEY (KANDIDATID) REFERENCES "
-		        + schemaName
-		        + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
+		        + ".STIMME " + "( " + Datenbank.kStimmeID + " " + autoIncrementID + " , "
+		        + Datenbank.kStimmeKandidatID + " BIGINT, "
+		        + Datenbank.kStimmeParteiID + " BIGINT, "
+		        + Datenbank.kStimmeWahlbezirkID + " BIGINT  NOT NULL , "
+		        + Datenbank.kStimmeWahlkreisID + " BIGINT NOT NULL , "
+		        + Datenbank.kStimmeJahr + " INTEGER , "
+		        + "CONSTRAINT CC1288610679447 PRIMARY KEY ( " + Datenbank.kStimmeID + ") , "
+		        + "CONSTRAINT CC1288610689165 FOREIGN KEY ( " + Datenbank.kStimmeKandidatID + ") REFERENCES "
+		        + schemaName + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED ENABLE QUERY OPTIMIZATION, "
+            + "CONSTRAINT CC1288610702435 FOREIGN KEY (PARTEIID) REFERENCES " + schemaName
+            + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
 		        // + "CONSTRAINT CC1288610713433 FOREIGN KEY (WAHLBEZIRKID, WAHLKREISID) REFERENCES "
 		        // + schemaName
 		        // + ".WAHLBEZIRK (ID, WAHLKREISID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
 		        + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLBEZIRKID, WAHLKREISID) ;\n",
 
-
-        // Zweitstimme
-        "CREATE TABLE "
-            + schemaName
-            + ".ZWEITSTIMME ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
-            + "PARTEIID BIGINT NOT NULL , "
-            + "WAHLBEZIRKID BIGINT  NOT NULL , "
-            + "WAHLKREISID BIGINT NOT NULL , "
-            + "JAHR INTEGER , "
-            + "CONSTRAINT CC1288610672344 PRIMARY KEY ( ID) , "
-            + "CONSTRAINT CC1288610702435 FOREIGN KEY (PARTEIID) REFERENCES "
-            + schemaName
-            + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
-            // + "CONSTRAINT CC1288610719087 FOREIGN KEY (WAHLBEZIRKID, WAHLKREISID) REFERENCES "
-            // + schemaName
-            // + ".WAHLBEZIRK (ID, WAHLKREISID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-            + "ORGANIZE BY DIMENSIONS ( PARTEIID, WAHLBEZIRKID, WAHLKREISID) ;\n",
-
 		    // WAHLERGEBNIS1
 		    "CREATE TABLE "
 		        + schemaName
-		        + ".WAHLERGEBNIS1 ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
+		        + ".WAHLERGEBNIS1 " + "( ID " + autoIncrementID + " , "
 		        + "KANDIDATID BIGINT  NOT NULL , "
 		        + "WAHLKREISID BIGINT  NOT NULL , "
 		        + "JAHR INTEGER  NOT NULL  , "
@@ -156,7 +141,7 @@ public class TabellenDef {
 		    // WAHLERGEBNIS2
 		    "CREATE TABLE "
 		        + schemaName
-		        + ".WAHLERGEBNIS2 ( ID BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ) , "
+		        + ".WAHLERGEBNIS2 " + "( ID " + autoIncrementID + " , "
 		        + "PARTEIID BIGINT  NOT NULL , "
 		        + "WAHLKREISID BIGINT  NOT NULL ,"
 		        + "JAHR INTEGER  NOT NULL  , "
