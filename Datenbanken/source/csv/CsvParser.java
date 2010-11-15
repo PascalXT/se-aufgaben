@@ -19,10 +19,6 @@ public class CsvParser {
 
   private Datenbank datenbank;
 
-  public CsvParser(Datenbank datenbank) {
-    this.datenbank = datenbank;
-  }
-
   public CsvParser(Datenbank datenbank, String stimmenFile, String erstStimmenAggregiertFile,
       String zweitStimmenAggregiertFile) {
     this.datenbank = datenbank;
@@ -201,45 +197,11 @@ public class CsvParser {
     }
   }
 
-  public void importVotes(String messagePfad) {
-
-    try {
-      datenbank.truncate(datenbank.stimme);
-      datenbank.truncate(datenbank.wahlergebnis1);
-      datenbank.truncate(datenbank.wahlergebnis2);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
-    }
-
-    final String importStimmenStmt = "LOAD FROM \"" + stimmenFile + "\" OF DEL MODIFIED BY COLDEL; "
-        + "METHOD P (1, 2, 3, 4, 5) SAVECOUNT 10000 " + "MESSAGES \"" + messagePfad + "\" " + "INSERT INTO "
-        + datenbank.stimme + " (" + Datenbank.kStimmeJahr + ", " + Datenbank.kStimmeWahlkreisID + ", "
-        + Datenbank.kStimmeWahlbezirkID + ", " + Datenbank.kStimmeKandidatID + "," + Datenbank.kStimmeParteiID + ")";
-
-    System.out.println(importStimmenStmt);
-    datenbank.executeDB2(importStimmenStmt);
+  public void importVotes() {
+    final String[] columnsStimmen = { Datenbank.kStimmeJahr, Datenbank.kStimmeWahlkreisID,
+        Datenbank.kStimmeWahlbezirkID, Datenbank.kStimmeKandidatID, Datenbank.kStimmeParteiID };
+    datenbank.load(stimmenFile, "(1, 2, 3, 4, 5)", columnsStimmen, datenbank.stimme);
     System.out.println("Stimmen have been imported to the database");
-
-    final String importErststimmenAggregiertStmt = "LOAD FROM \"" + erststimmenAggregiertFile
-        + "\" OF DEL MODIFIED BY COLDEL; " + "METHOD P (1, 2, 3, 4) SAVECOUNT 10000 " + "MESSAGES \"" + messagePfad
-        + "\" " + "INSERT INTO " + datenbank.wahlergebnis1 + " (" + Datenbank.kWahlergebnis1Jahr + ", "
-        + Datenbank.kWahlergebnis1WahlkreisID + ", " + Datenbank.kWahlergebnis1Anzahl + ", "
-        + Datenbank.kWahlergebnis1KandidatID + ")";
-
-    System.out.println(importErststimmenAggregiertStmt);
-    datenbank.executeDB2(importErststimmenAggregiertStmt);
-    System.out.println("ErststimmenAggregiert have been imported to the database");
-
-    final String importZweitstimmenAggregiertStmt = "LOAD FROM \"" + zweitstimmenAggregiertFile
-        + "\" OF DEL MODIFIED BY COLDEL; " + "METHOD P (1, 2, 3, 4) SAVECOUNT 10000 " + "MESSAGES \"" + messagePfad
-        + "\" " + "INSERT INTO " + datenbank.wahlergebnis2 + " (" + Datenbank.kWahlergebnis2Jahr + ", "
-        + Datenbank.kWahlergebnis2WahlkreisID + ", " + Datenbank.kWahlergebnis2Anzahl + ", "
-        + Datenbank.kWahlergebnis2ParteiID + ")";
-
-    System.out.println(importZweitstimmenAggregiertStmt);
-    datenbank.executeDB2(importZweitstimmenAggregiertStmt);
-    System.out.println("ZweitstimmenAggregiert have been imported to the database");
   }
 
   public void runImports(String dataFolder, String messagePfad) {
@@ -279,22 +241,15 @@ public class CsvParser {
     System.out.println("Import has been completed.");
   }
 
-  public void importAggregatedVotes(String csvFile, String logFile) {
-    try {
-      datenbank.truncate(datenbank.stimme);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      System.exit(1);
-    }
+  public void importAggregatedVotes() {
+    final String[] columnsErststimmenAggregiert = { Datenbank.kWahlergebnis1Jahr, Datenbank.kWahlergebnis1WahlkreisID,
+        Datenbank.kWahlergebnis1Anzahl, Datenbank.kWahlergebnis1KandidatID };
+    datenbank.load(erststimmenAggregiertFile, "(1, 2, 3, 4)", columnsErststimmenAggregiert, datenbank.wahlergebnis1);
+    System.out.println("ErststimmenAggregiert have been imported to the database");
 
-    final String importErststimmenStmt = "LOAD FROM \"" + csvFile + "\" OF DEL SKIPCOUNT 1 MODIFIED BY COLDEL; "
-        + "METHOD P (1, 2, 3, 5) SAVECOUNT 10000 " + "MESSAGES \"" + logFile + "\" " + "INSERT INTO "
-        + datenbank.wahlergebnis1 + " (" + Datenbank.kWahlergebnis1WahlkreisID + ", "
-        + Datenbank.kWahlergebnis1KandidatID + ", " + Datenbank.kStimmeWahlbezirkID + ", "
-        + Datenbank.kStimmeKandidatID + ")";
-
-    System.out.println(importErststimmenStmt);
-    datenbank.executeDB2(importErststimmenStmt);
+    final String[] columnsZweitstimmenAggregiert = { Datenbank.kWahlergebnis2Jahr, Datenbank.kWahlergebnis2WahlkreisID,
+        Datenbank.kWahlergebnis2Anzahl, Datenbank.kWahlergebnis2ParteiID };
+    datenbank.load(zweitstimmenAggregiertFile, "(1, 2, 3, 4)", columnsZweitstimmenAggregiert, datenbank.wahlergebnis2);
+    System.out.println("ZweitstimmenAggregiert have been imported to the database");
   }
-
 }

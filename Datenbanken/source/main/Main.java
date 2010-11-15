@@ -14,8 +14,9 @@ public class Main {
     final String dbSchemaName = Flags.getFlagValue(FlagDefinition.kFlagDbSchemaName);
     final String dbCommandFile = Flags.getFlagValue(FlagDefinition.kFlagDbCommandFile);
     final String dbCommandFlags = Flags.getFlagValue(FlagDefinition.kFlagDbCommandFlags);
+    final String logFile = Flags.getFlagValue(FlagDefinition.kFlagLogFile);
 
-    Datenbank db = new Datenbank(dbName, dbUser, dbPwd, dbSchemaName, dbCommandFile, dbCommandFlags);
+    Datenbank db = new Datenbank(dbName, dbUser, dbPwd, dbSchemaName, dbCommandFile, dbCommandFlags, logFile);
 
     if (Flags.isTrue(FlagDefinition.kFlagCreateTables)) {
       TabellenDef td = new TabellenDef(db.schemaName);
@@ -28,7 +29,6 @@ public class Main {
     final String parserZweitstimmenAggregiertFile = Flags
         .getFlagValue(FlagDefinition.kFlagParserZweitstimmenAggregiertFile);
     final String parserDataFolder = Flags.getFlagValue(FlagDefinition.kFlagParserDataFolder);
-    final String logFile = Flags.getFlagValue(FlagDefinition.kFlagLogFile);
 
     CsvParser csvParser = new CsvParser(db, parserStimmenFile, parserErststimmenAggregiertFile,
         parserZweitstimmenAggregiertFile);
@@ -42,10 +42,9 @@ public class Main {
     if (Flags.isTrue(FlagDefinition.kFlagCreateVotes))
       csvParser.parseVotes(parserDataFolder + "Wahlergebnisse.csv", bundesland, logFile);
     if (Flags.isTrue(FlagDefinition.kFlagImportVotes))
-      csvParser.importVotes(logFile);
+      csvParser.importVotes();
     if (Flags.isTrue(FlagDefinition.kFlagImportAggregatedVotes))
-      csvParser.importAggregatedVotes(parserDataFolder + "Wahlergebnisse.csv", logFile);
-
+      csvParser.importAggregatedVotes();
   }
 
 }

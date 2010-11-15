@@ -7,32 +7,32 @@ import java.sql.*;
 
 public class Datenbank {
 
-  
-	private String datenbank_name;
+  private String datenbank_name;
   private String datenbank_kurzname;
   private String user;
   private String db2_command_file;
   public String schemaName;
   private String dbCommandFlags;
-  
+  public String messagePath;
+
   private Connection connection;
   private Statement statement;
-  
+
   // Tabellen
   public String wahlkreis;
   public final static String kWahlkreisID = "ID";
   public final static String kWahlkreisName = "Name";
   public final static String kWahlkreisBundeslandID = "BundeslandID";
-  
+
   public String bundesland;
   public final static String kBundeslandID = "ID";
   public final static String kBundeslandName = "Name";
-  
+
   public String partei;
   public final static String kParteiID = "ID";
   public final static String kParteiKuerzel = "Kuerzel";
   public final static String kParteiName = "Name";
-  
+
   public String kandidat;
   public final static String kKandidatID = "ID";
   public final static String kKandidatParteiID = "ParteiID";
@@ -42,7 +42,7 @@ public class Datenbank {
   public final static String kKandidatBundeslandID = "BundeslandID";
   public final static String kKandidatDMParteiID = "DMParteiID";
   public final static String kKandidatDMWahlkreisID = "DMWahlkreisID";
-  
+
   public String stimme;
   public final static String kStimmeID = "ID";
   public final static String kStimmeJahr = "Jahr";
@@ -51,27 +51,26 @@ public class Datenbank {
   public final static String kStimmeParteiID = "ParteiID";
   public final static String kStimmeKandidatID = "KandidatID";
 
-  
   public String wahlergebnis1;
   public final static String kWahlergebnis1ID = "ID";
   public final static String kWahlergebnis1Anzahl = "Anzahl";
   public final static String kWahlergebnis1Jahr = "Jahr";
   public final static String kWahlergebnis1WahlkreisID = "WahlkreisID";
   public final static String kWahlergebnis1KandidatID = "KandidatID";
-  
+
   public String wahlergebnis2;
   public final static String kWahlergebnis2ID = "ID";
   public final static String kWahlergebnis2Anzahl = "Anzahl";
   public final static String kWahlergebnis2Jahr = "Jahr";
   public final static String kWahlergebnis2WahlkreisID = "WahlkreisID";
   public final static String kWahlergebnis2ParteiID = "ParteiID";
-  
+
   public String tabellenName(String kurzname) {
     return schemaName + "." + kurzname;
   }
 
-  public Datenbank(String name, String user, String pwd, String schemaName,
-                   String commandFile, String dbCommandFlags) {
+  public Datenbank(String name, String user, String pwd, String schemaName, String commandFile, String dbCommandFlags,
+      String messagePath) {
     this.datenbank_kurzname = name;
     this.datenbank_name = "jdbc:db2:" + name;
     this.user = user;
@@ -85,6 +84,7 @@ public class Datenbank {
     this.stimme = tabellenName("Stimme");
     this.wahlergebnis1 = tabellenName("Wahlergebnis1");
     this.wahlergebnis2 = tabellenName("Wahlergebnis2");
+    this.messagePath = messagePath;
     try {
       Class.forName("com.ibm.db2.jcc.DB2Driver");
       connection = DriverManager.getConnection(datenbank_name, user, pwd);
@@ -94,50 +94,48 @@ public class Datenbank {
       e.printStackTrace();
     }
   }
-  
+
   public void truncate(String table) throws SQLException {
-  	executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
+    executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
   }
-  
+
   public ResultSet executeSQL(String sql_statement) throws SQLException {
     System.out.println(sql_statement);
-    if (statement != null) statement.close();
+    if (statement != null)
+      statement.close();
     statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     ResultSet result_set;
     try {
       result_set = statement.executeQuery(sql_statement + "\n");
     } catch (SQLException e) {
       if (e.getErrorCode() == -551) {
-        System.out.println("User " + user + " does not have the necessary " +
-        		"priveleges to perform this action. You can change the priveleges" +
-        		" using this command: " + 
-        		"GRANT  CREATETAB,BINDADD,CONNECT,CREATE_NOT_FENCED_ROUTINE," +
-        		"IMPLICIT_SCHEMA,LOAD,CREATE_EXTERNAL_ROUTINE,QUIESCE_CONNECT " +
-        		"ON DATABASE  TO USER " + user + ";");
+        System.out.println("User " + user + " does not have the necessary "
+            + "priveleges to perform this action. You can change the priveleges" + " using this command: "
+            + "GRANT  CREATETAB,BINDADD,CONNECT,CREATE_NOT_FENCED_ROUTINE,"
+            + "IMPLICIT_SCHEMA,LOAD,CREATE_EXTERNAL_ROUTINE,QUIESCE_CONNECT " + "ON DATABASE  TO USER " + user + ";");
         System.exit(1);
       }
       throw new SQLException(e);
     }
     return result_set;
   }
-  
+
   public void executeUpdate(String sql_statement) throws SQLException {
     System.out.println(sql_statement);
     Statement statement = connection.createStatement();
     statement.executeUpdate(sql_statement);
     statement.close();
   }
-  
+
   public void executeDB2(String db2_statement) {
     File file = new File(db2_command_file);
-    if(file.exists()){
-        file.delete();
+    if (file.exists()) {
+      file.delete();
     }
     FileWriter file_writer;
     try {
       file_writer = new FileWriter(file);
-      file_writer.write("CONNECT TO " + datenbank_kurzname + ";\n" +
-                        db2_statement + ";\nCONNECT RESET;");
+      file_writer.write("CONNECT TO " + datenbank_kurzname + ";\n" + db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
       System.out.println("cmd: " + db2_statement);
       String cmd = "db2cmd.exe " + dbCommandFlags + " " + db2_command_file;
@@ -151,7 +149,34 @@ public class Datenbank {
       System.exit(1);
     }
   }
-  
+
+  public void load(String file, String columnNumbers, String[] columns, String table) {
+    // The previous load might have failed. Abort load.
+    final String abortLoadStmt = "LOAD FROM DUMMY OF DEL TERMINATE into " + table;
+    final String integrityStmt = "SET INTEGRITY FOR " + table + " IMMEDIATE CHECKED";
+    executeDB2(abortLoadStmt + ";\n" + integrityStmt);
+    
+    // Delete old content.
+    try {
+      truncate(table);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    
+    String columnString = "";
+    for (int i = 0; i < columns.length; i++) {
+      columnString += columns[i];
+      if (i != columns.length - 1) columnString += ", ";
+    }
+    final String loadStmt = "LOAD FROM \"" + file + "\" OF DEL MODIFIED BY COLDEL; " + "METHOD P " + columnNumbers
+        + " SAVECOUNT 10000 " + "MESSAGES \"" + messagePath + "\" " + "INSERT INTO " + table + " (" + columnString
+        + ");";
+    final String wholeStmt = loadStmt + "\n" + integrityStmt;
+    System.out.println(loadStmt);
+    executeDB2(wholeStmt);
+  }
+
   public Connection getConnection() {
     return connection;
   }
