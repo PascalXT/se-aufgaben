@@ -155,5 +155,5 @@ public class Datenbank {
   public Connection getConnection() {
     return connection;
   }
-   
+
 }

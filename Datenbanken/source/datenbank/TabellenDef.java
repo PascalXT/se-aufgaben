@@ -2,161 +2,117 @@ package datenbank;
 
 public class TabellenDef {
 
-	private String schemaName;
+  private String schemaName;
 
-	public TabellenDef(String schemaName) {
-		this.schemaName = schemaName;
-	}
+  public TabellenDef(String schemaName) {
+    this.schemaName = schemaName;
+  }
 
-	public String buildCreateTableStatement() {
-		String sql = "";
-		for (String statement : getStatements())
-			sql += statement;
-		return sql;
-	}
+  public String buildCreateTableStatement() {
+    String sql = "";
+    for (String statement : getStatements())
+      sql += statement;
+    return sql;
+  }
 
-	private String[] getStatements() {
+  private String[] getStatements() {
     final String autoIncrementID = "BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE )";
-		return new String[] {
-		    				
-			// Bundesland
-		    "CREATE TABLE " + schemaName + ".BUNDESLAND ( ID BIGINT  NOT NULL , "
-		        + "NAME VARCHAR (255)  NOT NULL  , "
-		        + "CONSTRAINT CC1288606507352 PRIMARY KEY ( ID)  ) ;\n",
-		    
-		        
-		    // Wahlkreis
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".WAHLKREIS ( ID BIGINT  NOT NULL , "
-		        + "BUNDESLANDID BIGINT  NOT NULL , "
-		        + "NAME VARCHAR (255)  , "
-		        + "CONSTRAINT CC1288606603901 PRIMARY KEY ( ID) , "
-		        + "CONSTRAINT CC1288606617285 FOREIGN KEY (BUNDESLANDID) REFERENCES "
-		        + schemaName
-		        + ".BUNDESLAND (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-		        + "ORGANIZE BY DIMENSIONS ( BUNDESLANDID) ;\n",
-		    
-		    // Wahlbezirk
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".WAHLBEZIRK " + "( ID " + autoIncrementID + " , "
-		        + "WAHLKREISID BIGINT  NOT NULL  , "
-		        + "CONSTRAINT CC1288606788792 PRIMARY KEY ( ID, WAHLKREISID) , "
-		        + "CONSTRAINT CC1288606799462 FOREIGN KEY (WAHLKREISID) REFERENCES "
-		        + schemaName
-		        + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-		        + "ORGANIZE BY DIMENSIONS ( WAHLKREISID) ;\n",
+    return new String[] {
 
-		    // Partei
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".PARTEI ( ID BIGINT  NOT NULL , "
-		        + "NAME VARCHAR (255) , "
-		        + "KUERZEL VARCHAR (63)  NOT NULL  , "
-		        + "CONSTRAINT CC1288606983948 PRIMARY KEY ( ID) );\n",
-		    
-		    // Direktmandat
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".DIREKTMANDAT " + "( ID " + autoIncrementID + " , "
-		        + "PARTEIID BIGINT  NOT NULL , "
-		        + "WAHLKREISID BIGINT  NOT NULL  , "
-		        + "CONSTRAINT CC1288607225718 PRIMARY KEY ( ID) , "
-		        + "CONSTRAINT CC1288607232192 FOREIGN KEY (PARTEIID) REFERENCES "
-		        + schemaName
-		        + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , CONSTRAINT CC1288607245171 FOREIGN KEY (WAHLKREISID) REFERENCES "
-		        + schemaName
-		        + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-		        + "ORGANIZE BY DIMENSIONS ( PARTEIID) ;\n",
+    // Bundesland
+        "CREATE TABLE " + schemaName + ".BUNDESLAND ( ID BIGINT  NOT NULL , " + "NAME VARCHAR (255)  NOT NULL  , "
+            + "CONSTRAINT CC1288606507352 PRIMARY KEY ( ID)  ) ;\n",
 
-		    // Kandidat
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".KANDIDAT " + "( ID " + autoIncrementID + " , "
-		        + "PARTEIID BIGINT , "
-		        + "BUNDESLANDID BIGINT ,"
-		        + "DMWAHLKREISID BIGINT,"
-		        + "DMPARTEIID BIGINT,"
-		        + "NACHNAME VARCHAR (255)  NOT NULL , "
-		        + "VORNAME VARCHAR (255)  NOT NULL , "
-		        + "BERUF VARCHAR (255) , "
-		        + "GEBURTSDATUM DATE , "
-		        + "GEBURTSORT VARCHAR (255) ,"
-		        + "ANSCHRIFT VARCHAR (2047)  , "
-		        + "LISTENPLATZ INTEGER ,"
-		        + "CONSTRAINT CC1288607383356 PRIMARY KEY ( ID) , "
-            + "CONSTRAINT CC1288607389830 FOREIGN KEY (PARTEIID) REFERENCES "
+        // Wahlkreis
+        "CREATE TABLE " + schemaName + ".WAHLKREIS ( ID BIGINT  NOT NULL , " + "BUNDESLANDID BIGINT  NOT NULL , "
+            + "NAME VARCHAR (255)  , " + "CONSTRAINT CC1288606603901 PRIMARY KEY ( ID) , "
+            + "CONSTRAINT CC1288606617285 FOREIGN KEY (BUNDESLANDID) REFERENCES " + schemaName
+            + ".BUNDESLAND (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
+            + "ORGANIZE BY DIMENSIONS ( BUNDESLANDID) ;\n",
+
+        // Wahlbezirk
+        "CREATE TABLE " + schemaName + ".WAHLBEZIRK " + "( ID " + autoIncrementID + " , "
+            + "WAHLKREISID BIGINT  NOT NULL  , " + "CONSTRAINT CC1288606788792 PRIMARY KEY ( ID, WAHLKREISID) , "
+            + "CONSTRAINT CC1288606799462 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
+            + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
+            + "ORGANIZE BY DIMENSIONS ( WAHLKREISID) ;\n",
+
+        // Partei
+        "CREATE TABLE " + schemaName + ".PARTEI ( ID BIGINT  NOT NULL , " + "NAME VARCHAR (255) , "
+            + "KUERZEL VARCHAR (63)  NOT NULL  , " + "CONSTRAINT CC1288606983948 PRIMARY KEY ( ID) );\n",
+
+        // Direktmandat
+        "CREATE TABLE "
             + schemaName
+            + ".DIREKTMANDAT "
+            + "( ID "
+            + autoIncrementID
+            + " , "
+            + "PARTEIID BIGINT  NOT NULL , "
+            + "WAHLKREISID BIGINT  NOT NULL  , "
+            + "CONSTRAINT CC1288607225718 PRIMARY KEY ( ID) , "
+            + "CONSTRAINT CC1288607232192 FOREIGN KEY (PARTEIID) REFERENCES "
+            + schemaName
+            + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , CONSTRAINT CC1288607245171 FOREIGN KEY (WAHLKREISID) REFERENCES "
+            + schemaName
+            + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
+            + "ORGANIZE BY DIMENSIONS ( PARTEIID) ;\n",
+
+        // Kandidat
+        "CREATE TABLE " + schemaName + ".KANDIDAT " + "( ID " + autoIncrementID + " , " + "PARTEIID BIGINT , "
+            + "BUNDESLANDID BIGINT ," + "DMWAHLKREISID BIGINT," + "DMPARTEIID BIGINT,"
+            + "NACHNAME VARCHAR (255)  NOT NULL , " + "VORNAME VARCHAR (255)  NOT NULL , " + "BERUF VARCHAR (255) , "
+            + "GEBURTSDATUM DATE , " + "GEBURTSORT VARCHAR (255) ," + "ANSCHRIFT VARCHAR (2047)  , "
+            + "LISTENPLATZ INTEGER ," + "CONSTRAINT CC1288607383356 PRIMARY KEY ( ID) , "
+            + "CONSTRAINT CC1288607389830 FOREIGN KEY (PARTEIID) REFERENCES " + schemaName
             + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
-            + "CONSTRAINT CC1288607385362 FOREIGN KEY (DMWAHLKREISID) REFERENCES "
-            + schemaName
+            + "CONSTRAINT CC1288607385362 FOREIGN KEY (DMWAHLKREISID) REFERENCES " + schemaName
             + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
-            + "CONSTRAINT CC1288607388564 FOREIGN KEY (DMPARTEIID) REFERENCES "
-            + schemaName
+            + "CONSTRAINT CC1288607388564 FOREIGN KEY (DMPARTEIID) REFERENCES " + schemaName
             + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
-            + "CONSTRAINT CC1288607382330 FOREIGN KEY (BUNDESLANDID) REFERENCES "
-		        + schemaName
-		        + ".BUNDESLAND (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
-		        + "ORGANIZE BY DIMENSIONS ( PARTEIID, BUNDESLANDID) ;\n",
-		    
-		    // Stimme
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".STIMME " + "( " + Datenbank.kStimmeID + " " + autoIncrementID + " , "
-		        + Datenbank.kStimmeKandidatID + " BIGINT, "
-		        + Datenbank.kStimmeParteiID + " BIGINT, "
-		        + Datenbank.kStimmeWahlbezirkID + " BIGINT  NOT NULL , "
-		        + Datenbank.kStimmeWahlkreisID + " BIGINT NOT NULL , "
-		        + Datenbank.kStimmeJahr + " INTEGER , "
-		        + "CONSTRAINT CC1288610679447 PRIMARY KEY ( " + Datenbank.kStimmeID + ") , "
-		        + "CONSTRAINT CC1288610689165 FOREIGN KEY ( " + Datenbank.kStimmeKandidatID + ") REFERENCES "
-		        + schemaName + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED ENABLE QUERY OPTIMIZATION, "
+            + "CONSTRAINT CC1288607382330 FOREIGN KEY (BUNDESLANDID) REFERENCES " + schemaName
+            + ".BUNDESLAND (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
+            + "ORGANIZE BY DIMENSIONS ( PARTEIID, BUNDESLANDID) ;\n",
+
+        // Stimme
+        "CREATE TABLE " + schemaName + ".STIMME " + "( " + Datenbank.kStimmeID + " " + autoIncrementID + " , "
+            + Datenbank.kStimmeKandidatID + " BIGINT, " + Datenbank.kStimmeParteiID + " BIGINT, "
+            + Datenbank.kStimmeWahlbezirkID + " BIGINT  NOT NULL , " + Datenbank.kStimmeWahlkreisID
+            + " BIGINT NOT NULL , " + Datenbank.kStimmeJahr + " INTEGER , "
+            + "CONSTRAINT CC1288610679447 PRIMARY KEY ( " + Datenbank.kStimmeID + ") , "
+            + "CONSTRAINT CC1288610689165 FOREIGN KEY ( " + Datenbank.kStimmeKandidatID + ") REFERENCES " + schemaName
+            + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED ENABLE QUERY OPTIMIZATION, "
             + "CONSTRAINT CC1288610702435 FOREIGN KEY (PARTEIID) REFERENCES " + schemaName
             + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "
-		        // + "CONSTRAINT CC1288610713433 FOREIGN KEY (WAHLBEZIRKID, WAHLKREISID) REFERENCES "
-		        // + schemaName
-		        // + ".WAHLBEZIRK (ID, WAHLKREISID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-		        + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLBEZIRKID, WAHLKREISID) ;\n",
+            // +
+            // "CONSTRAINT CC1288610713433 FOREIGN KEY (WAHLBEZIRKID, WAHLKREISID) REFERENCES "
+            // + schemaName
+            // +
+            // ".WAHLBEZIRK (ID, WAHLKREISID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
+            + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLBEZIRKID, WAHLKREISID) ;\n",
 
-		    // WAHLERGEBNIS1
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".WAHLERGEBNIS1 " + "( ID " + autoIncrementID + " , "
-		        + "KANDIDATID BIGINT  NOT NULL , "
-		        + "WAHLKREISID BIGINT  NOT NULL , "
-		        + "JAHR INTEGER  NOT NULL  , "
-		        + "ANZAHL INTEGER  NOT NULL, "
-		        + "CONSTRAINT CC1288610976900 PRIMARY KEY ( ID) , "
-		        + "CONSTRAINT CC1288610983160 FOREIGN KEY (KANDIDATID) REFERENCES "
-		        + schemaName
-		        + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
-		        + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES "
-		        + schemaName
-		        + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-		        + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLKREISID) ;\n"
-		        + "COMMENT ON TABLE " + schemaName
-		        + ".WAHLERGEBNIS1 IS 'Wahlergebnis 1. Stimme';\n",
-		    
-		    // WAHLERGEBNIS2
-		    "CREATE TABLE "
-		        + schemaName
-		        + ".WAHLERGEBNIS2 " + "( ID " + autoIncrementID + " , "
-		        + "PARTEIID BIGINT  NOT NULL , "
-		        + "WAHLKREISID BIGINT  NOT NULL ,"
-		        + "JAHR INTEGER  NOT NULL  , "
-		        + "ANZAHL INTEGER  NOT NULL, "
-		        + "CONSTRAINT CC1288610976900 PRIMARY KEY ( ID) , "
-		        + "CONSTRAINT CC1288610983160 FOREIGN KEY (PARTEIID) REFERENCES "
-		        + schemaName
-		        + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
-		        + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES "
-		        + schemaName
-		        + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-		        + "ORGANIZE BY DIMENSIONS ( PARTEIID, WAHLKREISID) ;\n"
-		        + "COMMENT ON TABLE " + schemaName
-		        + ".WAHLERGEBNIS2 IS 'Wahlergebnis 2. Stimme';\n", };
+        // WAHLERGEBNIS1
+        "CREATE TABLE " + schemaName + ".WAHLERGEBNIS1 " + "( ID " + autoIncrementID + " , "
+            + "KANDIDATID BIGINT  NOT NULL , " + "WAHLKREISID BIGINT  NOT NULL , " + "JAHR INTEGER  NOT NULL  , "
+            + "ANZAHL INTEGER  NOT NULL, " + "CONSTRAINT CC1288610976900 PRIMARY KEY ( ID) , "
+            + "CONSTRAINT CC1288610983160 FOREIGN KEY (KANDIDATID) REFERENCES " + schemaName
+            + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
+            + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
+            + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
+            + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLKREISID) ;\n" + "COMMENT ON TABLE " + schemaName
+            + ".WAHLERGEBNIS1 IS 'Wahlergebnis 1. Stimme';\n",
 
-	};
+        // WAHLERGEBNIS2
+        "CREATE TABLE " + schemaName + ".WAHLERGEBNIS2 " + "( ID " + autoIncrementID + " , "
+            + "PARTEIID BIGINT  NOT NULL , " + "WAHLKREISID BIGINT  NOT NULL ," + "JAHR INTEGER  NOT NULL  , "
+            + "ANZAHL INTEGER  NOT NULL, " + "CONSTRAINT CC1288610976900 PRIMARY KEY ( ID) , "
+            + "CONSTRAINT CC1288610983160 FOREIGN KEY (PARTEIID) REFERENCES " + schemaName
+            + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
+            + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
+            + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
+            + "ORGANIZE BY DIMENSIONS ( PARTEIID, WAHLKREISID) ;\n" + "COMMENT ON TABLE " + schemaName
+            + ".WAHLERGEBNIS2 IS 'Wahlergebnis 2. Stimme';\n", };
+
+  };
 
 }
