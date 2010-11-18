@@ -176,6 +176,14 @@ public class Datenbank {
     System.out.println(loadStmt);
     executeDB2(wholeStmt);
   }
+  
+  /**
+   * 
+   * @param columns List of columns the table should include. Format: "Column_1 type_1, [...] Column_n type_n" 
+   */
+  public void createTemporaryTable(String tableName, String columns) {
+    executeDB2("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
+  }
 
   public Connection getConnection() {
     return connection;
