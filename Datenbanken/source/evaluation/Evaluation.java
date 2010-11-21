@@ -76,11 +76,11 @@ public class Evaluation {
    *          Array of number of Stimmen for each party in the Bundestag
    * @param stimmenPerBundesland
    *          Array of Stimmen for each party and each Bundesland.
-   * @throws SQLException 
+   * @throws SQLException
    */
   public void createSitzeTable(int[] parteiID, int[] bundeslandID, int[] totalStimmen, int[][] stimmenPerBundesland,
       int maxSitze) throws SQLException {
-    database.createTemporaryTable(kSitzeTable, "ParteiID BIGING, bundeslandID BIGINT, AnzahlStimmen BIGINT");
+    database.createOrReplaceTemporaryTable(kSitzeTable, "ParteiID BIGING, bundeslandID BIGINT, AnzahlStimmen BIGINT");
     int[] sitzePerParty = getSitze(totalStimmen, maxSitze);
     for (int i = 0; i < parteiID.length; i++) {
       int[] sitzePerPartyAndBundesland = getSitze(stimmenPerBundesland[i], sitzePerParty[i]);
@@ -90,16 +90,32 @@ public class Evaluation {
       }
     }
   }
-  
-  //public void create
-  
-  public void doEverything(int[] parteienInBundestag) {
-    
+
+  // public void create
+
+  public void computeSitzverteilungBundestag() throws SQLException {
+    // Aggregate election results to Bundesland level.
+    database.createOrReplaceTemporaryTable(database.zweitStimmenNachBundesland(), Datenbank.kForeignKeyParteiID
+        + " BIGINT, " + Datenbank.kForeignKeyBundeslandID + " BIGINT, " + Datenbank.kAnzahlStimmen + " BIGINT");
+    database.executeUpdate("INSERT INTO " + database.zweitStimmenNachBundesland() + " SELECT w2."
+        + Datenbank.kWahlergebnis2ParteiID + ", wk." + Datenbank.kWahlkreisBundeslandID + ", sum(w2."
+        + Datenbank.kWahlergebnis2Anzahl + ") as " + Datenbank.kAnzahlStimmen + "" + " FROM "
+        + database.wahlergebnis2() + " w2" + ", " + database.wahlkreis + " wk" + " WHERE w2."
+        + Datenbank.kWahlergebnis2WahlkreisID + " = wk." + Datenbank.kWahlkreisID + " GROUP BY " + "wk."
+        + Datenbank.kWahlkreisBundeslandID + ", w2." + Datenbank.kWahlergebnis2ParteiID);
+
+    database.createOrReplaceTemporaryTable(database.zweitStimmenNachPartei(), Datenbank.kForeignKeyParteiID + " BIGINT, "
+        + Datenbank.kAnzahlStimmen + " BIGINT");
+    database.executeUpdate("INSERT INTO " + database.zweitStimmenNachPartei() + " SELECT " + Datenbank.kForeignKeyParteiID
+        + ", SUM(" + Datenbank.kAnzahlStimmen + ") FROM " + database.zweitStimmenNachBundesland() + " GROUP BY "
+        + Datenbank.kForeignKeyParteiID);
+
+    database.printTable(database.zweitStimmenNachBundesland());
+    database.printTable(database.zweitStimmenNachPartei());
+    database.printResultSet(database.executeSQL("SELECT " + Datenbank.kForeignKeyParteiID + ", SUM("
+        + Datenbank.kAnzahlStimmen + ") FROM " + database.zweitStimmenNachBundesland() + " GROUP BY "
+        + Datenbank.kForeignKeyParteiID));
   }
-
-  // Temporary tables:
-  // http://books.google.com/books?id=O-ueX_E_b9EC&lpg=PA276&ots=9qsV44q8wF&dq=db2%20create%20global%20temporary%20table&pg=PA276#v=onepage&q=db2%20create%20global%20temporary%20table&f=false
-
   // WITH maxErgebnis(WahlkreisId, maxStimmen) as (
   // SELECT k.dmwahlkreisid, max(w.anzahl)
   // FROM PASCAL.wahlergebnis1 w, Pascal.kandidat k
@@ -113,25 +129,5 @@ public class Evaluation {
   // Select g.Kandidat, p.kuerzel, g.Wahlkreis
   // FROM Gewinner g, Kandidat k, Partei P
   // WHERE g.Kandidat = k.ID AND k.DMParteiID = p.id AND p.KUErzel = 'CSU'
-
-  // Auf Bundeslandebene Aggregierte Zweitstimmenergebnisse
-  // SELECT wk.bundeslandid, w2.parteiid, sum(w2.anzahl) as Stimmen
-  // FROM Wahlergebnis2 w2, Wahlkreis wk
-  // WHERE w2.wahlkreisid = wk.id
-  // GROUP BY wk.bundeslandid, w2.parteiid
-  // ORDER BY parteiid
-  //  
-  // //DECLARE GLOBAL TEMPORARY TABLE ZweitstimmenBundesland (BundeslandID int,
-  // parteiID bigint, AnzahlStimmen bigint);
-  //
-  //
-  // CREATE TABLE Pascal.ZweitstimmenBundesland(BundeslandID, parteiID,
-  // AnzahlStimmen) AS (
-  // SELECT wk.bundeslandid, w2.parteiid, sum(w2.anzahl) as Stimmen
-  // FROM Wahlergebnis2 w2, Wahlkreis wk
-  // WHERE w2.wahlkreisid = wk.id
-  // GROUP BY wk.bundeslandid, w2.parteiid
-  // ) DATA INITIALLY DEFERRED REFRESH DEFERRED;
-  // SET INTEGRITY FOR Pascal.ZweitstimmenBundesland IMMEDIATE CHECKED;
 
 }

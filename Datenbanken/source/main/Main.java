@@ -7,14 +7,7 @@ import evaluation.Evaluation;
 import flags.*;
 
 public class Main {
-  public static void main(String[] args) throws Exception {
-//    int[] votes = {11828277, 9990488, 6316080, 5155933, 4643272, 2830238};
-//    int sitze[] = Evaluation.getSitze(votes, 622);
-//    for (int i = 0; i < sitze.length; i++) {
-//      System.out.println("Party " + i + " got " + sitze[i] + " Sitze.");
-//    }
-//    System.exit(0);
-    
+  public static void main(String[] args) throws Exception {    
     Flags.setFlags(FlagDefinition.kFlagDefinition, args);
     final String dbName = Flags.getFlagValue(FlagDefinition.kFlagDbName);
     final String dbUser = Flags.getFlagValue(FlagDefinition.kFlagDbUser);
@@ -53,6 +46,12 @@ public class Main {
       csvParser.importVotes();
     if (Flags.isTrue(FlagDefinition.kFlagImportAggregatedVotes))
       csvParser.importAggregatedVotes();
+    if (Flags.isTrue(FlagDefinition.kFlagComputeSitzverteilungBundestag)) {
+      Evaluation evaluation = new Evaluation(db);
+      evaluation.computeSitzverteilungBundestag();
+    }
+    
+    db.disconnect();
   }
 
 }

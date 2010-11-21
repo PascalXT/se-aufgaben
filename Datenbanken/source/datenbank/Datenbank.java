@@ -51,19 +51,38 @@ public class Datenbank {
   public final static String kStimmeParteiID = "ParteiID";
   public final static String kStimmeKandidatID = "KandidatID";
 
-  public String wahlergebnis1;
+  public String wahlergebnis1() {
+    return tabellenName("Wahlergebnis1");
+  }
+
   public final static String kWahlergebnis1ID = "ID";
   public final static String kWahlergebnis1Anzahl = "Anzahl";
   public final static String kWahlergebnis1Jahr = "Jahr";
   public final static String kWahlergebnis1WahlkreisID = "WahlkreisID";
   public final static String kWahlergebnis1KandidatID = "KandidatID";
 
-  public String wahlergebnis2;
+  public String wahlergebnis2() {
+    return tabellenName("Wahlergebnis2");
+  }
+
   public final static String kWahlergebnis2ID = "ID";
   public final static String kWahlergebnis2Anzahl = "Anzahl";
   public final static String kWahlergebnis2Jahr = "Jahr";
   public final static String kWahlergebnis2WahlkreisID = "WahlkreisID";
   public final static String kWahlergebnis2ParteiID = "ParteiID";
+
+  // Temporary tables
+  public String zweitStimmenNachBundesland() {
+    return tabellenName("ZweitStimmenNachBundesland");
+  }
+
+  public final static String kForeignKeyParteiID = "ParteiID";
+  public final static String kForeignKeyBundeslandID = "BundeslandID";
+  public final static String kAnzahlStimmen = "AnzahlStimmen";
+
+  public String zweitStimmenNachPartei() {
+    return tabellenName("ZweitStimmenNachPartei");
+  }
 
   public String tabellenName(String kurzname) {
     return schemaName + "." + kurzname;
@@ -82,8 +101,6 @@ public class Datenbank {
     this.kandidat = tabellenName("Kandidat");
     this.partei = tabellenName("Partei");
     this.stimme = tabellenName("Stimme");
-    this.wahlergebnis1 = tabellenName("Wahlergebnis1");
-    this.wahlergebnis2 = tabellenName("Wahlergebnis2");
     this.messagePath = messagePath;
     try {
       Class.forName("com.ibm.db2.jcc.DB2Driver");
@@ -95,6 +112,11 @@ public class Datenbank {
     }
   }
 
+  public void disconnect() throws SQLException {
+    connection.commit();
+    connection.close();
+  }
+
   public void truncate(String table) throws SQLException {
     executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
   }
@@ -103,7 +125,7 @@ public class Datenbank {
     System.out.println(sql_statement);
     if (statement != null)
       statement.close();
-    statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
     ResultSet result_set;
     try {
       result_set = statement.executeQuery(sql_statement + "\n");
@@ -150,43 +172,93 @@ public class Datenbank {
     }
   }
 
-  public void load(String file, String columnNumbers, String[] columns, String table) {
+  public String getTableShortName(String tableFullName) {
+    return tableFullName.substring(tableFullName.indexOf(".") + 1);
+  }
+
+  public boolean tableIntegrityIsUnchecked(String tableName) throws SQLException {
+    ResultSet rs = executeSQL("SELECT Status FROM SYSCAT.TABLES WHERE TABNAME="
+        + getTableShortName(tableName).toUpperCase() + " AND SCHEMA=" + schemaName.toUpperCase());
+    return rs.next();
+  }
+  
+  public void setIntegrityChecked(String tableName) throws SQLException {
+    if (tableIntegrityIsUnchecked(tableName)) {
+      executeDB2("SET INTEGRITY FOR " + tableName + " IMMEDIATE CHECKED");
+    }
+  }
+
+  public void load(String file, String columnNumbers, String[] columns, String tableName) throws SQLException {
     // The previous load might have failed. Abort load.
-    final String abortLoadStmt = "LOAD FROM DUMMY OF DEL TERMINATE into " + table;
-    final String integrityStmt = "SET INTEGRITY FOR " + table + " IMMEDIATE CHECKED";
-    executeDB2(abortLoadStmt + ";\n" + integrityStmt);
-    
+    final String abortLoadStmt = "LOAD FROM DUMMY OF DEL TERMINATE into " + tableName;
+    executeDB2(abortLoadStmt);
+    setIntegrityChecked(tableName);
+
     // Delete old content.
     try {
-      truncate(table);
+      truncate(tableName);
     } catch (SQLException e) {
       e.printStackTrace();
       System.exit(1);
     }
-    
+
     String columnString = "";
     for (int i = 0; i < columns.length; i++) {
       columnString += columns[i];
-      if (i != columns.length - 1) columnString += ", ";
+      if (i != columns.length - 1)
+        columnString += ", ";
     }
     final String loadStmt = "LOAD FROM \"" + file + "\" OF DEL MODIFIED BY COLDEL; " + "METHOD P " + columnNumbers
-        + " SAVECOUNT 10000 " + "MESSAGES \"" + messagePath + "\" " + "INSERT INTO " + table + " (" + columnString
-        + ");";
-    final String wholeStmt = loadStmt + "\n" + integrityStmt;
-    System.out.println(loadStmt);
-    executeDB2(wholeStmt);
+        + " SAVECOUNT 10000 " + "MESSAGES \"" + messagePath + "\" " + "INSERT INTO " + tableName + " (" + columnString
+        + ")";
+    executeDB2(loadStmt);
+    setIntegrityChecked(tableName);
   }
-  
+
+  public boolean tableExists(String tableName) throws SQLException {
+    String tableShortName = getTableShortName(tableName);
+    ResultSet rs = executeSQL("SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA='" + schemaName.toUpperCase()
+        + "' AND TABNAME='" + tableShortName.toUpperCase() + "'");
+    return rs.next();
+  }
+
+  public void dropTable(String tableName) throws SQLException {
+    executeUpdate("DROP TABLE " + tableName);
+  }
+
   /**
    * 
-   * @param columns List of columns the table should include. Format: "Column_1 type_1, [...] Column_n type_n" 
+   * @param columns
+   *          List of columns the table should include. Format:
+   *          "Column_1 type_1, [...] Column_n type_n"
+   * @throws SQLException
    */
-  public void createTemporaryTable(String tableName, String columns) {
-    executeDB2("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
+  public void createOrReplaceTemporaryTable(String tableName, String columns) throws SQLException {
+    if (tableExists(tableName))
+      dropTable(tableName);
+    executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
   }
 
   public Connection getConnection() {
     return connection;
+  }
+
+  public void printResultSet(ResultSet rs) throws SQLException {
+    ResultSetMetaData metadata = rs.getMetaData();
+    for (int i = 0; i < metadata.getColumnCount(); i++) {
+      System.out.print(metadata.getColumnLabel(i + 1) + "\t");
+    }
+    System.out.println();
+    while (rs.next()) {
+      for (int i = 0; i < metadata.getColumnCount(); i++) {
+        System.out.print(rs.getString(i + 1) + "\t");
+      }
+      System.out.println();
+    }
+  }
+
+  public void printTable(String table) throws SQLException {
+    printResultSet(executeSQL("SELECT * FROM " + table));
   }
 
 }

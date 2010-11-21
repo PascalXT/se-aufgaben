@@ -16,6 +16,7 @@ public class Flags {
   final static String kFlagNameDelimiter = "=";
   final static String kConfigFileParam = "configFile";
   final public static String kTrue = "true";
+  final public static String kOne = "1";
 
   // In fact, everything different to kTrue is considered false.
   final public static String kFalse = "false";
@@ -116,6 +117,6 @@ public class Flags {
   }
 
   public static boolean isTrue(String flagName) throws FlagErrorException {
-    return getFlagValue(flagName).equals(kTrue);
+    return getFlagValue(flagName).equals(kTrue) || getFlagValue(flagName).equals(kOne);
   }
 }
