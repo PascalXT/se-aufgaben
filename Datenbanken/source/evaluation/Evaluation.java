@@ -1,8 +1,9 @@
 package evaluation;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import datenbank.Datenbank;
 
@@ -115,6 +116,77 @@ public class Evaluation {
     database.printResultSet(database.executeSQL("SELECT " + Datenbank.kForeignKeyParteiID + ", SUM("
         + Datenbank.kAnzahlStimmen + ") FROM " + database.zweitStimmenNachBundesland() + " GROUP BY "
         + Datenbank.kForeignKeyParteiID));
+    
+    // +++++++++++++++++ DIREKTMANDATE +++++++++++++++++ //
+    database.createOrReplaceTemporaryTable(database.direktmandate(), 
+    		Datenbank.kKandidatID + " BIGINT, " + Datenbank.kForeignKeyParteiID + " BIGINT");
+    database.executeUpdate("INSERT INTO " + database.direktmandate() 
+    		+ " WITH maxErgebnis(wahlkreisID, maxStimmen) as (SELECT"
+    		+ " k." + Datenbank.kKandidatDMWahlkreisID + ", MAX(v." + Datenbank.kWahlergebnis1Anzahl + ")"
+    		+ " FROM " + database.wahlergebnis1() + " v, " + database.kandidat + " k"
+    		+ " WHERE v." + Datenbank.kWahlergebnis1KandidatID + " = k." + Datenbank.kKandidatID
+    		+ " GROUP BY k." + Datenbank.kKandidatDMWahlkreisID + ")"
+    		+ " SELECT k." + Datenbank.kKandidatID + ", k." + Datenbank.kKandidatParteiID
+    		+ " FROM maxErgebnis e, " + database.wahlergebnis1() + " v, " + database.kandidat + " k"
+    		+ " WHERE e.wahlkreisID = v." + Datenbank.kWahlergebnis1WahlkreisID
+    		+ " AND e.maxStimmen = v." + Datenbank.kWahlergebnis1Anzahl
+    		+ " AND k." + Datenbank.kKandidatID + " = v." + Datenbank.kWahlergebnis1KandidatID);
+    database.printResultSet(database.executeSQL("SELECT COUNT(*) FROM " + database.direktmandate()));
+    
+    // +++++++++++++++++ 5 PROZENT PARTEIEN +++++++++++++++++ //
+    database.createOrReplaceTemporaryTable(database.fuenfProzentParteien(), Datenbank.kParteiID + " BIGINT");
+    database.executeUpdate("INSERT INTO " + database.fuenfProzentParteien()
+    		+ " SELECT p." + Datenbank.kParteiID
+    		+ " FROM " + database.partei + " p, " + database.wahlergebnis2() + " v"
+    		+ " WHERE v." + Datenbank.kWahlergebnis2ParteiID + " = p." + Datenbank.kParteiID
+    		+ " GROUP BY p." + Datenbank.kParteiID
+    		+ " HAVING CAST(SUM(v." + Datenbank.kWahlergebnis2Anzahl + ") AS FLOAT)"
+    		+ " / (SELECT SUM(" + Datenbank.kAnzahlStimmen + ") FROM " + database.zweitStimmenNachBundesland() + ")"
+    		+ " >= 0.05"
+    );
+    database.printResultSet(database.executeSQL("SELECT p." + Datenbank.kParteiKuerzel 
+    		+ " FROM " + database.partei + " p, " + database.fuenfProzentParteien() + " fpp"
+    		+ " WHERE p." + Datenbank.kParteiID + " = fpp." + Datenbank.kParteiID
+    ));
+    
+    // +++++++++++++++++ PARTEIEN MIT MINDESTENS 3 DIREKTMANDATEN +++++++++++++++++ //
+    database.createOrReplaceTemporaryTable(database.dreiDirektMandatParteien(), Datenbank.kParteiID + " BIGINT");
+    database.executeUpdate("INSERT INTO " + database.dreiDirektMandatParteien()
+    		+ " SELECT dm." + Datenbank.kKandidatParteiID
+    		+ " FROM " + database.direktmandate() + " dm "
+    		+ " GROUP BY dm." + Datenbank.kKandidatParteiID
+    		+ " HAVING COUNT(*) >= 3"
+    );
+    database.printResultSet(database.executeSQL("SELECT p." + Datenbank.kParteiKuerzel 
+    		+ " FROM " + database.partei + " p, " + database.dreiDirektMandatParteien() + " ddmp"
+    		+ " WHERE p." + Datenbank.kParteiID + " = ddmp." + Datenbank.kParteiID
+    ));
+    
+    // +++++++++++++++++ PARTEIEN IM BUNDESTAG +++++++++++++++++ //
+    database.createOrReplaceTemporaryTable(database.parteienImBundestag(), Datenbank.kParteiID + " BIGINT");
+    database.executeUpdate("INSERT INTO " + database.parteienImBundestag()
+    		+ " SELECT * FROM " + database.fuenfProzentParteien()
+    		+ " UNION "
+    		+ " SELECT * FROM " + database.dreiDirektMandatParteien()
+    );
+    database.printResultSet(database.executeSQL("SELECT p." + Datenbank.kParteiKuerzel 
+    		+ " FROM " + database.partei + " p, " + database.dreiDirektMandatParteien() + " ddmp"
+    		+ " WHERE p." + Datenbank.kParteiID + " = ddmp." + Datenbank.kParteiID
+    ));
+    
+    // +++++++++++++++++ ANZAHL PROPORZSITZE +++++++++++++++++ //
+    ResultSet anzahlProporzSitzeResultSet = database.executeSQL("WITH AlleinigeDirektmandate AS ("
+    		+ " SELECT dm." + Datenbank.kKandidatID
+    		+ " FROM " + database.direktmandate() + " dm"
+    		+ " EXCEPT "
+    		+ " SELECT dm." + Datenbank.kKandidatID
+    		+ " FROM " + database.direktmandate() + " dm, " + database.parteienImBundestag() + " pib"
+    		+ " WHERE dm." + Datenbank.kKandidatParteiID + " = pib." + Datenbank.kParteiID + ")"
+    		+ " SELECT 598 - COUNT(*) AS AnzahlProporzSitze FROM AlleinigeDirektmandate"
+    );
+    anzahlProporzSitzeResultSet.next();
+    System.out.println("AnzahlProporzSitze: " + anzahlProporzSitzeResultSet.getInt("AnzahlProporzSitze"));
+    
   }
   // WITH maxErgebnis(WahlkreisId, maxStimmen) as (
   // SELECT k.dmwahlkreisid, max(w.anzahl)

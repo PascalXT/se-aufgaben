@@ -7,7 +7,10 @@ import evaluation.Evaluation;
 import flags.*;
 
 public class Main {
-  public static void main(String[] args) throws Exception {    
+  public static void main(String[] args) throws Exception {  
+  	
+  	System.out.println("sdjf");
+  	
     Flags.setFlags(FlagDefinition.kFlagDefinition, args);
     final String dbName = Flags.getFlagValue(FlagDefinition.kFlagDbName);
     final String dbUser = Flags.getFlagValue(FlagDefinition.kFlagDbUser);

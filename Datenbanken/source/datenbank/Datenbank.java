@@ -75,6 +75,22 @@ public class Datenbank {
   public String zweitStimmenNachBundesland() {
     return tabellenName("ZweitStimmenNachBundesland");
   }
+  
+  public String direktmandate() {
+    return tabellenName("Direktmandate");
+  }
+  
+  public String fuenfProzentParteien() {
+    return tabellenName("FuenfProzentParteien");
+  }
+  
+  public String dreiDirektMandatParteien() {
+    return tabellenName("DreiDirektMandatParteien");
+  }
+  
+  public String parteienImBundestag() {
+    return tabellenName("ParteienImBundestag");
+  }
 
   public final static String kForeignKeyParteiID = "ParteiID";
   public final static String kForeignKeyBundeslandID = "BundeslandID";
@@ -177,8 +193,8 @@ public class Datenbank {
   }
 
   public boolean tableIntegrityIsUnchecked(String tableName) throws SQLException {
-    ResultSet rs = executeSQL("SELECT Status FROM SYSCAT.TABLES WHERE TABNAME="
-        + getTableShortName(tableName).toUpperCase() + " AND SCHEMA=" + schemaName.toUpperCase());
+    ResultSet rs = executeSQL("SELECT Status FROM SYSCAT.TABLES WHERE TABNAME='"
+        + getTableShortName(tableName).toUpperCase() + "' AND TABSCHEMA='" + schemaName.toUpperCase() + "'");
     return rs.next();
   }
   
