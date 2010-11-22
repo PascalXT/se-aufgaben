@@ -75,12 +75,12 @@ public class TabellenDef {
             + "ORGANIZE BY DIMENSIONS ( PARTEIID, BUNDESLANDID) ;\n",
 
         // Stimme
-        "CREATE TABLE " + schemaName + ".STIMME " + "( " + Datenbank.kStimmeID + " " + autoIncrementID + " , "
-            + Datenbank.kStimmeKandidatID + " BIGINT, " + Datenbank.kStimmeParteiID + " BIGINT, "
-            + Datenbank.kStimmeWahlbezirkID + " BIGINT  NOT NULL , " + Datenbank.kStimmeWahlkreisID
+        "CREATE TABLE " + schemaName + ".STIMME " + "( " + Datenbank.kID + " " + autoIncrementID + " , "
+            + Datenbank.kForeignKeyKandidatID + " BIGINT, " + Datenbank.kForeignKeyParteiID + " BIGINT, "
+            + Datenbank.kForeignKeyWahlbezirkID + " BIGINT  NOT NULL , " + Datenbank.kForeignKeyWahlkreisID
             + " BIGINT NOT NULL , " + Datenbank.kStimmeJahr + " INTEGER , "
-            + "CONSTRAINT CC1288610679447 PRIMARY KEY ( " + Datenbank.kStimmeID + ") , "
-            + "CONSTRAINT CC1288610689165 FOREIGN KEY ( " + Datenbank.kStimmeKandidatID + ") REFERENCES " + schemaName
+            + "CONSTRAINT CC1288610679447 PRIMARY KEY ( " + Datenbank.kID + ") , "
+            + "CONSTRAINT CC1288610689165 FOREIGN KEY ( " + Datenbank.kForeignKeyKandidatID + ") REFERENCES " + schemaName
             + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED ENABLE QUERY OPTIMIZATION, "
             + "CONSTRAINT CC1288610702435 FOREIGN KEY (PARTEIID) REFERENCES " + schemaName
             + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION ) "

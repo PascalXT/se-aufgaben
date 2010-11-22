@@ -116,7 +116,11 @@ public class Flags {
     throw new FlagErrorException("Flag " + flagName + " has not been defined");
   }
 
-  public static boolean isTrue(String flagName) throws FlagErrorException {
-    return getFlagValue(flagName).equals(kTrue) || getFlagValue(flagName).equals(kOne);
+  public static boolean isTrue(String flagName) {
+    try {
+      return getFlagValue(flagName).equals(kTrue) || getFlagValue(flagName).equals(kOne);
+    } catch (FlagErrorException e) {
+      return false;
+    }
   }
 }

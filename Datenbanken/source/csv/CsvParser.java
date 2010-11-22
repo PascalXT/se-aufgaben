@@ -35,20 +35,20 @@ public class CsvParser {
     } else {
       parteiIDString = "=" + parteiID;
     }
-    final String sql = "SELECT " + Datenbank.kKandidatID + " " + "FROM " + datenbank.kandidat + " " + "WHERE "
+    final String sql = "SELECT " + Datenbank.kID + " " + "FROM " + datenbank.kandidat() + " " + "WHERE "
         + Datenbank.kKandidatDMWahlkreisID + "=" + wahlkreisID + " " + "AND " + Datenbank.kKandidatDMParteiID
         + parteiIDString;
     ResultSet resultSet = datenbank.executeSQL(sql);
     resultSet.next();
-    final int result = resultSet.getInt(Datenbank.kKandidatID);
+    final int result = resultSet.getInt(Datenbank.kID);
     resultSet.close();
     return result;
   }
 
   private String getBundesland(int wahlkreisID) throws SQLException {
-    String sql = "SELECT " + Datenbank.kBundeslandName + " FROM " + datenbank.bundesland + " WHERE "
-        + Datenbank.kBundeslandID + "=" + "(SELECT " + Datenbank.kWahlkreisBundeslandID + " FROM "
-        + datenbank.wahlkreis + " WHERE " + Datenbank.kWahlkreisID + "=" + wahlkreisID + ")";
+    String sql = "SELECT " + Datenbank.kBundeslandName + " FROM " + datenbank.bundesland() + " WHERE "
+        + Datenbank.kID + "=" + "(SELECT " + Datenbank.kForeignKeyBundeslandID + " FROM "
+        + datenbank.wahlkreis() + " WHERE " + Datenbank.kID + "=" + wahlkreisID + ")";
     ResultSet resultSet = datenbank.executeSQL(sql);
     resultSet.next();
     final String result = resultSet.getString(Datenbank.kBundeslandName);
@@ -198,9 +198,9 @@ public class CsvParser {
   }
 
   public void importVotes() throws SQLException {
-    final String[] columnsStimmen = { Datenbank.kStimmeJahr, Datenbank.kStimmeWahlkreisID,
-        Datenbank.kStimmeWahlbezirkID, Datenbank.kStimmeKandidatID, Datenbank.kStimmeParteiID };
-    datenbank.load(stimmenFile, "(1, 2, 3, 4, 5)", columnsStimmen, datenbank.stimme);
+    final String[] columnsStimmen = { Datenbank.kStimmeJahr, Datenbank.kForeignKeyWahlkreisID,
+        Datenbank.kForeignKeyWahlbezirkID, Datenbank.kForeignKeyKandidatID, Datenbank.kForeignKeyParteiID };
+    datenbank.load(stimmenFile, "(1, 2, 3, 4, 5)", columnsStimmen, datenbank.stimme());
     System.out.println("Stimmen have been imported to the database");
   }
 
@@ -210,22 +210,22 @@ public class CsvParser {
     final int kTableName = 2;
     final int kColumnName = 3;
     final String[][] kImportTripel = {
-        { "Bundeslaender.csv", "(1, 2)", datenbank.bundesland,
-            " (" + Datenbank.kBundeslandID + ", " + Datenbank.kBundeslandName + ")" },
+        { "Bundeslaender.csv", "(1, 2)", datenbank.bundesland(),
+            " (" + Datenbank.kID + ", " + Datenbank.kBundeslandName + ")" },
         {
             "Wahlkreise.csv",
             "(1, 2, 3)",
-            datenbank.wahlkreis,
-            " (" + Datenbank.kWahlkreisID + ", " + Datenbank.kWahlkreisName + ", " + Datenbank.kWahlkreisBundeslandID
+            datenbank.wahlkreis(),
+            " (" + Datenbank.kID + ", " + Datenbank.kWahlkreisName + ", " + Datenbank.kForeignKeyBundeslandID
                 + ")" },
-        { "Parteien.csv", "(3, 1, 2)", datenbank.partei,
-            " (" + Datenbank.kParteiID + ", " + Datenbank.kParteiKuerzel + ", " + Datenbank.kParteiName + ")" },
+        { "Parteien.csv", "(3, 1, 2)", datenbank.partei(),
+            " (" + Datenbank.kID + ", " + Datenbank.kParteiKuerzel + ", " + Datenbank.kParteiName + ")" },
         {
             "Kandidaten.csv",
             "(1, 2, 3, 4, 5, 3, 6)",
-            datenbank.kandidat,
-            " (" + Datenbank.kKandidatNachname + ", " + Datenbank.kKandidatVorname + ", " + Datenbank.kKandidatParteiID
-                + ", " + Datenbank.kKandidatBundeslandID + ", " + Datenbank.kKandidatListenplatz + ", "
+            datenbank.kandidat(),
+            " (" + Datenbank.kKandidatNachname + ", " + Datenbank.kKandidatVorname + ", " + Datenbank.kForeignKeyParteiID
+                + ", " + Datenbank.kForeignKeyBundeslandID + ", " + Datenbank.kKandidatListenplatz + ", "
                 + Datenbank.kKandidatDMParteiID + ", " + Datenbank.kKandidatDMWahlkreisID + ")" }, };
 
     for (int i = 0; i < Math.min(4, kImportTripel.length); i++) {
@@ -242,13 +242,13 @@ public class CsvParser {
   }
 
   public void importAggregatedVotes() throws SQLException {
-    final String[] columnsErststimmenAggregiert = { Datenbank.kWahlergebnis1Jahr, Datenbank.kWahlergebnis1WahlkreisID,
-        Datenbank.kWahlergebnis1Anzahl, Datenbank.kWahlergebnis1KandidatID };
+    final String[] columnsErststimmenAggregiert = { Datenbank.kWahlergebnis1Jahr, Datenbank.kForeignKeyWahlkreisID,
+        Datenbank.kWahlergebnis1Anzahl, Datenbank.kForeignKeyKandidatID };
     datenbank.load(erststimmenAggregiertFile, "(1, 2, 3, 4)", columnsErststimmenAggregiert, datenbank.wahlergebnis1());
     System.out.println("ErststimmenAggregiert have been imported to the database");
 
-    final String[] columnsZweitstimmenAggregiert = { Datenbank.kWahlergebnis2Jahr, Datenbank.kWahlergebnis2WahlkreisID,
-        Datenbank.kWahlergebnis2Anzahl, Datenbank.kWahlergebnis2ParteiID };
+    final String[] columnsZweitstimmenAggregiert = { Datenbank.kWahlergebnis2Jahr, Datenbank.kForeignKeyWahlkreisID,
+        Datenbank.kWahlergebnis2Anzahl, Datenbank.kForeignKeyParteiID };
     datenbank
         .load(zweitstimmenAggregiertFile, "(1, 2, 3, 4)", columnsZweitstimmenAggregiert, datenbank.wahlergebnis2());
     System.out.println("ZweitstimmenAggregiert have been imported to the database");

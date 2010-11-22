@@ -5,6 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 
+import flags.FlagDefinition;
+import flags.Flags;
+
 public class Datenbank {
 
   private String datenbank_name;
@@ -19,82 +22,84 @@ public class Datenbank {
   private Statement statement;
 
   // Tabellen
-  public String wahlkreis;
-  public final static String kWahlkreisID = "ID";
+  public String wahlkreis() {
+    return tabellenName("Wahlkreis");
+  }
+  
   public final static String kWahlkreisName = "Name";
-  public final static String kWahlkreisBundeslandID = "BundeslandID";
-
-  public String bundesland;
-  public final static String kBundeslandID = "ID";
+  
+  public String bundesland() {return tabellenName("Bundesland");}
   public final static String kBundeslandName = "Name";
 
-  public String partei;
-  public final static String kParteiID = "ID";
+  public String partei() {
+    return tabellenName("Partei");
+  }
+  public final static String kID = "ID";
   public final static String kParteiKuerzel = "Kuerzel";
   public final static String kParteiName = "Name";
 
-  public String kandidat;
-  public final static String kKandidatID = "ID";
-  public final static String kKandidatParteiID = "ParteiID";
+  public String kandidat() {
+    return tabellenName("Kandidat");
+  }
+
   public final static String kKandidatNachname = "Nachname";
   public final static String kKandidatVorname = "Vorname";
   public final static String kKandidatListenplatz = "Listenplatz";
-  public final static String kKandidatBundeslandID = "BundeslandID";
   public final static String kKandidatDMParteiID = "DMParteiID";
   public final static String kKandidatDMWahlkreisID = "DMWahlkreisID";
 
-  public String stimme;
-  public final static String kStimmeID = "ID";
+  public String stimme() {
+    return tabellenName("Stimme");
+  }
   public final static String kStimmeJahr = "Jahr";
-  public final static String kStimmeWahlkreisID = "WahlkreisID";
-  public final static String kStimmeWahlbezirkID = "WahlbezirkID";
-  public final static String kStimmeParteiID = "ParteiID";
-  public final static String kStimmeKandidatID = "KandidatID";
 
   public String wahlergebnis1() {
     return tabellenName("Wahlergebnis1");
   }
 
-  public final static String kWahlergebnis1ID = "ID";
   public final static String kWahlergebnis1Anzahl = "Anzahl";
   public final static String kWahlergebnis1Jahr = "Jahr";
-  public final static String kWahlergebnis1WahlkreisID = "WahlkreisID";
-  public final static String kWahlergebnis1KandidatID = "KandidatID";
 
   public String wahlergebnis2() {
     return tabellenName("Wahlergebnis2");
   }
 
-  public final static String kWahlergebnis2ID = "ID";
   public final static String kWahlergebnis2Anzahl = "Anzahl";
   public final static String kWahlergebnis2Jahr = "Jahr";
-  public final static String kWahlergebnis2WahlkreisID = "WahlkreisID";
-  public final static String kWahlergebnis2ParteiID = "ParteiID";
 
   // Temporary tables
   public String zweitStimmenNachBundesland() {
     return tabellenName("ZweitStimmenNachBundesland");
   }
-  
+
   public String direktmandate() {
     return tabellenName("Direktmandate");
   }
-  
+
   public String fuenfProzentParteien() {
     return tabellenName("FuenfProzentParteien");
   }
-  
+
   public String dreiDirektMandatParteien() {
     return tabellenName("DreiDirektMandatParteien");
   }
-  
+
   public String parteienImBundestag() {
     return tabellenName("ParteienImBundestag");
   }
 
+  public String sitzeNachLandeslisten() {
+    return tabellenName("SitzeNachLandeslisten");
+  }
+
   public final static String kForeignKeyParteiID = "ParteiID";
   public final static String kForeignKeyBundeslandID = "BundeslandID";
+  public final static String kForeignKeyWahlbezirkID = "WahlbezirkID";
+  public final static String kForeignKeyWahlkreisID = "WahlkreisID";
+  public final static String kForeignKeyKandidatID = "KandidatID";
+  
   public final static String kAnzahlStimmen = "AnzahlStimmen";
+  public final static String kAnzahlSitze = "AnzahlSitze";
 
   public String zweitStimmenNachPartei() {
     return tabellenName("ZweitStimmenNachPartei");
@@ -112,11 +117,6 @@ public class Datenbank {
     this.db2_command_file = commandFile;
     this.dbCommandFlags = dbCommandFlags;
     this.schemaName = schemaName;
-    this.bundesland = tabellenName("Bundesland");
-    this.wahlkreis = tabellenName("Wahlkreis");
-    this.kandidat = tabellenName("Kandidat");
-    this.partei = tabellenName("Partei");
-    this.stimme = tabellenName("Stimme");
     this.messagePath = messagePath;
     try {
       Class.forName("com.ibm.db2.jcc.DB2Driver");
@@ -197,7 +197,7 @@ public class Datenbank {
         + getTableShortName(tableName).toUpperCase() + "' AND TABSCHEMA='" + schemaName.toUpperCase() + "'");
     return rs.next();
   }
-  
+
   public void setIntegrityChecked(String tableName) throws SQLException {
     if (tableIntegrityIsUnchecked(tableName)) {
       executeDB2("SET INTEGRITY FOR " + tableName + " IMMEDIATE CHECKED");
@@ -252,7 +252,11 @@ public class Datenbank {
   public void createOrReplaceTemporaryTable(String tableName, String columns) throws SQLException {
     if (tableExists(tableName))
       dropTable(tableName);
-    executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
+    if (Flags.isTrue(FlagDefinition.kFlagMakeTemporaryTablesPermanent)) {
+      executeUpdate("CREATE TABLE " + tableName + " (" + columns + ")");
+    } else {
+      executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
+    }
   }
 
   public Connection getConnection() {
