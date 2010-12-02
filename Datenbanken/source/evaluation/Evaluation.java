@@ -104,9 +104,9 @@ public class Evaluation {
     database.createOrReplaceTemporaryTable(database.fuenfProzentParteien(), Datenbank.kForeignKeyParteiID + " BIGINT");
     database.executeUpdate("INSERT INTO " + database.fuenfProzentParteien() + " SELECT p." + Datenbank.kID + " as "
         + Datenbank.kForeignKeyParteiID + " FROM " + database.partei() + " p, " + database.wahlergebnis2() + " v"
-        + " WHERE v." + Datenbank.kForeignKeyParteiID + " = p." + Datenbank.kID + " GROUP BY p." + Datenbank.kID
-        + " HAVING CAST(SUM(v." + Datenbank.kWahlergebnis2Anzahl + ") AS FLOAT)" + " / (SELECT SUM("
-        + Datenbank.kAnzahlStimmen + ") FROM " + database.zweitStimmenNachBundesland() + ")" + " >= 0.05");
+        + " WHERE v.I = p." + Datenbank.kID + " GROUP BY p." + Datenbank.kID + " HAVING CAST(SUM(v."
+        + Datenbank.kWahlergebnis2Anzahl + ") AS FLOAT)" + " / (SELECT SUM(" + Datenbank.kAnzahlStimmen + ") FROM "
+        + database.zweitStimmenNachBundesland() + ")" + " >= 0.05");
     database.printResultSet(database.executeSQL("SELECT p." + Datenbank.kParteiKuerzel + " FROM " + database.partei()
         + " p, " + database.fuenfProzentParteien() + " fpp" + " WHERE p." + Datenbank.kID + " = fpp."
         + Datenbank.kForeignKeyParteiID));
@@ -152,8 +152,8 @@ public class Evaluation {
       votesList.add(votesRS.getInt(Datenbank.kForeignKeyParteiID));
     }
 
-    database.createOrReplaceTemporaryTable(database.sitzeNachLandeslisten(), Datenbank.kForeignKeyParteiID + " BIGINT, "
-        + Datenbank.kForeignKeyBundeslandID + " BIGINT, " + Datenbank.kAnzahlSitze + " BIGINT");
+    database.createOrReplaceTemporaryTable(database.sitzeNachLandeslisten(), Datenbank.kForeignKeyParteiID
+        + " BIGINT, " + Datenbank.kForeignKeyBundeslandID + " BIGINT, " + Datenbank.kAnzahlSitze + " BIGINT");
     int[] verteilungSitzeAufParteien = hoechstZahlVerfahren(votesList.toArray(new Integer[0]), anzahlProporzSitze);
     ArrayList<Integer> bundeslandList;
     int[][] VerteilungSitzeAufLandeslisten = new int[parteienList.size()][];

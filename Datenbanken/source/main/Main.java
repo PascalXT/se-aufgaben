@@ -1,5 +1,6 @@
 package main;
 
+import benchmark.Benchmark;
 import csv.CsvParser;
 import datenbank.Datenbank;
 import datenbank.TabellenDef;
@@ -8,7 +9,8 @@ import flags.*;
 
 public class Main {
   public static void main(String[] args) throws Exception {  
-  	
+  	Benchmark.runBenchmark(10);
+  	System.exit(0);
   	System.out.println("sdjf");
   	
     Flags.setFlags(FlagDefinition.kFlagDefinition, args);
