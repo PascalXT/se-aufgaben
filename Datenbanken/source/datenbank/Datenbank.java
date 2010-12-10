@@ -87,6 +87,10 @@ public class Datenbank {
   public String parteienImBundestag() {
     return tabellenName("ParteienImBundestag");
   }
+  
+  public String sitzeNachPartei() {
+    return tabellenName("SitzeNachPartei");
+  }
 
   public String sitzeNachLandeslisten() {
     return tabellenName("SitzeNachLandeslisten");

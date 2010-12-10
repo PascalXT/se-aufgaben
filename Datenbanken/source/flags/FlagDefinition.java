@@ -20,6 +20,7 @@ public class FlagDefinition {
   final public static String kFlagOnlyVotesForBundesland = "onlyVotesForBundesland";
   final public static String kFlagComputeSitzverteilungBundestag = "computeSitzverteilungBundestag";
   final public static String kFlagMakeTemporaryTablesPermanent = "makeTemporaryTablesPermanent";
+  final public static String kFlagExecuteBenchmark = "executeBenchmark";
   final public static String[][] kFlagDefinition = {
       { kFlagDbName, "WahlSys", "Name of the db2 database." },
       { kFlagDbUser, null, "Username for the db2 database." },

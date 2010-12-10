@@ -9,11 +9,13 @@ import flags.*;
 
 public class Main {
   public static void main(String[] args) throws Exception {  
-  	Benchmark.runBenchmark(10);
-  	System.exit(0);
-  	System.out.println("sdjf");
-  	
     Flags.setFlags(FlagDefinition.kFlagDefinition, args);
+    
+    if (Flags.isTrue(FlagDefinition.kFlagExecuteBenchmark)) {
+      Benchmark.runBenchmark(10);
+      System.exit(0);
+    }
+    
     final String dbName = Flags.getFlagValue(FlagDefinition.kFlagDbName);
     final String dbUser = Flags.getFlagValue(FlagDefinition.kFlagDbUser);
     final String dbPwd = Flags.getFlagValue(FlagDefinition.kFlagDbPwd);
