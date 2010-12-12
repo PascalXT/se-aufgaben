@@ -87,17 +87,17 @@ public class Evaluation {
         + Datenbank.kForeignKeyParteiID));
 
     // +++++++++++++++++ DIREKTMANDATE +++++++++++++++++ //
-    database.createOrReplaceTemporaryTable(database.direktmandate(), Datenbank.kID + " BIGINT, "
+    database.createOrReplaceTemporaryTable(database.direktmandate(), Datenbank.kForeignKeyKandidatID + " BIGINT, "
         + Datenbank.kForeignKeyParteiID + " BIGINT");
     database.executeUpdate("INSERT INTO " + database.direktmandate()
         + " WITH maxErgebnis(wahlkreisID, maxStimmen) as (SELECT" + " k." + Datenbank.kKandidatDMWahlkreisID
         + ", MAX(v." + Datenbank.kWahlergebnis1Anzahl + ")" + " FROM " + database.wahlergebnis1() + " v, "
         + database.kandidat() + " k" + " WHERE v." + Datenbank.kForeignKeyKandidatID + " = k." + Datenbank.kID
-        + " GROUP BY k." + Datenbank.kKandidatDMWahlkreisID + ")" + " SELECT k." + Datenbank.kID + ", k."
-        + Datenbank.kForeignKeyParteiID + " FROM maxErgebnis e, " + database.wahlergebnis1() + " v, "
-        + database.kandidat() + " k" + " WHERE e.wahlkreisID = v." + Datenbank.kForeignKeyWahlkreisID
-        + " AND e.maxStimmen = v." + Datenbank.kWahlergebnis1Anzahl + " AND k." + Datenbank.kID + " = v."
-        + Datenbank.kForeignKeyKandidatID);
+        + " GROUP BY k." + Datenbank.kKandidatDMWahlkreisID + ")" + " SELECT k." + Datenbank.kID + " as "
+        + Datenbank.kForeignKeyKandidatID + ", k." + Datenbank.kForeignKeyParteiID + " FROM maxErgebnis e, "
+        + database.wahlergebnis1() + " v, " + database.kandidat() + " k" + " WHERE e.wahlkreisID = v."
+        + Datenbank.kForeignKeyWahlkreisID + " AND e.maxStimmen = v." + Datenbank.kWahlergebnis1Anzahl + " AND k."
+        + Datenbank.kID + " = v." + Datenbank.kForeignKeyKandidatID);
     database.printResultSet(database.executeSQL("SELECT COUNT(*) FROM " + database.direktmandate()));
 
     // +++++++++++++++++ 5 PROZENT PARTEIEN +++++++++++++++++ //
@@ -132,9 +132,10 @@ public class Evaluation {
 
     // +++++++++++++++++ ANZAHL PROPORZSITZE +++++++++++++++++ //
     ResultSet anzahlProporzSitzeResultSet = database.executeSQL("WITH AlleinigeDirektmandate AS (" + " SELECT dm."
-        + Datenbank.kID + " FROM " + database.direktmandate() + " dm" + " EXCEPT " + " SELECT dm." + Datenbank.kID
-        + " FROM " + database.direktmandate() + " dm, " + database.parteienImBundestag() + " pib" + " WHERE dm."
-        + Datenbank.kForeignKeyParteiID + " = pib." + Datenbank.kForeignKeyParteiID + ")"
+        + Datenbank.kForeignKeyKandidatID + " FROM " + database.direktmandate() + " dm" + " EXCEPT " + " SELECT dm."
+        + Datenbank.kForeignKeyKandidatID + " FROM " + database.direktmandate() + " dm, "
+        + database.parteienImBundestag() + " pib" + " WHERE dm." + Datenbank.kForeignKeyParteiID + " = pib."
+        + Datenbank.kForeignKeyParteiID + ")"
         + " SELECT 598 - COUNT(*) AS AnzahlProporzSitze FROM AlleinigeDirektmandate");
     anzahlProporzSitzeResultSet.next();
     int anzahlProporzSitze = anzahlProporzSitzeResultSet.getInt("AnzahlProporzSitze");
@@ -156,40 +157,26 @@ public class Evaluation {
         + ", COUNT(Rang) as " + Datenbank.kAnzahlSitze + " FROM Zugriffsreihenfolge " + " WHERE Rang <= 598 "
         + " GROUP BY ParteiID");
 
-    // Input arrays for Höchstzahlverfahren
-    ResultSet votesRS = database.executeSQL("SELECT znp." + Datenbank.kForeignKeyParteiID + ", znp."
-        + Datenbank.kAnzahlStimmen + " FROM " + database.zweitStimmenNachPartei() + " znp, "
-        + database.parteienImBundestag() + " p WHERE znp." + Datenbank.kForeignKeyParteiID + "=p."
-        + Datenbank.kForeignKeyParteiID);
-    ArrayList<Integer> parteienList = new ArrayList<Integer>();
-    ArrayList<Integer> votesList = new ArrayList<Integer>();
-    while (votesRS.next()) {
-      parteienList.add(votesRS.getInt(Datenbank.kForeignKeyParteiID));
-      votesList.add(votesRS.getInt(Datenbank.kForeignKeyParteiID));
-    }
-
+    // +++++++++++++++++ Sitze nach Landeslisten +++++++++++++++++++ //
     database.createOrReplaceTemporaryTable(database.sitzeNachLandeslisten(), Datenbank.kForeignKeyParteiID
         + " BIGINT, " + Datenbank.kForeignKeyBundeslandID + " BIGINT, " + Datenbank.kAnzahlSitze + " BIGINT");
-    int[] verteilungSitzeAufParteien = hoechstZahlVerfahren(votesList.toArray(new Integer[0]), anzahlProporzSitze);
-    ArrayList<Integer> bundeslandList;
-    int[][] VerteilungSitzeAufLandeslisten = new int[parteienList.size()][];
-    for (int i = 0; i < parteienList.size(); i++) {
-      ResultSet votesBundeslandRS = database.executeSQL("SELECT znb." + Datenbank.kForeignKeyBundeslandID + ", znb."
-          + Datenbank.kAnzahlStimmen + " FROM " + database.zweitStimmenNachBundesland() + " znb WHERE znb."
-          + Datenbank.kForeignKeyParteiID + "=" + parteienList.get(i));
-      ArrayList<Integer> votesBundeslandList = new ArrayList<Integer>();
-      bundeslandList = new ArrayList<Integer>();
-      while (votesBundeslandRS.next()) {
-        votesBundeslandList.add(votesBundeslandRS.getInt(Datenbank.kAnzahlStimmen));
-        bundeslandList.add(votesBundeslandRS.getInt(Datenbank.kForeignKeyBundeslandID));
-      }
-      VerteilungSitzeAufLandeslisten[i] = hoechstZahlVerfahren(votesBundeslandList.toArray(new Integer[0]),
-          verteilungSitzeAufParteien[i]);
-      for (int j = 0; j < VerteilungSitzeAufLandeslisten[i].length; j++) {
-        database.executeUpdate("INSERT INTO " + database.sitzeNachLandeslisten() + " VALUES(" + parteienList.get(i)
-            + ", " + bundeslandList.get(j) + ", " + VerteilungSitzeAufLandeslisten[i][j] + ")");
-      }
-    }
+    database.executeUpdate("INSERT INTO " + database.sitzeNachLandeslisten() + " " + "WITH Divisoren (wert) as ( "
+        + "SELECT ROW_NUMBER() OVER (order by w.ID) - 0.5 FROM " + database.wahlkreis() + " w "
+        + "UNION SELECT ROW_NUMBER() OVER (order by w.ID) + (SELECT COUNT(*) FROM " + database.wahlkreis()
+        + ") - 0.5 FROM " + database.wahlkreis() + " w " + "), " + " " + "Zugriffsreihenfolge ("
+        + Datenbank.kForeignKeyParteiID + ", " + Datenbank.kForeignKeyBundeslandID
+        + ", AnzahlStimmen, DivWert, Rang) as " + "(SELECT p." + Datenbank.kForeignKeyParteiID + ", z."
+        + Datenbank.kForeignKeyBundeslandID + ", z." + Datenbank.kAnzahlStimmen + ", (z." + Datenbank.kAnzahlStimmen
+        + " / d.wert) as DivWert, ROW_NUMBER() OVER (PARTITION BY p." + Datenbank.kForeignKeyParteiID + " ORDER BY (z."
+        + Datenbank.kAnzahlStimmen + " / d.wert) DESC) as Rang " + "FROM " + database.parteienImBundestag() + " p, "
+        + database.zweitStimmenNachBundesland() + " z, Divisoren d " + "WHERE p." + Datenbank.kForeignKeyParteiID
+        + " = z." + Datenbank.kForeignKeyParteiID + " ORDER BY " + Datenbank.kForeignKeyParteiID + ", DivWert desc) "
+        + " " + "SELECT z." + Datenbank.kForeignKeyParteiID + ", " + Datenbank.kForeignKeyBundeslandID
+        + ", COUNT(Rang) as " + Datenbank.kAnzahlSitze + " " + "FROM Zugriffsreihenfolge z, "
+        + database.sitzeNachPartei() + " s " + "WHERE z." + Datenbank.kForeignKeyParteiID + " = s."
+        + Datenbank.kForeignKeyParteiID + " AND z.Rang <= s." + Datenbank.kAnzahlSitze + " " + "GROUP BY z."
+        + Datenbank.kForeignKeyParteiID + ", z." + Datenbank.kForeignKeyBundeslandID + ", s."
+        + Datenbank.kForeignKeyParteiID);
 
     database.printTable(database.sitzeNachLandeslisten());
   }
