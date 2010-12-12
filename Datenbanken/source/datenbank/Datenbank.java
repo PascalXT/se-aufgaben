@@ -138,6 +138,7 @@ public class Datenbank {
   }
 
   public void truncate(String table) throws SQLException {
+    connection.commit();
     executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
   }
 
