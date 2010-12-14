@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import queries.Q1;
+import queries.Q2;
 import queries.Query;
 import database.Database;
 
@@ -30,11 +31,15 @@ public class ShowResult extends HttpServlet {
 			return;
 		}
 		
-		Database database = new Database("Wahlsys", "Korbi", "stunk6", "KORBI");
+		Database database = new Database("Wahlsys", "Korbi", "stunk6", "KORBI", false);
 
 		if (queryParam.equalsIgnoreCase("Q1")) {
 			
 			query = new Q1("Q1 - Sitzverteilung");
+			
+		} else if (queryParam.equalsIgnoreCase("Q2")) {
+			
+			query = new Q2("Q2 - Abgeordnete");
 		}
 		
 		query.setDatabase(database);

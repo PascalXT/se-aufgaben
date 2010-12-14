@@ -18,7 +18,12 @@ public class Database {
 	  public String schemaName;
 	  private String dbCommandFlags;
 	  public String messagePath;
-
+	  
+	  /**
+	   * if the database uses temporary or persistant tables to store intermediate results
+	   */
+	  private boolean createTemporaryTables;
+	  
 	  private Connection connection;
 	  private Statement statement;
 
@@ -114,14 +119,16 @@ public class Database {
 	    return schemaName + "." + kurzname;
 	  }
 
-	  public Database(String name, String user, String pwd, String schemaName) {
+	  public Database(String name, String user, String pwd, String schemaName, boolean createTemporaryTables) {
 		  
 	    this.datenbank_kurzname = name;
 	    this.datenbank_name = "jdbc:db2:" + name;
 	    this.user = user;
 
 	    this.schemaName = schemaName;
-
+	    
+	    this.createTemporaryTables = createTemporaryTables;
+	    
 	    try {
 	      Class.forName("com.ibm.db2.jcc.DB2Driver");
 	      connection = DriverManager.getConnection(datenbank_name, user, pwd);
@@ -206,18 +213,23 @@ public class Database {
 	  public void dropTable(String tableName) throws SQLException {
 	    executeUpdate("DROP TABLE " + tableName);
 	  }
-
+	  
 	  /**
 	   * 
 	   * @param columns
 	   *          List of columns the table should include. Format:
 	   *          "Column_1 type_1, [...] Column_n type_n"
+	   * @param temporary TODO
 	   * @throws SQLException
 	   */
-	  public void createOrReplaceTemporaryTable(String tableName, String columns) throws SQLException {
+	  public void createOrReplaceTable(String tableName, String columns) throws SQLException {
 	    if (tableExists(tableName)) {
 	      dropTable(tableName);
-	      executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
+	      if (createTemporaryTables)
+	      	executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
+	      else
+	      	executeUpdate("CREATE TABLE " + tableName + " (" + columns + ")");
+	      
 	    }
 	  }
 
