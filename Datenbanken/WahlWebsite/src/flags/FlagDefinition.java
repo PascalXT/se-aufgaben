@@ -9,6 +9,7 @@ public class FlagDefinition {
   final public static String kFlagParserStimmenFile = "parserStimmenFile";
   final public static String kFlagParserErststimmenAggregiertFile = "parserErststimmenAggregiertFile";
   final public static String kFlagParserZweitstimmenAggregiertFile = "parserZweitstimmenAggregiertFile";
+  final public static String kFlagParserWahlberechtigteFile = "parserWahlberechtigteFile";
   final public static String kFlagParserDataFolder = "parserDataFolder";
   final public static String kFlagLogFile = "logFile";
   final public static String kFlagCreateTables = "createTables";
@@ -20,6 +21,7 @@ public class FlagDefinition {
   final public static String kFlagOnlyVotesForBundesland = "onlyVotesForBundesland";
   final public static String kFlagComputeSitzverteilungBundestag = "computeSitzverteilungBundestag";
   final public static String kFlagMakeTemporaryTablesPermanent = "makeTemporaryTablesPermanent";
+  final public static String kFlagAllowedWahlkreisIDs = "allowedWahlkreisIDs";
   final public static String[][] kFlagDefinition = {
       { kFlagDbName, "WahlSys", "Name of the db2 database." },
       { kFlagDbUser, null, "Username for the db2 database." },
@@ -34,6 +36,7 @@ public class FlagDefinition {
       { kFlagParserErststimmenAggregiertFile, null, "Path of the file used for storing the aggregated votes" },
       { kFlagParserZweitstimmenAggregiertFile, null, "Path of the file used for storing the aggregated votes" },
       { kFlagParserDataFolder, null, "Folder in which the csv source files are stored." },
+      { kFlagParserWahlberechtigteFile, null, "Path of the file used for storing persons eligible to vote." },
       { kFlagLogFile, null, "Path of the file, where log messages of db2 commands are stored." },
       { kFlagCreateTables, Flags.kFalse, "If true, the database tables will be created in the beginning." },
       { kImportCsvFiles, Flags.kFalse, "If true, the csv files will be imported in the beginning." },
@@ -45,6 +48,8 @@ public class FlagDefinition {
       { kFlagComputeSitzverteilungBundestag, Flags.kFalse,
           "If true, the Sitzverteilung for the Bundestag will be computed." },
       { kFlagMakeTemporaryTablesPermanent, Flags.kFalse,
-          "If true, permanent tables will be used instead of temporary tables." } };
+          "If true, permanent tables will be used instead of temporary tables." },
+      { kFlagAllowedWahlkreisIDs, "", 
+          	"If not empty, only votes of WahlkreisIDs in this comma separated list will be created"} };
 
 }
