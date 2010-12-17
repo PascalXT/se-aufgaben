@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import queries.Q1;
 import queries.Q2;
 import queries.Query;
-import database.Database;
+import database.DB;
+import flags.FlagDefinition;
+import flags.FlagErrorException;
+import flags.Flags;
 
 @WebServlet("/ShowResult")
 public class ShowResult extends HttpServlet {
@@ -24,14 +27,29 @@ public class ShowResult extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		String configFile = gitIgnore.Config.getConfigFile();
+		String[] args = {configFile};
+		try {
+			Flags.setFlags(FlagDefinition.kFlagDefinition, args);
+		} catch (FlagErrorException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			System.exit(0);
+		}
 		String queryParam = request.getParameter("query");
 		if (queryParam == null) {
 			response.getWriter().write("query parameter missing");
 			return;
 		}
 		
-		Database database = new Database("Wahlsys", "Korbi", "stunk6", "KORBI", false);
+		DB database = null;
+		try {
+			database = DB.getDatabaseByFlags();
+		} catch (FlagErrorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(0);
+		}
 
 		if (queryParam.equalsIgnoreCase("Q1")) {
 			

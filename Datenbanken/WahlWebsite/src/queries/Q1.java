@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import database.Database;
+import database.DB;
 
 public class Q1 extends Query {
 	
@@ -26,9 +26,9 @@ public class Q1 extends Query {
     database.printTable(zweitStimmenNachBundeslandTable);
     database.printTable(zweitStimmenNachParteiTable);
 
-    database.printResultSet(database.executeSQL("SELECT " + Database.kForeignKeyParteiID + ", SUM("
-        + Database.kAnzahlStimmen + ") FROM " + zweitStimmenNachBundeslandTable + " GROUP BY "
-        + Database.kForeignKeyParteiID));
+    database.printResultSet(database.executeSQL("SELECT " + DB.kForeignKeyParteiID + ", SUM("
+        + DB.kAnzahlStimmen + ") FROM " + zweitStimmenNachBundeslandTable + " GROUP BY "
+        + DB.kForeignKeyParteiID));
 
     String direktMandateTable = createDirektmandateTable();
 	  database.printResultSet(database.executeSQL("SELECT COUNT(*) FROM " + direktMandateTable));
@@ -37,9 +37,9 @@ public class Q1 extends Query {
 	  
 	  String dreiDirektMandateParteienTable = createDreiDirektmandateParteienTable(direktMandateTable);
 
-    database.printResultSet(database.executeSQL("SELECT p." + Database.kParteiKuerzel + " FROM " + database.partei()
-        + " p, " + dreiDirektMandateParteienTable + " ddmp" + " WHERE p." + Database.kID + " = ddmp."
-        + Database.kForeignKeyParteiID));
+    database.printResultSet(database.executeSQL("SELECT p." + DB.kParteiKuerzel + " FROM " + database.partei()
+        + " p, " + dreiDirektMandateParteienTable + " ddmp" + " WHERE p." + DB.kID + " = ddmp."
+        + DB.kForeignKeyParteiID));
 
 	  String parteienImBundestagTable = createParteienImBundestagTable(fuenfProzentParteienTable, dreiDirektMandateParteienTable);
 	  
@@ -49,14 +49,14 @@ public class Q1 extends Query {
     
     
     String qry = String.format("SELECT %s, SUM(%s) AS %s FROM %s sitze, %s partei WHERE sitze.%s = partei.%s GROUP BY %s", 
-    		Database.kParteiKuerzel, 
-    		Database.kAnzahlSitze, 
-    		Database.kAnzahlSitze, 
+    		DB.kParteiKuerzel, 
+    		DB.kAnzahlSitze, 
+    		DB.kAnzahlSitze, 
     		sitzeNachLandesListenTable, 
     		database.partei(),
-    		Database.kForeignKeyParteiID,
-    		Database.kID,
-    		Database.kParteiKuerzel);
+    		DB.kForeignKeyParteiID,
+    		DB.kID,
+    		DB.kParteiKuerzel);
     
     return database.executeSQL(qry);
 	}
@@ -73,8 +73,8 @@ public class Q1 extends Query {
 		String chartData = "&chd=t:";
 		String chartLabels = "&chl=";
 		while(resultSet.next()) {
-			String partei = resultSet.getString(Database.kParteiKuerzel);
-			int sitze = resultSet.getInt(Database.kAnzahlSitze);
+			String partei = resultSet.getString(DB.kParteiKuerzel);
+			int sitze = resultSet.getInt(DB.kAnzahlSitze);
 			sum += sitze;
 			tableRows += "<tr><td>" + partei + "</td><td>" + sitze + "</td></tr>";
 			
