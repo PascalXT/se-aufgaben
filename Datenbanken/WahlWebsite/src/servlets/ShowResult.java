@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import queries.Q1;
 import queries.Q2;
+import queries.Q5;
 import queries.Query;
 import database.DB;
 import flags.FlagDefinition;
@@ -27,6 +28,7 @@ public class ShowResult extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
 		String configFile = gitIgnore.Config.getConfigFile();
 		String[] args = {configFile};
 		try {
@@ -36,6 +38,7 @@ public class ShowResult extends HttpServlet {
 			e1.printStackTrace();
 			System.exit(0);
 		}
+
 		String queryParam = request.getParameter("query");
 		if (queryParam == null) {
 			response.getWriter().write("query parameter missing");
@@ -58,6 +61,10 @@ public class ShowResult extends HttpServlet {
 		} else if (queryParam.equalsIgnoreCase("Q2")) {
 			
 			query = new Q2("Q2 - Abgeordnete");
+			
+		} else if (queryParam.equalsIgnoreCase("Q5")) {
+			
+			query = new Q5("Q5 - Überhangsmandate");
 		}
 		
 		query.setDatabase(database);

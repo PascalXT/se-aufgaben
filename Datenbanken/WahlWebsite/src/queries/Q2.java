@@ -2,6 +2,8 @@ package queries;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import database.DB;
 
@@ -16,72 +18,62 @@ public class Q2 extends Query {
 		
 		String zweitStimmenNachBundeslandTable = createZweitStimmenNachBundeslandTable();
 		String zweitStimmenNachParteiTable = createZweitStimmenNachParteiTable();
-
     String direktMandateTable = createDirektmandateTable();
-
 	  String fuenfProzentParteienTable = createFuenfProzentParteienTable(zweitStimmenNachBundeslandTable);
-	  
 	  String dreiDirektMandateParteienTable = createDreiDirektmandateParteienTable(direktMandateTable);
-
 	  String parteienImBundestagTable = createParteienImBundestagTable(fuenfProzentParteienTable, dreiDirektMandateParteienTable);
-	  
     String sitzeNachParteiTable = createSitzeNachParteiTable(zweitStimmenNachParteiTable, parteienImBundestagTable);
-    
     String sitzeNachLandesListenTable = createSitzeNachLandeslistenTable(parteienImBundestagTable, zweitStimmenNachBundeslandTable, sitzeNachParteiTable);
     
-    String qry = "WITH Abgeordnete AS (";
-    qry += String.format("SELECT %s FROM %s ", DB.kForeignKeyKandidatID, direktMandateTable);
-    qry += "UNION ";
-    qry += String.format("SELECT k.%s FROM %s k ", DB.kID, database.kandidat());
-    qry += String.format("WHERE k.%s NOT IN (SELECT %s FROM %s) ", DB.kID, DB.kForeignKeyKandidatID, direktMandateTable);
-    qry += String.format("AND k.%s <= ", DB.kKandidatListenplatz);
-    qry += String.format("(SELECT SUM(AnzahlSitze) FROM %s s WHERE s.%s = k.%s AND s.%s = k.%s) ", 
-    		sitzeNachLandesListenTable, 
-    		DB.kForeignKeyParteiID, 
-    		DB.kForeignKeyParteiID, 
-    		DB.kForeignKeyBundeslandID, 
-    		DB.kForeignKeyBundeslandID);
-    qry += "- ";
-    qry += String.format("(SELECT COUNT(*) FROM %s dm, %s k0 WHERE dm.%s = k.%s AND k0.%s = dm.%s AND k0.%s = k.%s) ", 
-    		direktMandateTable, 
-    		database.kandidat(), 
-    		DB.kForeignKeyParteiID, 
-    		DB.kForeignKeyParteiID, 
-    		DB.kID, 
-    		DB.kForeignKeyKandidatID, 
-    		DB.kForeignKeyBundeslandID, 
-    		DB.kForeignKeyBundeslandID);
-    qry += ") ";
-    qry += String.format("SELECT k.%s, k.%s, p.%s FROM Abgeordnete a, %s k, %s p WHERE a.%s = k.%s AND (k.%s IS NULL OR k.%s = p.%s) ORDER BY p.%s",
-    		DB.kKandidatVorname, 
-    		DB.kKandidatNachname, 
-    		DB.kParteiKuerzel, 
-    		database.kandidat(),
-    		database.partei(),
-    		DB.kForeignKeyKandidatID,
-    		DB.kID,
-    		DB.kForeignKeyParteiID,
-    		DB.kForeignKeyParteiID,
-    		DB.kID,
-    		DB.kParteiKuerzel);
-
-    return database.executeSQL(qry);
+    String qry = "WITH ListenKandidaten AS (" +
+  		"SELECT " + DB.kID + " FROM " + db.kandidat() + " WHERE " + DB.kForeignKeyBundeslandID + " IS NOT NULL " + 
+  		"EXCEPT " +
+  		"SELECT " + DB.kForeignKeyKandidatID + " FROM " + db.direktmandate() + " " +
+  	"), " +
+  	"ListenKandidatenMitRang AS ( " + 
+  		"SELECT lk." + DB.kID + ", k." + DB.kForeignKeyParteiID + ", b." + DB.kID + " AS BundeslandID, " +
+  		"ROW_NUMBER() OVER (PARTITION BY b." + DB.kID + ", k." + DB.kForeignKeyParteiID + " ORDER BY k." + DB.kKandidatListenplatz + ") AS Rang " + 
+  		"FROM ListenKandidaten lk, " + db.bundesland() + " b, " + db.kandidat() + " k " +
+  		"WHERE lk." + DB.kID + " = k." + DB.kID + " " + 
+  		"AND k." + DB.kForeignKeyBundeslandID + " = b." + DB.kID + " " + 
+  	"), " +
+  	"Abgeordnete AS ( " + 
+  		"SELECT " + DB.kForeignKeyKandidatID + " FROM " + direktMandateTable + " " + 
+  		"UNION " +
+  		"SELECT lkr." + DB.kID + " FROM ListenKandidatenMitRang lkr, " + sitzeNachLandesListenTable + " s " + 
+  		"WHERE s." + DB.kForeignKeyParteiID + " = lkr." + DB.kForeignKeyParteiID + " " + 
+  		"AND s." + DB.kForeignKeyBundeslandID + " = lkr." + DB.kForeignKeyBundeslandID + " " + 
+  		"AND lkr.Rang <= s." + DB.kAnzahlSitze + " - (" +
+  			"SELECT COUNT(*) FROM " + direktMandateTable + " dm, " + db.wahlkreis() + " w " +
+  			"WHERE dm." + DB.kForeignKeyParteiID + " = lkr." + DB.kForeignKeyParteiID + " " + 
+  			"AND dm." + DB.kKandidatDMWahlkreisID + " = w." + DB.kID + " " +
+  			"AND w." + DB.kForeignKeyBundeslandID + " = lkr." + DB.kForeignKeyBundeslandID + " " +
+  		") " +
+  	") " +
+	  "SELECT k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + " " +
+	  "FROM Abgeordnete a, " + db.kandidat() + " k, " + db.partei() + " p " +
+	  "WHERE a." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
+	  "AND (k." + DB.kForeignKeyParteiID + " IS NULL OR k." + DB.kForeignKeyParteiID + " = p." + DB.kID + ") ";
+	
+	  return db.executeSQL(qry);
 	}
 	
 	@Override
 	protected String generateBody(ResultSet resultSet) throws SQLException {
 		
-		String tableRows = "<tr><th></th><th>Abgeordneter</th><th>Partei</th></tr>";
+		String[] headers = new String[] {"Abgeordneter", "Partei"};
+		List<List<String>> rows = new ArrayList<List<String>>();
 		
-		for(int seat = 1; resultSet.next(); seat++) {
-			String name = resultSet.getString(DB.kKandidatVorname) + " " + resultSet.getString(DB.kKandidatNachname);
-			String partei = resultSet.getString(DB.kParteiKuerzel);
-			tableRows += "<tr><td>" + seat + "</td><td>" + name + "</td><td>" + partei + "</td></tr>";
+		while (resultSet.next()) {
+			List<String> row = new ArrayList<String>();
+			row.add(resultSet.getString(DB.kKandidatVorname) + " " + resultSet.getString(DB.kKandidatNachname));
+			row.add(resultSet.getString(DB.kParteiKuerzel));
+			rows.add(row);
 		}
 		
-		return "<table>" + tableRows + "</table>";
+		Table table = new Table(headers, rows);
 		
-		
+		return table.getHtml();
 	}
 
 }

@@ -96,7 +96,11 @@ public class DB {
   public String sitzeNachLandeslisten() {
     return tabellenName("SitzeNachLandeslisten");
   }
-
+  
+  public String ueberhangsMandate() {
+		return tabellenName("Ueberhangsmandate");
+	}
+  
   public final static String kForeignKeyParteiID = "ParteiID";
   public final static String kForeignKeyBundeslandID = "BundeslandID";
   public final static String kForeignKeyWahlbezirkID = "WahlbezirkID";
@@ -105,6 +109,8 @@ public class DB {
   
   public final static String kAnzahlStimmen = "AnzahlStimmen";
   public final static String kAnzahlSitze = "AnzahlSitze";
+  
+  public final static String kAnzahlUeberhangsmandate = "AnzahlUeberhangsmandate";
 
   public String zweitStimmenNachPartei() {
     return tabellenName("ZweitStimmenNachPartei");
