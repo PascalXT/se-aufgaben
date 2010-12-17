@@ -82,22 +82,28 @@ public class Evaluation {
 
     database.printTable(database.zweitStimmenNachBundesland());
     database.printTable(database.zweitStimmenNachPartei());
-    database.printResultSet(database.executeSQL("SELECT " + Datenbank.kForeignKeyParteiID + ", SUM("
-        + Datenbank.kAnzahlStimmen + ") FROM " + database.zweitStimmenNachBundesland() + " GROUP BY "
-        + Datenbank.kForeignKeyParteiID));
+    database.printResultSet(database.executeSQL(""
+        + "SELECT " + Datenbank.kForeignKeyParteiID + ", SUM(" + Datenbank.kAnzahlStimmen + ") "
+        + "FROM " + database.zweitStimmenNachBundesland() + " "
+        + "GROUP BY " + Datenbank.kForeignKeyParteiID));
 
     // +++++++++++++++++ DIREKTMANDATE +++++++++++++++++ //
     database.createOrReplaceTemporaryTable(database.direktmandate(), Datenbank.kForeignKeyKandidatID + " BIGINT, "
         + Datenbank.kForeignKeyParteiID + " BIGINT");
-    database.executeUpdate("INSERT INTO " + database.direktmandate()
-        + " WITH maxErgebnis(wahlkreisID, maxStimmen) as (SELECT" + " k." + Datenbank.kKandidatDMWahlkreisID
-        + ", MAX(v." + Datenbank.kWahlergebnis1Anzahl + ")" + " FROM " + database.wahlergebnis1() + " v, "
-        + database.kandidat() + " k" + " WHERE v." + Datenbank.kForeignKeyKandidatID + " = k." + Datenbank.kID
-        + " GROUP BY k." + Datenbank.kKandidatDMWahlkreisID + ")" + " SELECT k." + Datenbank.kID + " as "
-        + Datenbank.kForeignKeyKandidatID + ", k." + Datenbank.kForeignKeyParteiID + " FROM maxErgebnis e, "
-        + database.wahlergebnis1() + " v, " + database.kandidat() + " k" + " WHERE e.wahlkreisID = v."
-        + Datenbank.kForeignKeyWahlkreisID + " AND e.maxStimmen = v." + Datenbank.kWahlergebnis1Anzahl + " AND k."
-        + Datenbank.kID + " = v." + Datenbank.kForeignKeyKandidatID);
+    database.executeUpdate(""
+        + "INSERT INTO " + database.direktmandate() + " "
+        + "WITH maxErgebnis(wahlkreisID, maxStimmen) as ("
+          + "SELECT k." + Datenbank.kKandidatDMWahlkreisID + ", MAX(v." + Datenbank.kWahlergebnis1Anzahl + ") "
+          + "FROM " + database.wahlergebnis1() + " v, " + database.kandidat() + " k "
+          + "WHERE v." + Datenbank.kForeignKeyKandidatID + " = k." + Datenbank.kID + " "
+          + "GROUP BY k." + Datenbank.kKandidatDMWahlkreisID + ") "
+        + "SELECT k." + Datenbank.kID + " as " + Datenbank.kForeignKeyKandidatID + ", "
+               + "k." + Datenbank.kForeignKeyParteiID + " "
+        + "FROM maxErgebnis e, " + database.wahlergebnis1() + " v, " + database.kandidat() + " k "
+        + "WHERE e.wahlkreisID = v." + Datenbank.kForeignKeyWahlkreisID + " "
+          + "AND e.maxStimmen = v." + Datenbank.kWahlergebnis1Anzahl + " "
+          + "AND k." + Datenbank.kID + " = v." + Datenbank.kForeignKeyKandidatID);
+    
     database.printResultSet(database.executeSQL("SELECT COUNT(*) FROM " + database.direktmandate()));
 
     // +++++++++++++++++ 5 PROZENT PARTEIEN +++++++++++++++++ //
