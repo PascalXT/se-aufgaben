@@ -47,7 +47,7 @@ public class Q5 extends Query {
     
 		String ueberhangsmandateTable = createUeberhangsmandateTable(direktMandateTable, sitzeNachLandesListenTable);
 
-		return database.executeSQL("SELECT * FROM " + ueberhangsmandateTable);
+		return db.executeSQL("SELECT * FROM " + ueberhangsmandateTable);
 	}
 
 }
