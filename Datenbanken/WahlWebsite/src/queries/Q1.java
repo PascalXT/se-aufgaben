@@ -1,10 +1,11 @@
 package queries;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import queries.GoogleChart.ChartType;
 import database.Database;
 
 public class Q1 extends Query {
@@ -68,28 +69,25 @@ public class Q1 extends Query {
 		
 		int sum = 0;
 		
-		// see http://code.google.com/apis/chart/docs/gallery/pie_charts.html
-		String chartUrl = "http://chart.apis.google.com/chart?cht=p&chs=420x250";
-		String chartData = "&chd=t:";
-		String chartLabels = "&chl=";
+		List<Integer> data = new ArrayList<Integer>();
+		List<String> labels = new ArrayList<String>();
+		
 		while(resultSet.next()) {
 			String partei = resultSet.getString(Database.kParteiKuerzel);
 			int sitze = resultSet.getInt(Database.kAnzahlSitze);
 			sum += sitze;
 			tableRows += "<tr><td>" + partei + "</td><td>" + sitze + "</td></tr>";
 			
-			chartData += (sitze * 100 / 598) + ",";
-			try {
-				chartLabels += URLEncoder.encode(partei + " (" + sitze + ")", "UTF-8") + "|";
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
+			data.add(sitze * 100 / 598);
+			labels.add(partei + " (" + sitze + ")");
+			
+
 		}
+		GoogleChart chart = new GoogleChart(ChartType.PIE, 400, 240, data, labels);
+		
 		tableRows += "<tr><td><strong>Summe</strong></td><td><strong>" + sum + "</strong></td></tr>";
-		chartUrl += chartData.substring(0, chartData.length() - 1);
-		chartUrl += chartLabels.substring(0, chartLabels.length() - 1);
-	
-		return "<p> <img src=\"" + chartUrl + "\" alt=\"\"/> </p>" + "<table>" + tableRows + "</table>";
+
+		return "<p>" +  chart.getHtml() + "</p>" + "<table>" + tableRows + "</table>";
 	}
 	
 }
