@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.Random;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import queries.Q1;
 import queries.Q2;
+import queries.Q3;
 import queries.Q5;
 import queries.Query;
 import database.DB;
@@ -61,6 +63,12 @@ public class ShowResult extends HttpServlet {
 		} else if (queryParam.equalsIgnoreCase("Q2")) {
 			
 			query = new Q2("Q2 - Abgeordnete");
+			
+		} else if (queryParam.equalsIgnoreCase("Q3")) {
+			
+			int randomWahlkreis = new Random().nextInt(299) + 1;
+
+			query = new Q3("Q3 - Wahlkreisinfo", randomWahlkreis);
 			
 		} else if (queryParam.equalsIgnoreCase("Q5")) {
 			

@@ -30,10 +30,10 @@ public abstract class Query {
 			return null;
 		}
 	}
-
-	protected abstract String generateBody(ResultSet resultSet) throws SQLException;
-
+	
 	protected abstract ResultSet doQuery() throws SQLException;
+	
+	protected abstract String generateBody(ResultSet resultSet) throws SQLException;
 
 	protected String createZweitStimmenNachBundeslandTable() throws SQLException {
 		 	db.createOrReplaceTemporaryTable(db.zweitStimmenNachBundesland(), DB.kForeignKeyParteiID
