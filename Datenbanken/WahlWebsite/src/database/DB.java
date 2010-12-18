@@ -101,6 +101,10 @@ public class DB {
 		return tabellenName("Ueberhangsmandate");
 	}
   
+  public String wahlkreissieger() {
+		return tabellenName("Wahlkreissieger");
+	}
+  
   public final static String kForeignKeyParteiID = "ParteiID";
   public final static String kForeignKeyBundeslandID = "BundeslandID";
   public final static String kForeignKeyWahlbezirkID = "WahlbezirkID";

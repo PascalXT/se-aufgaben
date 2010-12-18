@@ -151,35 +151,76 @@ public abstract class Query {
 	}	
 
 
-public String createUeberhangsmandateTable(String direktMandateTable, String sitzeNachLandeslistenTable) throws SQLException {
-	db.createOrReplaceTemporaryTable(db.ueberhangsMandate(), 
-			DB.kForeignKeyBundeslandID + " BIGINT, " +
-			DB.kBundeslandName + " VARCHAR(255), " + 
-			DB.kForeignKeyParteiID + " BIGINT, " +
-			DB.kParteiKuerzel + " VARCHAR(64), " +
-			DB.kAnzahlUeberhangsmandate + " BIGINT ");
-
-	db.executeUpdate("" + 
-	"INSERT INTO " + db.ueberhangsMandate() + " " + 
-	"WITH DirektMandateProParteiUndBundesland AS (" +
-		"SELECT k." + DB.kForeignKeyParteiID + ", w." + DB.kForeignKeyBundeslandID + ", COUNT(*) AS AnzahlDirektmandate " +
-		"FROM " + direktMandateTable + " dm, " + db.kandidat() + " k, " + db.wahlkreis() + " w " +
-		"WHERE dm." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " + 
-		"AND w." + DB.kID + " = k." + DB.kKandidatDMWahlkreisID + " " + 
-		"GROUP BY k." + DB.kForeignKeyParteiID + ", w." + DB.kForeignKeyBundeslandID + 
-	") " +
-	"SELECT b." + DB.kID + " AS " + DB.kForeignKeyBundeslandID + ", b." + DB.kBundeslandName + ", p." + DB.kID + " AS " + DB.kForeignKeyParteiID + ", p." + DB.kParteiKuerzel + ", " +
-		"dmpb.AnzahlDirektmandate - s." + DB.kAnzahlSitze + " AS " + DB.kAnzahlUeberhangsmandate + " " +
-	"FROM DirektMandateProParteiUndBundesland dmpb, " + sitzeNachLandeslistenTable + " s, " +
-		db.partei() + " p, " + db.bundesland() + " b " + 
-	"WHERE dmpb." + DB.kForeignKeyBundeslandID + " = s." + DB.kForeignKeyBundeslandID + " " + 
-		"AND dmpb." + DB.kForeignKeyParteiID + " = s." + DB.kForeignKeyParteiID + " " +
-		"AND dmpb." + DB.kForeignKeyParteiID + " = p." + DB.kID + " " + 
-		"AND dmpb." + DB.kForeignKeyBundeslandID + " = b." + DB.kID + " " +
-		"AND dmpb.AnzahlDirektmandate - s." + DB.kAnzahlSitze + " > 0" 
-	);
+	public String createUeberhangsmandateTable(String direktMandateTable, String sitzeNachLandeslistenTable) throws SQLException {
+		db.createOrReplaceTemporaryTable(db.ueberhangsMandate(), 
+				DB.kForeignKeyBundeslandID + " BIGINT, " +
+				DB.kBundeslandName + " VARCHAR(255), " + 
+				DB.kForeignKeyParteiID + " BIGINT, " +
+				DB.kParteiKuerzel + " VARCHAR(64), " +
+				DB.kAnzahlUeberhangsmandate + " BIGINT ");
 	
-	return db.ueberhangsMandate();
-}
+		db.executeUpdate("" + 
+		"INSERT INTO " + db.ueberhangsMandate() + " " + 
+		"WITH DirektMandateProParteiUndBundesland AS (" +
+			"SELECT k." + DB.kForeignKeyParteiID + ", w." + DB.kForeignKeyBundeslandID + ", COUNT(*) AS AnzahlDirektmandate " +
+			"FROM " + direktMandateTable + " dm, " + db.kandidat() + " k, " + db.wahlkreis() + " w " +
+			"WHERE dm." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " + 
+			"AND w." + DB.kID + " = k." + DB.kKandidatDMWahlkreisID + " " + 
+			"GROUP BY k." + DB.kForeignKeyParteiID + ", w." + DB.kForeignKeyBundeslandID + 
+		") " +
+		"SELECT b." + DB.kID + " AS " + DB.kForeignKeyBundeslandID + ", b." + DB.kBundeslandName + ", p." + DB.kID + " AS " + DB.kForeignKeyParteiID + ", p." + DB.kParteiKuerzel + ", " +
+			"dmpb.AnzahlDirektmandate - s." + DB.kAnzahlSitze + " AS " + DB.kAnzahlUeberhangsmandate + " " +
+		"FROM DirektMandateProParteiUndBundesland dmpb, " + sitzeNachLandeslistenTable + " s, " +
+			db.partei() + " p, " + db.bundesland() + " b " + 
+		"WHERE dmpb." + DB.kForeignKeyBundeslandID + " = s." + DB.kForeignKeyBundeslandID + " " + 
+			"AND dmpb." + DB.kForeignKeyParteiID + " = s." + DB.kForeignKeyParteiID + " " +
+			"AND dmpb." + DB.kForeignKeyParteiID + " = p." + DB.kID + " " + 
+			"AND dmpb." + DB.kForeignKeyBundeslandID + " = b." + DB.kID + " " +
+			"AND dmpb.AnzahlDirektmandate - s." + DB.kAnzahlSitze + " > 0" 
+		);
+		
+		return db.ueberhangsMandate();
+	}
+	
+	public String createWahlkreissiegerTable() throws SQLException {
+		db.createOrReplaceTemporaryTable(db.wahlkreissieger(), 
+				DB.kForeignKeyWahlkreisID + " BIGINT, " +
+				DB.kForeignKeyBundeslandID + " BIGINT, " +
+				"P1 VARCHAR(64), " +
+				"P2 VARCHAR(64) ");
+
+		db.executeUpdate("INSERT INTO " + db.wahlkreissieger() + " " +
+				"WITH " +
+				"MaxErstStimmen(WahlkreisID, Anzahl) AS ( " +
+					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis1Anzahl + ") " + 
+					"FROM " + db.wahlergebnis1() + " we GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
+				"), " +
+				"MaxZweitStimmen(WahlkreisID, Anzahl) AS ( " +
+					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis2Anzahl + ") " + 
+					"FROM " + db.wahlergebnis2() + " we GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
+				"), " +
+				"GewinnerErstStimmen(WahlkreisID, KandidatID) AS ( " +
+					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyKandidatID + " " + 
+					"FROM " + db.wahlergebnis1() + " we, MaxErstStimmen ms " + 
+					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
+					"AND we." + DB.kWahlergebnis1Anzahl + " = ms.Anzahl " +
+				"), " +
+				"GewinnerZweitStimmen(WahlkreisID, ParteiID) AS ( " +
+					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyParteiID + " " + 
+					"FROM " + db.wahlergebnis2() + " we, MaxZweitStimmen ms " + 
+					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
+					"AND we." + DB.kWahlergebnis2Anzahl + " = ms.Anzahl " +
+				") " +
+				"SELECT g1.WahlkreisID, wk." + DB.kForeignKeyBundeslandID + ", p1." + DB.kParteiKuerzel + " AS P1, p2." + DB.kParteiKuerzel + " AS P2 " +
+				"FROM GewinnerErstStimmen g1, GewinnerZweitStimmen g2, " + db.partei() + " p1, " + db.partei() + " p2, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " + 
+				"WHERE g1.WahlkreisID = g2.WahlkreisID " + 
+				"AND g1.KandidatID = k." + DB.kID + " " +
+				"AND k.ParteiID = p1." + DB.kID + " " +
+				"AND g2.ParteiID = p2." + DB.kID + " " + 
+				"AND wk." + DB.kID + " = g1.WahlkreisID "
+		);
+		
+		return db.wahlkreissieger();
+	}
 
 }

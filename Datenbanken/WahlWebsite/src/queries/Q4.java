@@ -3,9 +3,11 @@ package queries;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import database.DB;
+import queries.GoogleChart.ChartType;
 
 public class Q4 extends Query {
 
@@ -15,36 +17,7 @@ public class Q4 extends Query {
 
 	@Override
 	protected ResultSet doQuery() throws SQLException {
-		
-		return db.executeSQL("" +
-				"WITH " +
-				"MaxErstStimmen(WahlkreisID, Anzahl) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis1Anzahl + ") " + 
-					"FROM " + db.wahlergebnis1() + " we GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
-				"), " +
-				"MaxZweitStimmen(WahlkreisID, Anzahl) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis2Anzahl + ") " + 
-					"FROM " + db.wahlergebnis2() + " we GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
-				"), " +
-				"GewinnerErstStimmen(WahlkreisID, KandidatID) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyKandidatID + " " + 
-					"FROM " + db.wahlergebnis1() + " we, MaxErstStimmen ms " + 
-					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
-					"AND we." + DB.kWahlergebnis1Anzahl + " = ms.Anzahl " +
-				"), " +
-				"GewinnerZweitStimmen(WahlkreisID, ParteiID) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyParteiID + " " + 
-					"FROM " + db.wahlergebnis2() + " we, MaxZweitStimmen ms " + 
-					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
-					"AND we." + DB.kWahlergebnis2Anzahl + " = ms.Anzahl " +
-				") " +
-				"SELECT g1.WahlkreisID, p1." + DB.kParteiKuerzel + " AS P1, p2." + DB.kParteiKuerzel + " AS P2 " +
-				"FROM GewinnerErstStimmen g1, GewinnerZweitStimmen g2, " + db.partei() + " p1, " + db.partei() + " p2, " + db.kandidat() + " k " +
-				"WHERE g1.WahlkreisID = g2.WahlkreisID " + 
-				"AND g1.KandidatID = k." + DB.kID + " " +
-				"AND k.ParteiID = p1." + DB.kID + " " +
-				"AND g2.ParteiID = p2." + DB.kID + " "
-		);
+		return db.executeSQL("SELECT * FROM " + createWahlkreissiegerTable());
 	}
 
 	@Override
@@ -63,7 +36,81 @@ public class Q4 extends Query {
 		
 		Table table = new Table(tableHeaders, rows);
 		
-		return table.getHtml();
+		// SPECIAL - eingefärbte Deutschlandkarte
+		Map<String, String> colorMapping = new HashMap<String, String>();
+		colorMapping.put("CDU", "000000");
+		colorMapping.put("SPD", "FF0000");
+		colorMapping.put("CSU", "00FFFF");
+		colorMapping.put("DIE LINKE", "FF00FF");
+		
+		Map<Integer, String> bundeslandMapping = new HashMap<Integer, String>();
+		bundeslandMapping.put(1, "DE-BW");
+		bundeslandMapping.put(2, "DE-BY");
+		bundeslandMapping.put(3, "DE-BE");
+		bundeslandMapping.put(4, "DE-BB");
+		bundeslandMapping.put(5, "DE-HB");
+		bundeslandMapping.put(6, "DE-HH");
+		bundeslandMapping.put(7, "DE-HE");
+		bundeslandMapping.put(8, "DE-MV");
+		bundeslandMapping.put(9, "DE-NI");
+		bundeslandMapping.put(10, "DE-NW");
+		bundeslandMapping.put(11, "DE-RP");
+		bundeslandMapping.put(12, "DE-SL");
+		bundeslandMapping.put(13, "DE-SN");
+		bundeslandMapping.put(14, "DE-ST");
+		bundeslandMapping.put(15, "DE-SH");
+		bundeslandMapping.put(16, "DE-TH");
+		
+		ResultSet rs = db.executeSQL("" +
+			"WITH " + 
+			"GewinnerErststimmen(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
+				"SELECT BundeslandID, P1, COUNT(*) FROM " + db.wahlkreissieger() + " GROUP BY BundeslandID, P1 " + 
+			"), " + 
+			"GewinnerZweitStimmen(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
+				"SELECT BundeslandID, P2, COUNT(*) FROM " + db.wahlkreissieger() + " GROUP BY BundeslandID, P2 " + 
+			"), " + 
+			"GewinnerGesamt(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
+				"SELECT g1.BundeslandID, g1.Partei, g1.GewonneneWahlkreise + g2.GewonneneWahlkreise " + 
+				"FROM GewinnerErststimmen g1, GewinnerZweitStimmen g2 " + 
+			") " + 
+			"SELECT g.BundeslandID, g.Partei " + 
+			"FROM GewinnerGesamt g WHERE NOT EXISTS ( " + 
+				"SELECT * FROM GewinnerGesamt g0 " + 
+				"WHERE g0.BundeslandID = g.BundeslandID " + 
+			 	"AND g0.GewonneneWahlkreise > g.GewonneneWahlkreise " + 
+			") "
+		);
+		
+		List<String> labels = new ArrayList<String>(); 
+		List<String> colors = new ArrayList<String>(); 
+		
+		colors.add("FFFFFF"); // first value is background color
+		
+		while (rs.next()) {
+			labels.add(bundeslandMapping.get(rs.getInt("BundeslandID")));
+			colors.add(colorMapping.get(rs.getString("Partei")));
+		}
+		
+		GoogleChart chart = new GoogleChart(ChartType.MAP, 300, 500);
+		chart.setLabels(labels);
+		chart.setColors(colors);
+		
+		String html = "<h2>Deutschlandkarte</h2><p>Die meisten gewonnenen Wahlkreise in einem Bundesland:</p>";
+		
+		// Legende
+		String[] legendHeaders = new String[] {"Partei", "Farbe"};
+		List<List<String>> legendRows = new ArrayList<List<String>>();
+		for (String partei : colorMapping.keySet()) {
+			List<String> row = new ArrayList<String>();
+			row.add(partei);
+			row.add("<div style=\"background-color:#" + colorMapping.get(partei) + "\">&nbsp;</div>");
+			legendRows.add(row);
+		}
+		
+		html += new Table(legendHeaders, legendRows).getHtml();
+		html += "<p>" + chart.getHtml() + "</p> <p><h2>Wahlkreissieger</h2>" + table.getHtml() + "</p>";
+		
+		return html;
 	}
 
 }

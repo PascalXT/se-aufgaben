@@ -81,7 +81,9 @@ public class Q1 extends Query {
 			data.add(sitze * 100 / 598);
 			labels.add(partei + " (" + sitze + ")");
 		}
-		GoogleChart chart = new GoogleChart(ChartType.PIE, 400, 240, data, labels);
+		GoogleChart chart = new GoogleChart(ChartType.PIE, 400, 240);
+		chart.setData(data);
+		chart.setLabels(labels);
 		
 		List<String> finalRow = new ArrayList<String>();
 		finalRow.add("Summe");
