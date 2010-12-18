@@ -14,6 +14,8 @@ import queries.Q2;
 import queries.Q3;
 import queries.Q4;
 import queries.Q5;
+import queries.Q6;
+import queries.Q7;
 import queries.Query;
 import database.DB;
 import flags.FlagDefinition;
@@ -37,7 +39,6 @@ public class ShowResult extends HttpServlet {
 		try {
 			Flags.setFlags(FlagDefinition.kFlagDefinition, args);
 		} catch (FlagErrorException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			System.exit(0);
 		}
@@ -52,32 +53,25 @@ public class ShowResult extends HttpServlet {
 		try {
 			database = DB.getDatabaseByFlags();
 		} catch (FlagErrorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(0);
 		}
 
 		if (queryParam.equalsIgnoreCase("Q1")) {
-			
-			query = new Q1("Q1 - Sitzverteilung");
-			
-		} else if (queryParam.equalsIgnoreCase("Q2")) {
-			
-			query = new Q2("Q2 - Abgeordnete");
-			
-		} else if (queryParam.equalsIgnoreCase("Q3")) {
-			
+			query = new Q1("Q1 - Sitzverteilung");			
+		} else if (queryParam.equalsIgnoreCase("Q2")) {			
+			query = new Q2("Q2 - Abgeordnete");		
+		} else if (queryParam.equalsIgnoreCase("Q3")) {		
 			int randomWahlkreis = new Random().nextInt(299) + 1;
-
-			query = new Q3("Q3 - Wahlkreisinfo", randomWahlkreis);
-			
-		} else if (queryParam.equalsIgnoreCase("Q4")) {
-			
+			query = new Q3("Q3 - Wahlkreisinfo", randomWahlkreis);			
+		} else if (queryParam.equalsIgnoreCase("Q4")) {	
 			query = new Q4("Q4 - Wahlkreisergebnisse");
-			
 		} else if (queryParam.equalsIgnoreCase("Q5")) {
-			
 			query = new Q5("Q5 - Überhangsmandate");
+		} else if (queryParam.equalsIgnoreCase("Q6")) {
+			query = new Q6("Q6 - Knappste Sieger");
+		} else if (queryParam.equalsIgnoreCase("Q7")) {
+			query = new Q7("Q7 - Wahlkreisinfo (Einzelstimmen)");
 		}
 		
 		query.setDatabase(database);
