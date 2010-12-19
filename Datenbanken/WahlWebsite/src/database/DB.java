@@ -118,6 +118,13 @@ public class DB {
   public final static String kAnzahlStimmen = "AnzahlStimmen";
   public final static String kAnzahlSitze = "AnzahlSitze";
   
+  public String wahlkreisDaten() {
+  	return tabellenName("WahlkreisDaten");
+  }
+  public final static String kAnzahlWahlberechtigte = "AnzahlWahlberechtigte";
+  public final static String kUngueltigeErststimmen = "UngueltigeErststimmen";
+  public final static String kUngueltigeZweitstimmen = "UngueltigeZweitstimmen";
+  
   public final static String kAnzahlUeberhangsmandate = "AnzahlUeberhangsmandate";
 
   public String zweitStimmenNachPartei() {

@@ -31,16 +31,18 @@ public class CsvParser {
   String erststimmenAggregiertFile;
   String zweitstimmenAggregiertFile;
   String wahlberechtigteFile;
+  String wahlkreisdatenFile;
 
   private DB datenbank;
 
   public CsvParser(DB datenbank, String stimmenFile, String erstStimmenAggregiertFile,
-      String zweitStimmenAggregiertFile, String wahlberechtigteFile) {
+      String zweitStimmenAggregiertFile, String wahlberechtigteFile, String wahlkreisdatenFile) {
     this.datenbank = datenbank;
     this.stimmenFile = stimmenFile;
     this.erststimmenAggregiertFile = erstStimmenAggregiertFile;
     this.zweitstimmenAggregiertFile = zweitStimmenAggregiertFile;
     this.wahlberechtigteFile = wahlberechtigteFile;
+    this.wahlkreisdatenFile = wahlkreisdatenFile;
   }
 
   private int getKandidat(int wahlkreisID, int parteiID) throws SQLException {
@@ -130,6 +132,7 @@ public class CsvParser {
     FileWriter fileWriterErststimmenAggregiert = new FileWriter(erststimmenAggregiertFile);
     FileWriter fileWriterZweitstimmenAggregiert = new FileWriter(zweitstimmenAggregiertFile);
     FileWriter fileWriterWahlberechtigte = new FileWriter(wahlberechtigteFile);
+    FileWriter fileWriterWahlkreisDaten = new FileWriter(wahlkreisdatenFile);
     
     for (int i = 0; i < skipCountBeforeParties; i++) line_number_reader.readLine();
   	String next_line = line_number_reader.readLine(); 
@@ -149,11 +152,6 @@ public class CsvParser {
       
       int wahlkreisID = Integer.parseInt(tokens[kPosWahlkreisID]);
       
-      if (!Flags.getFlagValue(FlagDefinition.kFlagAllowedWahlkreisIDs).equals("")
-      		&& (Flags.getFlagValue(FlagDefinition.kFlagAllowedWahlkreisIDs) + ",").indexOf(wahlkreisID + ",") < 0) {
-      	continue;
-      }
-      
       int wahlberechtigte = Integer.parseInt(tokens[kPosWahlberechtigte]);
       createWaehlberechtigte(wahlkreisID, wahlberechtigte, fileWriterWahlberechtigte);
       
@@ -166,8 +164,16 @@ public class CsvParser {
       int ungueltigeZweitstimmen = getInteger(tokens, kUngueltigePos + kOffsetZweitstimmen);
       zweitstimmenQueue.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeZweitstimmen));
       
+      createWahlkreisDaten(wahlkreisID, wahlberechtigte, ungueltigeErststimmen, ungueltigeZweitstimmen,
+      		kCurrentElectionYear, fileWriterWahlkreisDaten);
+      int ungueltigeErststimmenVorperiode = getInteger(tokens, kUngueltigePos + kOffsetErststimmenVorperiode);
+      int ungueltigeZweitstimmenVorperiode = getInteger(tokens, kUngueltigePos + kOffsetZweitstimmenVorperiode);
+      createWahlkreisDaten(wahlkreisID, wahlberechtigte, ungueltigeErststimmen, ungueltigeZweitstimmen,
+      		kPreviousElectionYear, fileWriterWahlkreisDaten);
+      
       // Fill the queue.
-      for (int i = 0; i < 29; i++) {
+      final int kNumParties = 29;
+      for (int i = 0; i < kNumParties; i++) {
       	int column = kPartiesStart + 4*i;
       	int parteiID = getParty(parties[column]);
       	int anzahlErststimmen = getInteger(tokens, column + kOffsetErststimmen);
@@ -187,6 +193,13 @@ public class CsvParser {
       	writeErststimmenAggregiert(kPreviousElectionYear, wahlkreisID, parteiID, anzahlErststimmenVorperiode,
       			fileWriterErststimmenAggregiert);
 
+      }
+      
+      // Only create detailed votes for the selected Wahlkreise.
+      if (!Flags.getFlagValue(FlagDefinition.kFlagAllowedWahlkreisIDs).equals("")
+      		&& ("," + Flags.getFlagValue(FlagDefinition.kFlagAllowedWahlkreisIDs) + ",").
+      		indexOf("," + wahlkreisID + ",") < 0) {
+      	continue;
       }
 
       Tuple<Integer, Integer> erststimmenTuple;
@@ -233,10 +246,12 @@ public class CsvParser {
     fileWriterErststimmenAggregiert.flush();
     fileWriterZweitstimmenAggregiert.flush();
     fileWriterWahlberechtigte.flush();
+    fileWriterWahlkreisDaten.flush();
     fileWriterStimmen.close();
     fileWriterErststimmenAggregiert.close();
     fileWriterZweitstimmenAggregiert.close();
     fileWriterWahlberechtigte.close();
+    fileWriterWahlkreisDaten.close();
   }
 
   /**
@@ -372,6 +387,13 @@ public class CsvParser {
       System.exit(1);
     }
   }
+  
+  private void createWahlkreisDaten(int wahlkreisID, int wahlberechtigte, int ungueltigeErststimmen,
+  		int ungueltigeZweitstimmen, int year, FileWriter fileWriter) throws IOException {
+  	String csvLine = wahlkreisID + ";" + wahlberechtigte + ";" + ungueltigeErststimmen + ";" + ungueltigeZweitstimmen
+  			+ ";" + year;
+  	fileWriter.write(csvLine + "\n");
+  }
 
   private void writeZweitstimmenAggregiert(int jahr, int wahlkreisID, int parteiID, int anzahlZweitstimmen,
       FileWriter fileWriter) {
@@ -447,5 +469,9 @@ public class CsvParser {
     datenbank
         .load(zweitstimmenAggregiertFile, "(1, 2, 3, 4)", columnsZweitstimmenAggregiert, datenbank.wahlergebnis2());
     System.out.println("ZweitstimmenAggregiert have been imported to the database");
+    
+    final String[] columnsWahlkreisDaten = {DB.kForeignKeyWahlkreisID, DB.kAnzahlWahlberechtigte,
+    		DB.kUngueltigeErststimmen, DB.kUngueltigeZweitstimmen};
+    datenbank.load(wahlkreisdatenFile, "(1, 2, 3, 4)", columnsWahlkreisDaten, datenbank.wahlkreisDaten());
   }
 }

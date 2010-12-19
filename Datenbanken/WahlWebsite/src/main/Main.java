@@ -25,10 +25,11 @@ public class Main {
     final String parserZweitstimmenAggregiertFile = Flags
         .getFlagValue(FlagDefinition.kFlagParserZweitstimmenAggregiertFile);
     final String parserWahlberechtigteFile = Flags.getFlagValue(FlagDefinition.kFlagParserWahlberechtigteFile);
+    final String parserWahlkreisdatenFile = Flags.getFlagValue(FlagDefinition.kFlagParserWahlkreisDatenFile);
     final String parserDataFolder = Flags.getFlagValue(FlagDefinition.kFlagParserDataFolder);
 
     CsvParser csvParser = new CsvParser(db, parserStimmenFile, parserErststimmenAggregiertFile,
-        parserZweitstimmenAggregiertFile, parserWahlberechtigteFile);
+        parserZweitstimmenAggregiertFile, parserWahlberechtigteFile, parserWahlkreisdatenFile);
 
     String bundesland = Flags.getFlagValue(FlagDefinition.kFlagOnlyVotesForBundesland);
     if (bundesland.isEmpty())

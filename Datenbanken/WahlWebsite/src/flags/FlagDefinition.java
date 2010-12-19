@@ -9,6 +9,7 @@ public class FlagDefinition {
   final public static String kFlagParserStimmenFile = "parserStimmenFile";
   final public static String kFlagParserErststimmenAggregiertFile = "parserErststimmenAggregiertFile";
   final public static String kFlagParserZweitstimmenAggregiertFile = "parserZweitstimmenAggregiertFile";
+  final public static String kFlagParserWahlkreisDatenFile = "parserWahlkreisDatenFile";
   final public static String kFlagParserWahlberechtigteFile = "parserWahlberechtigteFile";
   final public static String kFlagParserDataFolder = "parserDataFolder";
   final public static String kFlagLogFile = "logFile";
@@ -36,6 +37,7 @@ public class FlagDefinition {
               + " import." },
       { kFlagParserErststimmenAggregiertFile, null, "Path of the file used for storing the aggregated votes" },
       { kFlagParserZweitstimmenAggregiertFile, null, "Path of the file used for storing the aggregated votes" },
+      { kFlagParserWahlkreisDatenFile, null, "Path of the file used for storing the aggregated WahlkreisDaten." },
       { kFlagParserDataFolder, null, "Folder in which the csv source files are stored." },
       { kFlagParserWahlberechtigteFile, null, "Path of the file used for storing persons eligible to vote." },
       { kFlagLogFile, null, "Path of the file, where log messages of db2 commands are stored." },
