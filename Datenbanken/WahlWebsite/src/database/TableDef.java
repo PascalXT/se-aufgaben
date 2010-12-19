@@ -93,7 +93,7 @@ public class TableDef {
 
         // WAHLERGEBNIS1
         "CREATE TABLE " + schemaName + ".WAHLERGEBNIS1 " + "("
-        	  + "KANDIDATID BIGINT NOT NULL , "
+        	  + "KANDIDATID BIGINT, "
             + "WAHLKREISID BIGINT  NOT NULL , "
             + "JAHR INTEGER NOT NULL, "
             + "ANZAHL INTEGER NOT NULL, "

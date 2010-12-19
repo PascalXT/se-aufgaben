@@ -370,6 +370,14 @@ public class CsvParser {
     assert (remainingErststimmen == 0);
     assert (remainingZweitstimmen == 0);
   }
+  
+  // Returns an empty String, if the ID is invalid.
+  public String emptyIfInvalid(int ID) {
+  	if (ID == kInvalidID)
+  		return "";
+  	else
+  		return "" + ID;
+  }
 
   private void writeErststimmenAggregiert(int jahr, int wahlkreisID, int parteiID, int anzahlErststimmen,
       FileWriter fileWriter) {
@@ -377,7 +385,7 @@ public class CsvParser {
       return;
     try {
       final int kandidatID = getKandidat(wahlkreisID, parteiID);
-      String csvLine = jahr + ";" + wahlkreisID + ";" + anzahlErststimmen + ";" + kandidatID;
+      String csvLine = jahr + ";" + wahlkreisID + ";" + anzahlErststimmen + ";" + emptyIfInvalid(kandidatID);
       fileWriter.write(csvLine + "\n");
     } catch (SQLException e) {
       e.printStackTrace();
