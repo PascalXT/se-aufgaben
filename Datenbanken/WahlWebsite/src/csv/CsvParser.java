@@ -124,9 +124,6 @@ public class CsvParser {
 		final int kOffsetZweitstimmen = 2;
 		final int kOffsetZweitstimmenVorperiode = 3;
 		
-		
-		final int kInvalidVote = -10;
-		
     FileReader fileReader = new FileReader(csvFile);
     LineNumberReader line_number_reader = new LineNumberReader(fileReader);
     FileWriter fileWriterStimmen = new FileWriter(stimmenFile);
@@ -165,9 +162,9 @@ public class CsvParser {
       
       // Ungueltige Stimmen
       int ungueltigeErststimmen = getInteger(tokens, kUngueltigePos + kOffsetErststimmen);
-      erststimmenQueue.add(new Tuple<Integer, Integer>(kInvalidVote, ungueltigeErststimmen));
+      erststimmenQueue.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeErststimmen));
       int ungueltigeZweitstimmen = getInteger(tokens, kUngueltigePos + kOffsetZweitstimmen);
-      zweitstimmenQueue.add(new Tuple<Integer, Integer>(kInvalidVote, ungueltigeZweitstimmen));
+      zweitstimmenQueue.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeZweitstimmen));
       
       // Fill the queue.
       for (int i = 0; i < 29; i++) {
@@ -220,8 +217,8 @@ public class CsvParser {
       	}
       	
       	int numVotes = Math.min(Math.min(remainingErststimmen, remainingZweitstimmen), remainingVotes);
-      	createVotes((kandidatID == kInvalidVote ? "" : "" + kandidatID),
-      			(parteiID == kInvalidVote ? "" : "" + parteiID), currentWahlbezirk, wahlkreisID, kCurrentElectionYear,
+      	createVotes((kandidatID == kInvalidID ? "" : "" + kandidatID),
+      			(parteiID == kInvalidID ? "" : "" + parteiID), currentWahlbezirk, wahlkreisID, kCurrentElectionYear,
       			numVotes, fileWriterStimmen);
       	
       	remainingErststimmen -= numVotes;
@@ -236,6 +233,10 @@ public class CsvParser {
     fileWriterErststimmenAggregiert.flush();
     fileWriterZweitstimmenAggregiert.flush();
     fileWriterWahlberechtigte.flush();
+    fileWriterStimmen.close();
+    fileWriterErststimmenAggregiert.close();
+    fileWriterZweitstimmenAggregiert.close();
+    fileWriterWahlberechtigte.close();
   }
 
   /**
