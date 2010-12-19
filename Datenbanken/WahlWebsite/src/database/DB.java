@@ -105,6 +105,10 @@ public class DB {
 		return tabellenName("Wahlkreissieger");
 	}
   
+  public String wahlberechtigter() {
+		return tabellenName("Wahlberechtigter");
+	}
+  
   public final static String kForeignKeyParteiID = "ParteiID";
   public final static String kForeignKeyBundeslandID = "BundeslandID";
   public final static String kForeignKeyWahlbezirkID = "WahlbezirkID";

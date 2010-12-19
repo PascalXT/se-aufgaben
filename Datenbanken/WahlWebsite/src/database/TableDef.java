@@ -111,8 +111,13 @@ public class TableDef {
             + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
             + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
             + "ORGANIZE BY DIMENSIONS ( PARTEIID, WAHLKREISID) ;\n" + "COMMENT ON TABLE " + schemaName
-            + ".WAHLERGEBNIS2 IS 'Wahlergebnis 2. Stimme';\n", };
-
+            + ".WAHLERGEBNIS2 IS 'Wahlergebnis 2. Stimme';\n",
+            
+        // Wahlberechtigter
+        "CREATE TABLE " + schemaName + ".Wahlberechtigter ("
+        	  + "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ), "
+        	  + "WahlkreisID BIGINT REFERENCES " + schemaName + ".Wahlkreis, "
+        	  + "Gewaehlt INTEGER WITH DEFAULT 0)"};
   };
 
 }

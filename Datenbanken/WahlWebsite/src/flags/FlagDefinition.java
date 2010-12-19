@@ -17,6 +17,7 @@ public class FlagDefinition {
   final public static String kFlagCreateVotes = "createVotes";
   final public static String kFlagDbCommandFlags = "dbCommandFlags";
   final public static String kFlagImportVotes = "importVotes";
+  final public static String kFlagImportVoters = "importVoters";
   final public static String kFlagImportAggregatedVotes = "importAggregatedVotes";
   final public static String kFlagOnlyVotesForBundesland = "onlyVotesForBundesland";
   final public static String kFlagComputeSitzverteilungBundestag = "computeSitzverteilungBundestag";
@@ -40,8 +41,10 @@ public class FlagDefinition {
       { kFlagLogFile, null, "Path of the file, where log messages of db2 commands are stored." },
       { kFlagCreateTables, Flags.kFalse, "If true, the database tables will be created in the beginning." },
       { kImportCsvFiles, Flags.kFalse, "If true, the csv files will be imported in the beginning." },
-      { kFlagCreateVotes, Flags.kFalse, "If true, the csv files containing the votes will be generated." },
-      { kFlagImportVotes, Flags.kFalse, "If true, the csv files containing the votes will be generated." },
+      { kFlagCreateVotes, Flags.kFalse,
+      	  "If true, the csv files containing the votes and the csv file containing the voters will be generated." },
+      { kFlagImportVotes, Flags.kFalse, "If true, the csv file containing the votes will be imported." },
+      { kFlagImportVoters, Flags.kFalse, "If true, the csv file containing the voters will be imported" },
       { kFlagImportAggregatedVotes, Flags.kFalse, "If true, the aggregated votes / wahlkreis will be imported" },
       { kFlagDbCommandFlags, "-w db2 -tvf", "The flags that are added to db2cmd.exe in executeDB2." },
       { kFlagOnlyVotesForBundesland, "", "If not empty, only votes for this Bundesland will be created." },

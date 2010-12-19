@@ -40,6 +40,8 @@ public class Main {
       csvParser.parseKergCsv(parserDataFolder + "kerg.csv");
     if (Flags.isTrue(FlagDefinition.kFlagImportVotes))
       csvParser.importVotes();
+    if (Flags.isTrue(FlagDefinition.kFlagImportVoters))
+    	csvParser.importVoters();
     if (Flags.isTrue(FlagDefinition.kFlagImportAggregatedVotes))
       csvParser.importAggregatedVotes();
     if (Flags.isTrue(FlagDefinition.kFlagComputeSitzverteilungBundestag)) {
