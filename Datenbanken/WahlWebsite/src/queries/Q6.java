@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import database.Database;
+import database.DB;
 
 public class Q6 extends Query {
 
@@ -82,7 +82,7 @@ public class Q6 extends Query {
 			List<String> row = new ArrayList<String>();
 			row.add(resultSet.getString("Partei"));
 			row.add(resultSet.getString("Rang"));
-			row.add(resultSet.getString(Database.kKandidatVorname) + " " + resultSet.getString(Database.kKandidatNachname));
+			row.add(resultSet.getString(DB.kKandidatVorname) + " " + resultSet.getString(DB.kKandidatNachname));
 			row.add(resultSet.getString("Wahlkreis"));
 			row.add(resultSet.getString("Vorsprung"));
 			rows.add(row);

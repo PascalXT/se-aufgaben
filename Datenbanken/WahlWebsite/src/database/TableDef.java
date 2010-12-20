@@ -93,13 +93,13 @@ public class TableDef {
 
         // WAHLERGEBNIS1
         "CREATE TABLE " + schemaName + ".WAHLERGEBNIS1 " + "("
-        	  + "KANDIDATID BIGINT, "
+        	  + "KANDIDATID BIGINT NOT NULL, "
             + "WAHLKREISID BIGINT  NOT NULL , "
             + "JAHR INTEGER NOT NULL, "
             + "ANZAHL INTEGER NOT NULL, "
             + "CONSTRAINT CC1288610976900 PRIMARY KEY ( KANDIDATID, WAHLKREISID, JAHR) , "
-            + "CONSTRAINT CC1288610983160 FOREIGN KEY (KANDIDATID) REFERENCES " + schemaName
-            + ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
+            //+ "CONSTRAINT CC1288610983160 FOREIGN KEY (KANDIDATID) REFERENCES " + schemaName
+            //+ ".KANDIDAT (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , "
             + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
             + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
             + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLKREISID) ;\n" + "COMMENT ON TABLE " + schemaName
@@ -120,15 +120,15 @@ public class TableDef {
         "CREATE TABLE " + schemaName + ".Wahlberechtigter ("
         	  + "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ), "
         	  + "WahlkreisID BIGINT REFERENCES " + schemaName + ".Wahlkreis, "
-        	  + "Gewaehlt INTEGER WITH DEFAULT 0)",
+        	  + "Gewaehlt INTEGER WITH DEFAULT 0);\n",
     
     		// Wahlkreisdaten
     		"CREATE TABLE " + schemaName + ".WahlkreisDaten ("
-    		    + "WahlkreisID BIGINT PRIMARY KEY, "
+    		    + "WahlkreisID BIGINT NOT NULL PRIMARY KEY, "
     		    + "AnzahlWahlberechtigte BIGINT, "
     		    + "AnzahlUngueltigeErststimmen BIGINT, "
     		    + "AnzahlUngueltigeZweitstimmen BIGINT, "
-    		    + "Jahr BIGINT)"};
+    		    + "Jahr BIGINT);\n"};
   };
 
 }

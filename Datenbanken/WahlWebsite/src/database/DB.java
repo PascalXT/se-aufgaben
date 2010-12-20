@@ -122,10 +122,12 @@ public class DB {
   	return tabellenName("WahlkreisDaten");
   }
   public final static String kAnzahlWahlberechtigte = "AnzahlWahlberechtigte";
-  public final static String kUngueltigeErststimmen = "UngueltigeErststimmen";
-  public final static String kUngueltigeZweitstimmen = "UngueltigeZweitstimmen";
+  public final static String kUngueltigeErststimmen = "AnzahlUngueltigeErststimmen";
+  public final static String kUngueltigeZweitstimmen = "AnzahlUngueltigeZweitstimmen";
   
   public final static String kAnzahlUeberhangsmandate = "AnzahlUeberhangsmandate";
+  
+  public final static String kJahr = "Jahr";
 
   public String zweitStimmenNachPartei() {
     return tabellenName("ZweitStimmenNachPartei");

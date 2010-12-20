@@ -479,7 +479,7 @@ public class CsvParser {
     System.out.println("ZweitstimmenAggregiert have been imported to the database");
     
     final String[] columnsWahlkreisDaten = {DB.kForeignKeyWahlkreisID, DB.kAnzahlWahlberechtigte,
-    		DB.kUngueltigeErststimmen, DB.kUngueltigeZweitstimmen};
-    datenbank.load(wahlkreisdatenFile, "(1, 2, 3, 4)", columnsWahlkreisDaten, datenbank.wahlkreisDaten());
+    		DB.kUngueltigeErststimmen, DB.kUngueltigeZweitstimmen, DB.kStimmeJahr};
+    datenbank.load(wahlkreisdatenFile, "(1, 2, 3, 4, 5)", columnsWahlkreisDaten, datenbank.wahlkreisDaten());
   }
 }

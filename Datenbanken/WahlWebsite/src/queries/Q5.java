@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import database.Database;
+import database.DB;
 
 public class Q5 extends Query {
 
@@ -22,9 +22,9 @@ public class Q5 extends Query {
 		
 		while (resultSet.next()) {
 			List<String> row = new ArrayList<String>();
-			row.add(resultSet.getString(Database.kBundeslandName));
-			row.add(resultSet.getString(Database.kParteiKuerzel));
-			row.add(resultSet.getString(Database.kAnzahlUeberhangsmandate));
+			row.add(resultSet.getString(DB.kBundeslandName));
+			row.add(resultSet.getString(DB.kParteiKuerzel));
+			row.add(resultSet.getString(DB.kAnzahlUeberhangsmandate));
 			rows.add(row);
 		}
 		
