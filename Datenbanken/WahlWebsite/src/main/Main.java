@@ -3,7 +3,6 @@ package main;
 import csv.CsvParser;
 import database.DB;
 import database.TableDef;
-import evaluation.Evaluation;
 import flags.*;
 
 public class Main {
@@ -45,10 +44,6 @@ public class Main {
     	csvParser.importVoters();
     if (Flags.isTrue(FlagDefinition.kFlagImportAggregatedVotes))
       csvParser.importAggregatedVotes();
-    if (Flags.isTrue(FlagDefinition.kFlagComputeSitzverteilungBundestag)) {
-      Evaluation evaluation = new Evaluation(db);
-      evaluation.computeSitzverteilungBundestag();
-    }
     
     db.disconnect();
   }

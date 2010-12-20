@@ -21,7 +21,6 @@ public class FlagDefinition {
   final public static String kFlagImportVoters = "importVoters";
   final public static String kFlagImportAggregatedVotes = "importAggregatedVotes";
   final public static String kFlagOnlyVotesForBundesland = "onlyVotesForBundesland";
-  final public static String kFlagComputeSitzverteilungBundestag = "computeSitzverteilungBundestag";
   final public static String kFlagMakeTemporaryTablesPermanent = "makeTemporaryTablesPermanent";
   final public static String kFlagAllowedWahlkreisIDs = "allowedWahlkreisIDs";
   final public static String[][] kFlagDefinition = {
@@ -50,8 +49,6 @@ public class FlagDefinition {
       { kFlagImportAggregatedVotes, Flags.kFalse, "If true, the aggregated votes / wahlkreis will be imported" },
       { kFlagDbCommandFlags, "-w db2 -tvf", "The flags that are added to db2cmd.exe in executeDB2." },
       { kFlagOnlyVotesForBundesland, "", "If not empty, only votes for this Bundesland will be created." },
-      { kFlagComputeSitzverteilungBundestag, Flags.kFalse,
-          "If true, the Sitzverteilung for the Bundestag will be computed." },
       { kFlagMakeTemporaryTablesPermanent, Flags.kFalse,
           "If true, permanent tables will be used instead of temporary tables." },
       { kFlagAllowedWahlkreisIDs, "", 
