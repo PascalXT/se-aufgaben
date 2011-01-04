@@ -8,7 +8,8 @@ import database.DB;
 public abstract class Query {
 
 	protected String headline;
-
+  protected final int kCurrentElectionYear = 2009;
+  protected final int kPreviousElectionYear = 2005;
 	
 	protected DB db;
 	
@@ -36,25 +37,27 @@ public abstract class Query {
 	protected abstract String generateBody(ResultSet resultSet) throws SQLException;
 
 	protected String createZweitStimmenNachBundeslandTable() throws SQLException {
-		 	db.createOrReplaceTemporaryTable(db.zweitStimmenNachBundesland(), DB.kForeignKeyParteiID
-	        + " BIGINT, " + DB.kForeignKeyBundeslandID + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
-	    db.executeUpdate("INSERT INTO " + db.zweitStimmenNachBundesland() + " SELECT w2."
-	        + DB.kForeignKeyParteiID + ", wk." + DB.kForeignKeyBundeslandID + ", sum(w2."
-	        + DB.kWahlergebnis2Anzahl + ") as " + DB.kAnzahlStimmen + "" + " FROM "
-	        + db.wahlergebnis2() + " w2" + ", " + db.wahlkreis() + " wk" + " WHERE w2."
-	        + DB.kForeignKeyWahlkreisID + " = wk." + DB.kID + " GROUP BY " + "wk."
-	        + DB.kForeignKeyBundeslandID + ", w2." + DB.kForeignKeyParteiID);
+		 	db.createOrReplaceTemporaryTable(db.zweitStimmenNachBundesland(), DB.kForeignKeyParteiID + " BIGINT, "
+		 			+ DB.kForeignKeyBundeslandID + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
+	    db.executeUpdate(""
+	    		+ "INSERT INTO " + db.zweitStimmenNachBundesland() + " "
+	    		+ "SELECT w2." + DB.kForeignKeyParteiID + ", wk." + DB.kForeignKeyBundeslandID + ", "
+	    					 + "sum(w2." + DB.kWahlergebnis2Anzahl + ") as " + DB.kAnzahlStimmen + " "
+	    		+ "FROM " + db.wahlergebnis2() + " w2" + ", " + db.wahlkreis() + " wk" + " "
+	    		+ "WHERE w2." + DB.kForeignKeyWahlkreisID + " = wk." + DB.kID + " "
+	    		+   "AND w2." + DB.kJahr + " = " + kCurrentElectionYear + " "
+	    		+ "GROUP BY " + "wk." + DB.kForeignKeyBundeslandID + ", w2." + DB.kForeignKeyParteiID);
 	    return db.zweitStimmenNachBundesland();
 	}
 
 	protected String createZweitStimmenNachParteiTable() throws SQLException {
-
     db.createOrReplaceTemporaryTable(db.zweitStimmenNachPartei(), DB.kForeignKeyParteiID
         + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.zweitStimmenNachPartei() + " SELECT "
-        + DB.kForeignKeyParteiID + ", SUM(" + DB.kAnzahlStimmen + ") FROM "
-        + db.zweitStimmenNachBundesland() + " GROUP BY " + DB.kForeignKeyParteiID);
-
+    db.executeUpdate(""
+    		+ "INSERT INTO " + db.zweitStimmenNachPartei() + " "
+    		+ "SELECT " + DB.kForeignKeyParteiID + ", SUM(" + DB.kAnzahlStimmen + ") "
+    		+ "FROM " + db.zweitStimmenNachBundesland() + " "
+    		+ "GROUP BY " + DB.kForeignKeyParteiID);
 		return db.zweitStimmenNachPartei();
 	}
 
@@ -66,14 +69,16 @@ public abstract class Query {
         "WITH maxErgebnis(wahlkreisID, maxStimmen) AS ( " + 
         	"SELECT k." + DB.kKandidatDMWahlkreisID + ", MAX(v." + DB.kWahlergebnis1Anzahl + ") " + 
         	"FROM " + db.wahlergebnis1() + " v, " + db.kandidat() + " k " + 
-        	"WHERE v." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " + 
+        	"WHERE v." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
+        		"AND v." + DB.kJahr + " = " + kCurrentElectionYear + " " +
         	"GROUP BY k." + DB.kKandidatDMWahlkreisID + " " + 
         ") " + 
         "SELECT k." + DB.kID + " AS " + DB.kForeignKeyKandidatID + ", k." + DB.kForeignKeyParteiID + ", k." + DB.kKandidatDMWahlkreisID + " " +
         "FROM maxErgebnis e, " + db.wahlergebnis1() + " v, " + db.kandidat() + " k " + 
         "WHERE e.wahlkreisID = v." + DB.kForeignKeyWahlkreisID + " " + 
         "AND e.maxStimmen = v." + DB.kWahlergebnis1Anzahl + " " + 
-        "AND k." + DB.kID + " = v." + DB.kForeignKeyKandidatID
+        "AND k." + DB.kID + " = v." + DB.kForeignKeyKandidatID + " " +
+        "AND v." + DB.kJahr + " = " + kCurrentElectionYear
     );
     return db.direktmandate();
 	}
@@ -81,11 +86,16 @@ public abstract class Query {
 	protected String createFuenfProzentParteienTable(String zweitStimmenNachBundeslandTable) throws SQLException {
 
 		db.createOrReplaceTemporaryTable(db.fuenfProzentParteien(), DB.kForeignKeyParteiID + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.fuenfProzentParteien() + " SELECT p." + DB.kID + " as "
-        + DB.kForeignKeyParteiID + " FROM " + db.partei() + " p, " + db.wahlergebnis2() + " v"
-        + " WHERE v." + DB.kForeignKeyParteiID + " = p." + DB.kID + " GROUP BY p." + DB.kID
-        + " HAVING CAST(SUM(v." + DB.kWahlergebnis2Anzahl + ") AS FLOAT)" + " / (SELECT SUM("
-        + DB.kAnzahlStimmen + ") FROM " + zweitStimmenNachBundeslandTable + ")" + " >= 0.05");
+    db.executeUpdate(""
+    		+ "INSERT INTO " + db.fuenfProzentParteien() + " "
+    		+ "SELECT p." + DB.kID + " as " + DB.kForeignKeyParteiID + " "
+    		+ "FROM " + db.partei() + " p, " + db.wahlergebnis2() + " v "
+        + "WHERE v." + DB.kForeignKeyParteiID + " = p." + DB.kID + " "
+        	+ "AND v." + DB.kJahr + "=" + kCurrentElectionYear + " "
+        + "GROUP BY p." + DB.kID + " "
+        + "HAVING CAST(SUM(v." + DB.kWahlergebnis2Anzahl + ") AS FLOAT)" + " / "
+        	+ "(SELECT SUM(" + DB.kAnzahlStimmen + ") "	+ "FROM " + zweitStimmenNachBundeslandTable + ")"
+        	+ " >= 0.05");
     db.printResultSet(db.executeSQL("SELECT p." + DB.kParteiKuerzel + " FROM " + db.partei()
         + " p, " + db.fuenfProzentParteien() + " fpp" + " WHERE p." + DB.kID + " = fpp."
         + DB.kForeignKeyParteiID));
@@ -193,23 +203,29 @@ public abstract class Query {
 				"WITH " +
 				"MaxErstStimmen(WahlkreisID, Anzahl) AS ( " +
 					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis1Anzahl + ") " + 
-					"FROM " + db.wahlergebnis1() + " we GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
+					"FROM " + db.wahlergebnis1() + " we " +
+					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
+					"GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
 				"), " +
 				"MaxZweitStimmen(WahlkreisID, Anzahl) AS ( " +
 					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis2Anzahl + ") " + 
-					"FROM " + db.wahlergebnis2() + " we GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
+					"FROM " + db.wahlergebnis2() + " we " +
+					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
+					"GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
 				"), " +
 				"GewinnerErstStimmen(WahlkreisID, KandidatID) AS ( " +
 					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyKandidatID + " " + 
 					"FROM " + db.wahlergebnis1() + " we, MaxErstStimmen ms " + 
 					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
 					"AND we." + DB.kWahlergebnis1Anzahl + " = ms.Anzahl " +
+					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 				"), " +
 				"GewinnerZweitStimmen(WahlkreisID, ParteiID) AS ( " +
 					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyParteiID + " " + 
 					"FROM " + db.wahlergebnis2() + " we, MaxZweitStimmen ms " + 
 					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
 					"AND we." + DB.kWahlergebnis2Anzahl + " = ms.Anzahl " +
+					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 				") " +
 				"SELECT g1.WahlkreisID, wk." + DB.kForeignKeyBundeslandID + ", p1." + DB.kParteiKuerzel + " AS P1, p2." + DB.kParteiKuerzel + " AS P2 " +
 				"FROM GewinnerErstStimmen g1, GewinnerZweitStimmen g2, " + db.partei() + " p1, " + db.partei() + " p2, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " + 
