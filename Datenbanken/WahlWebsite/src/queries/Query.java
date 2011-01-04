@@ -20,12 +20,26 @@ public abstract class Query {
 	public void setDatabase(DB db) {
 		this.db = db;
 	}
+	
+	public String replaceUmlaute(String input) {
+		input = input.replace("ü", "&uuml;");
+		input = input.replace("Ü", "&Uuml;");
+		input = input.replace("ö", "&ouml;");
+		input = input.replace("Ö", "&Ouml;");
+		input = input.replace("ä", "&auml;");
+		input = input.replace("Ä", "&Auml;");
+		return input;
+	}
 
 	public String generateHtmlOutput() {
 		try {
+			final long startTime = System.currentTimeMillis();
 			ResultSet resultSet = doQuery();
 			String body = generateBody(resultSet);
-			return "<html><body><h1>" + headline + "</h1>" + body + "</body></html>";
+			body = replaceUmlaute(body);
+			final long processMillis = System.currentTimeMillis() - startTime;
+			final String processMillisHtml = "<br><br>Die Berechnung hat " + processMillis + " Millisekunden gedauert.<br>";
+			return "<html><body><h1>" + headline + "</h1>" + body + processMillisHtml + "</body></html>";
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;

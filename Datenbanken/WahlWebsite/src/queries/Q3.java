@@ -60,11 +60,15 @@ public class Q3 extends Query {
     ResultSet rs3 = db.executeSQL("" + 
     		"WITH ZweitStimmenWahlkreis AS ( " + 
     			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
-    			"FROM " + db.wahlergebnis2() + " WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
+    			"FROM " + db.wahlergebnis2() + " " +
+    			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
+    				"AND " + DB.kJahr + " = " + kCurrentElectionYear +
     		"), " +
     		"SummeZweitStimmenWahlkreis AS ( " + 
     			"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
-    			"FROM " + db.wahlergebnis2() + " WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
+    			"FROM " + db.wahlergebnis2() + " " +
+    			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
+    				"AND " + DB.kJahr + " = " + kCurrentElectionYear + " " +
     			"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
     		") " +
     		"SELECT " + 
@@ -72,6 +76,7 @@ public class Q3 extends Query {
     			"COALESCE(w2." + DB.kWahlergebnis2Anzahl + ", 0) AS Absolut, " +
     			"CAST(COALESCE(w2." + DB.kWahlergebnis2Anzahl + ", 0) AS FLOAT) / (SELECT Summe FROM SummeZweitStimmenWahlkreis) AS Prozentual " +
     		"FROM ZweitStimmenWahlkreis w2 RIGHT OUTER JOIN " + db.partei() + " p ON p." + DB.kID + " = w2." + DB.kForeignKeyParteiID + " " +
+    		"WHERE w2." + DB.kWahlergebnis2Anzahl + " > 0 " +
     		"ORDER BY Absolut DESC"
     );
     
@@ -79,8 +84,8 @@ public class Q3 extends Query {
 		while(rs3.next()) {
 			List<String> row = new ArrayList<String>();
 			row.add(rs3.getString(DB.kParteiKuerzel));
-			row.add(String.valueOf(rs3.getInt("Absolut")));
-			row.add(String.valueOf(rs3.getFloat("Prozentual")));
+			row.add(String.format("%d", rs3.getInt("Absolut")));
+			row.add(String.format("%12.2f%%", 100 * rs3.getFloat("Prozentual")));
 			q3rows.add(row);
 		}
     

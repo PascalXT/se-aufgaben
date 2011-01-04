@@ -19,33 +19,39 @@ public class Q6 extends Query {
 				"WITH " +
 				"MaxStimmen(WahlkreisID, Anzahl) AS ( " +
 					"SELECT we.WahlkreisID, MAX(we.Anzahl) " +
-					"FROM Wahlergebnis1 we " +
+					"FROM " + db.wahlergebnis1() + " we " +
+					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"GROUP BY we.WahlkreisID " +
 				"), " +
 				"Erster(WahlkreisID, KandidatID, ParteiID, Anzahl) AS ( " +
 					"SELECT we.WahlkreisID, we.KandidatID, k.ParteiID, we.Anzahl " +
-					"FROM Wahlergebnis1 we, MaxStimmen ms, Kandidat k " +
+					"FROM " + db.wahlergebnis1() + " we, MaxStimmen ms, " + db.kandidat() + " k " +
 					"WHERE we.WahlkreisID = ms.WahlkreisID " +
+					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"AND we.KandidatID = k.ID " +
 					"AND we.Anzahl = ms.Anzahl " +
 				"), " +
 				"RestKandidaten(KandidatID) AS ( " +
-					"SELECT KandidatID FROM Wahlergebnis1 " +
+					"SELECT KandidatID " +
+					"FROM " + db.wahlergebnis1() + " " + 
+					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"EXCEPT " +
 					"SELECT KandidatID FROM Erster " +
 				"), " +
 				"MaxStimmenRest(WahlkreisID, Anzahl) AS ( " +
 					"SELECT we.WahlkreisID, MAX(we.Anzahl) " +
-					"FROM Wahlergebnis1 we, RestKandidaten r " +
+					"FROM " + db.wahlergebnis1() + " we, RestKandidaten r " +
 					"WHERE we.KandidatID = r.KandidatID " +
+						"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"GROUP BY we.WahlkreisID " +
 				"), " +
 				"Zweiter(WahlkreisID, KandidatID, ParteiID, Anzahl) AS ( " +
 					"SELECT k.DMWahlkreisID, k.ID, k.ParteiID, we.Anzahl " +
-					"FROM Kandidat k, Wahlergebnis1 we, MaxStimmenRest ms " +
+					"FROM " + db.kandidat() + " k, " + db.wahlergebnis1() + " we, MaxStimmenRest ms " +
 					"WHERE we.Anzahl = ms.Anzahl " +
 					"AND we.WahlkreisID = ms.WahlkreisID " +
 					"AND we.KandidatID = k.ID " +
+					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 				"), " +
 				"KnappsteSieger(GewinnerID, Differenz, VerliererID, WahlkreisID) AS ( " +
 					"SELECT e.ParteiID, e.Anzahl - z.Anzahl AS Differenz, z.ParteiID, e.WahlkreisID " +
@@ -59,12 +65,12 @@ public class Q6 extends Query {
 					"FROM KnappsteSieger kn " +
 				"), " +
 				"ParteienOhneSieg AS ( " + // TODO: benutzen um knappste Verlierer für Parteien ohne Erststimmen-Sieg zu bestimmen
-					"SELECT ID FROM Partei " +
+					"SELECT ID FROM " + db.partei() + " " +
 					"EXCEPT " +
 					"SELECT GewinnerID FROM KnappsteSiegerRang " +
 				") " +
 				"SELECT knr.Rang, k.Vorname, k.Nachname, p.Kuerzel AS Partei, wk.Name AS Wahlkreis, knr.Differenz AS Vorsprung " + 
-				"FROM KnappsteSiegerRang knr, Partei p, Kandidat k, Wahlkreis wk " +
+				"FROM KnappsteSiegerRang knr, " + db.partei() + " p, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " +
 				"WHERE Rang <= 10 " +
 				"AND knr.GewinnerID = p.ID " +
 				"AND knr.WahlkreisID = k.DMWahlkreisID " +
