@@ -14,6 +14,7 @@ public class Q3 extends Query {
 	
 	private String wahlkreisName;
 	
+	private List<List<String>> q1rows;
 	private List<List<String>> q2rows;
 	private List<List<String>> q3rows;
 	
@@ -36,8 +37,20 @@ public class Q3 extends Query {
     
 		// Q3.1 - Wahlbeteiligung
     
-		// TODO
-    
+		ResultSet rs1 = db.executeSQL(""
+			+ "SELECT (1.0 * sum(w2." + DB.kWahlergebnis2Anzahl + ") / "
+				+ "max(wd." + DB.kAnzahlWahlberechtigte + ")) as Wahlbeteiligung "
+      + "FROM " + db.wahlkreisDaten() + " wd, " + db.wahlergebnis2() + " w2 "
+      + "WHERE wd." + DB.kForeignKeyWahlkreisID + " = w2." + DB.kForeignKeyWahlkreisID + " "
+      	+ "AND wd." + DB.kJahr + " = w2.jahr AND wd." + DB.kJahr + " = " + kCurrentElectionYear + " "
+      	+ "AND wd." + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " "
+      + "GROUP BY w2." + DB.kForeignKeyWahlkreisID);
+    q1rows = new ArrayList<List<String>>();
+    rs1.next();
+    q1rows.add(new ArrayList<String>(Arrays.asList(new String[] {
+    		String.format("%.2f %%", rs1.getFloat("Wahlbeteiligung") * 100)
+    })));
+		
 		// Q3.2 - gewählter Direktkandidat
 		
     ResultSet rs2 = db.executeSQL("" +
@@ -58,34 +71,55 @@ public class Q3 extends Query {
 		// Q3.3 - prozentuale und absolute Anzahl an Stimmen für jede Partei
 		
     ResultSet rs3 = db.executeSQL("" + 
-    		"WITH ZweitStimmenWahlkreis AS ( " + 
+    		"WITH ZweitStimmenWahlkreis2009 AS ( " + 
     			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
     			"FROM " + db.wahlergebnis2() + " " +
     			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
     				"AND " + DB.kJahr + " = " + kCurrentElectionYear +
     		"), " +
-    		"SummeZweitStimmenWahlkreis AS ( " + 
-    			"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
-    			"FROM " + db.wahlergebnis2() + " " +
-    			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
-    				"AND " + DB.kJahr + " = " + kCurrentElectionYear + " " +
-    			"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
-    		") " +
+    		"ZweitStimmenWahlkreis2005 AS ( " + 
+  			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
+  			"FROM " + db.wahlergebnis2() + " " +
+  			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
+  				"AND " + DB.kJahr + " = " + kPreviousElectionYear +
+  			"), " +
+    		"SummeZweitStimmenWahlkreis2009 AS ( " + 
+  			"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
+  			"FROM " + db.wahlergebnis2() + " " +
+  			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
+  				"AND " + DB.kJahr + " = " + kCurrentElectionYear + " " +
+  			"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
+	  		"), " +
+	  		"SummeZweitStimmenWahlkreis2005 AS ( " + 
+				"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
+				"FROM " + db.wahlergebnis2() + " " +
+				"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
+					"AND " + DB.kJahr + " = " + kPreviousElectionYear + " " +
+				"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
+				") " +
+				
     		"SELECT " + 
     			"p." + DB.kParteiKuerzel + ", " +
-    			"COALESCE(w2." + DB.kWahlergebnis2Anzahl + ", 0) AS Absolut, " +
-    			"CAST(COALESCE(w2." + DB.kWahlergebnis2Anzahl + ", 0) AS FLOAT) / (SELECT Summe FROM SummeZweitStimmenWahlkreis) AS Prozentual " +
-    		"FROM ZweitStimmenWahlkreis w2 RIGHT OUTER JOIN " + db.partei() + " p ON p." + DB.kID + " = w2." + DB.kForeignKeyParteiID + " " +
-    		"WHERE w2." + DB.kWahlergebnis2Anzahl + " > 0 " +
-    		"ORDER BY Absolut DESC"
+    			"COALESCE(w2009." + DB.kWahlergebnis2Anzahl + ", 0) AS Absolut2009, " +
+    			"CAST(COALESCE(w2009." + DB.kWahlergebnis2Anzahl + ", 0) AS FLOAT) / (SELECT Summe FROM SummeZweitStimmenWahlkreis2009) AS Prozentual2009, " +
+    			"COALESCE(w2005." + DB.kWahlergebnis2Anzahl + ", 0) AS Absolut2005, " +
+    			"CAST(COALESCE(w2005." + DB.kWahlergebnis2Anzahl + ", 0) AS FLOAT) / (SELECT Summe FROM SummeZweitStimmenWahlkreis2005) AS Prozentual2005, " +
+    			"(COALESCE(w2009." + DB.kWahlergebnis2Anzahl + ", 0) - COALESCE(w2005." + DB.kWahlergebnis2Anzahl + ", 0)) as Aenderung " +
+    		"FROM ZweitStimmenWahlkreis2009 w2009 FULL OUTER JOIN ZweitStimmenWahlkreis2005 w2005 "
+    			+ "ON w2009." + DB.kForeignKeyParteiID  + " = w2005." + DB.kForeignKeyParteiID
+    			+ " RIGHT OUTER JOIN " + db.partei() + " p ON p." + DB.kID + " = w2005." + DB.kForeignKeyParteiID + " " +
+    		"ORDER BY Absolut2009 DESC, Absolut2005 DESC"
     );
     
 		q3rows = new ArrayList<List<String>>();
 		while(rs3.next()) {
 			List<String> row = new ArrayList<String>();
 			row.add(rs3.getString(DB.kParteiKuerzel));
-			row.add(String.format("%d", rs3.getInt("Absolut")));
-			row.add(String.format("%12.2f%%", 100 * rs3.getFloat("Prozentual")));
+			row.add(String.format("%d", rs3.getInt("Absolut2009")));
+			row.add(String.format("%12.2f %%", 100 * rs3.getFloat("Prozentual2009")));
+			row.add(String.format("%d", rs3.getInt("Absolut2005")));
+			row.add(String.format("%12.2f %%", 100 * rs3.getFloat("Prozentual2005")));
+			row.add(String.format("%+d", rs3.getInt("Aenderung")));
 			q3rows.add(row);
 		}
     
@@ -105,9 +139,14 @@ public class Q3 extends Query {
     String[] q2headers = new String[] {"Name", "Partei"};
 		Table q2table = new Table(q2headers, q2rows);
 		html += q2table.getHtml();
+		
+		html += "<h3>Wahlbeteiligung</h3>";
+		String[] q1headers = new String[] {"" + kCurrentElectionYear};
+		Table q1table = new Table(q1headers, q1rows);
+		html += q1table.getHtml();
     
 		html += "<h3>Stimmen für jede Partei</h3>";
-    String[] q3headers = new String[] {"Partei", "Stimmen Absolut", "Stimmen Prozentual"};
+    String[] q3headers = new String[] {"Partei", "Stimmen Absolut 2009", "Stimmen Prozentual 2009", "Stimmen Absolut 2005", "Stimmen Prozentual 2005", "Änderung 2009 - 2005"};
     Table q3table = new Table(q3headers, q3rows);
     html += q3table.getHtml();
     
