@@ -33,7 +33,7 @@ public class Q6 extends Query {
 				"), " +
 				"RestKandidaten(KandidatID) AS ( " +
 					"SELECT KandidatID " +
-					"FROM " + db.erstStimmenNachWahlkreis() + " " + 
+					"FROM " + db.erstStimmenNachWahlkreis() + " we " + 
 					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"EXCEPT " +
 					"SELECT KandidatID FROM Erster " +
@@ -64,39 +64,90 @@ public class Q6 extends Query {
 						"kn.GewinnerID, kn.Differenz, kn.VerliererID, kn.WahlkreisID " +
 					"FROM KnappsteSieger kn " +
 				"), " +
-				"ParteienOhneSieg AS ( " + // TODO: benutzen um knappste Verlierer für Parteien ohne Erststimmen-Sieg zu bestimmen
+				"ParteienOhneSieg(ParteiID) AS ( " +
 					"SELECT ID FROM " + db.partei() + " " +
 					"EXCEPT " +
 					"SELECT GewinnerID FROM KnappsteSiegerRang " +
+				"), " +
+				"KnappsteSiegerOutput(Rang, Vorname, Nachname, Partei, Wahlkreis, Differenz, Typ) AS ( " +
+						"SELECT knr.Rang, k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + ", wk." + DB.kWahlkreisName + ", knr.Differenz, 'Gewinner' " +
+						"FROM KnappsteSiegerRang knr, " + db.partei() + " p, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " +
+						"WHERE Rang <= 10 AND knr.GewinnerID = p." + DB.kID + " " +
+						"AND knr.WahlkreisID = k." + DB.kKandidatDMWahlkreisID + " " +
+						"AND k." + DB.kForeignKeyParteiID + " = p." + DB.kID + " " + 
+						"AND wk." + DB.kID + " = knr.WahlkreisID " +
+				"), " +
+				"KnappsteVerlierer(ParteiID, KandidatID, AbstandZumErsten, WahlkreisID) AS ( " +
+					"SELECT pos.ParteiID, k.ID, e.Anzahl - we." + DB.kAnzahl + ", w." + DB.kID + " " +
+					"FROM ParteienOhneSieg pos, Erster e, " + db.wahlkreis() + " w, " + db.erstStimmenNachWahlkreis() + " we, " + db.kandidat() + " k " +
+					"WHERE we." + DB.kForeignKeyWahlkreisID + " = w." + DB.kID + " " +
+					"AND we." + DB.kWahlergebnis1Jahr + " = " + kCurrentElectionYear + " " +
+					"AND e.WahlkreisID = w." + DB.kID + " " +
+					"AND we." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
+					"AND k." + DB.kKandidatDMWahlkreisID + " = w." + DB.kID + " " +
+					"AND k." + DB.kForeignKeyParteiID + " = pos.ParteiID " +
+				"), " +
+				"KnappsteVerliererRang(Rang, ParteiID, KandidatID, AbstandZumErsten, WahlkreisID) AS ( " +
+					"SELECT ROW_NUMBER() OVER (PARTITION BY kv.ParteiID ORDER BY kv.AbstandZumErsten ASC), kv.ParteiID, kv.KandidatID, kv.AbstandZumErsten, kv.WahlkreisID " +
+					"FROM KnappsteVerlierer kv " + 
+				"), " +
+				"KnappsteVerliererOutput(Rang, Vorname, Nachname, Partei, Wahlkreis, Differenz, Typ) AS ( " +
+					"SELECT kvr.Rang, k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + ", wk." + DB.kWahlkreisName + ", kvr.AbstandZumErsten, 'Verlierer' " +
+					"FROM KnappsteVerliererRang kvr, " + db.partei() + " p, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " +
+					"WHERE Rang <= 10 " + 
+					"AND kvr.ParteiID = p." + DB.kID + " " +
+					"AND kvr.WahlkreisID = k." + DB.kKandidatDMWahlkreisID + " " +
+					"AND k." + DB.kForeignKeyParteiID + " = p." + DB.kID + " " +
+					"AND wk." + DB.kID + " = kvr.WahlkreisID " +
+				"), " +
+				"GewinnerUndVerliererOutput AS ( " +
+					"SELECT * FROM KnappsteSiegerOutput " +
+					"UNION ALL " +
+					"SELECT * FROM KnappsteVerliererOutput " + 
 				") " +
-				"SELECT knr.Rang, k.Vorname, k.Nachname, p.Kuerzel AS Partei, wk.Name AS Wahlkreis, knr.Differenz AS Vorsprung " + 
-				"FROM KnappsteSiegerRang knr, " + db.partei() + " p, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " +
-				"WHERE Rang <= 10 " +
-				"AND knr.GewinnerID = p.ID " +
-				"AND knr.WahlkreisID = k.DMWahlkreisID " +
-				"AND k.ParteiID = p.ID " +
-				"AND wk.ID = knr.WahlkreisID"
+				"SELECT * FROM GewinnerUndVerliererOutput ORDER BY Typ"
 		);
 	}
 
 	@Override
 	protected String generateBody(ResultSet resultSet) throws SQLException {
-		String[] headers = new String[] {"Rang", "Gewinner", "Partei", "Wahlkreis", "Vorsprung"};
-		List<List<String>> rows = new ArrayList<List<String>>();
 		
+		String html = "<h2>Knappste Gewinner</h2>";
+		
+		String[] headersGewinner = new String[] {"Partei", "Rang", "Kandidat", "Wahlkreis", "Abstand zum Zweiten"};
+		List<List<String>> rowsGewinner = new ArrayList<List<String>>();
+
 		while (resultSet.next()) {
+			if ("Verlierer".equals(resultSet.getString("Typ")))
+				break;
 			List<String> row = new ArrayList<String>();
 			row.add(resultSet.getString("Partei"));
 			row.add(resultSet.getString("Rang"));
 			row.add(resultSet.getString(DB.kKandidatVorname) + " " + resultSet.getString(DB.kKandidatNachname));
 			row.add(resultSet.getString("Wahlkreis"));
-			row.add(resultSet.getString("Vorsprung"));
-			rows.add(row);
+			row.add(resultSet.getString("Differenz"));
+			rowsGewinner.add(row);
 		}
+		html += new Table(headersGewinner, rowsGewinner).getHtml();
+
 		
-		Table table = new Table(headers, rows);
+		html += "<h2>Knappste Verlierer</h2>";
+		String[] headersVerlierer = new String[] {"Partei", "Rang", "Kandidat", "Wahlkreis", "Abstand zum Gewinner"};
+		List<List<String>> rowsVerlierer = new ArrayList<List<String>>();
+
+		do {
+			List<String> row = new ArrayList<String>();
+			row.add(resultSet.getString("Partei"));
+			row.add(resultSet.getString("Rang"));
+			row.add(resultSet.getString(DB.kKandidatVorname) + " " + resultSet.getString(DB.kKandidatNachname));
+			row.add(resultSet.getString("Wahlkreis"));
+			row.add(resultSet.getString("Differenz"));
+			rowsVerlierer.add(row);
+		} while (resultSet.next());
 		
-		return table.getHtml();
+		html += new Table(headersVerlierer, rowsVerlierer).getHtml();
+		
+		return html;
 	}
 
 }
