@@ -25,6 +25,11 @@ public class Q3 extends Query {
 	
 	@Override
 	protected ResultSet doQuery() throws SQLException {
+		return doQuery(db.erstStimmenNachWahlkreis(), db.zweitStimmenNachWahlkreis());
+	}
+	
+	protected ResultSet doQuery(String erststimmenNachWahlkreisTable, 
+			String zweitStimmenNachWahlkreisTable) throws SQLException {
 		
 		ResultSet rsWahlkreisName = db.executeSQL("" + 
 				"SELECT " + DB.kWahlkreisName + " FROM " + db.wahlkreis() + " " +
@@ -40,7 +45,7 @@ public class Q3 extends Query {
 		ResultSet rs1 = db.executeSQL(""
 			+ "SELECT (1.0 * sum(w2." + DB.kWahlergebnis2Anzahl + ") / "
 				+ "max(wd." + DB.kAnzahlWahlberechtigte + ")) as Wahlbeteiligung "
-      + "FROM " + db.wahlkreisDaten() + " wd, " + db.wahlergebnis2() + " w2 "
+      + "FROM " + db.wahlkreisDaten() + " wd, " + db.zweitStimmenNachWahlkreis() + " w2 "
       + "WHERE wd." + DB.kForeignKeyWahlkreisID + " = w2." + DB.kForeignKeyWahlkreisID + " "
       	+ "AND wd." + DB.kJahr + " = w2.jahr AND wd." + DB.kJahr + " = " + kCurrentElectionYear + " "
       	+ "AND wd." + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " "
@@ -73,26 +78,26 @@ public class Q3 extends Query {
     ResultSet rs3 = db.executeSQL("" + 
     		"WITH ZweitStimmenWahlkreis2009 AS ( " + 
     			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
-    			"FROM " + db.wahlergebnis2() + " " +
+    			"FROM " + db.zweitStimmenNachWahlkreis() + " " +
     			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
     				"AND " + DB.kJahr + " = " + kCurrentElectionYear +
     		"), " +
     		"ZweitStimmenWahlkreis2005 AS ( " + 
   			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
-  			"FROM " + db.wahlergebnis2() + " " +
+  			"FROM " + db.zweitStimmenNachWahlkreis() + " " +
   			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
   				"AND " + DB.kJahr + " = " + kPreviousElectionYear +
   			"), " +
     		"SummeZweitStimmenWahlkreis2009 AS ( " + 
   			"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
-  			"FROM " + db.wahlergebnis2() + " " +
+  			"FROM " + db.zweitStimmenNachWahlkreis() + " " +
   			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
   				"AND " + DB.kJahr + " = " + kCurrentElectionYear + " " +
   			"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
 	  		"), " +
 	  		"SummeZweitStimmenWahlkreis2005 AS ( " + 
 				"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
-				"FROM " + db.wahlergebnis2() + " " +
+				"FROM " + db.zweitStimmenNachWahlkreis() + " " +
 				"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
 					"AND " + DB.kJahr + " = " + kPreviousElectionYear + " " +
 				"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
@@ -122,10 +127,6 @@ public class Q3 extends Query {
 			row.add(String.format("%+d", rs3.getInt("Aenderung")));
 			q3rows.add(row);
 		}
-    
-		// Q3.4 - Vergleich Stimmen zum Vorjahr
-		
-		// TODO
 		
 		return null;
 	}

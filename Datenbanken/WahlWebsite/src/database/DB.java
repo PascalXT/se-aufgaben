@@ -54,15 +54,15 @@ public class DB {
   }
   public final static String kStimmeJahr = "Jahr";
 
-  public String wahlergebnis1() {
-    return tabellenName("Wahlergebnis1");
+  public String erstStimmenNachWahlkreis() {
+    return tabellenName("erstStimmenNachWahlkreis");
   }
 
   public final static String kWahlergebnis1Anzahl = "Anzahl";
   public final static String kWahlergebnis1Jahr = "Jahr";
 
-  public String wahlergebnis2() {
-    return tabellenName("Wahlergebnis2");
+  public String zweitStimmenNachWahlkreis() {
+    return tabellenName("zweitStimmenNachWahlkreis");
   }
 
   public final static String kWahlergebnis2Anzahl = "Anzahl";

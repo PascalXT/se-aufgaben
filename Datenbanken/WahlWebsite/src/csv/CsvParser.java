@@ -469,13 +469,13 @@ public class CsvParser {
   public void importAggregatedVotes() throws SQLException {
     final String[] columnsErststimmenAggregiert = { DB.kWahlergebnis1Jahr, DB.kForeignKeyWahlkreisID,
         DB.kWahlergebnis1Anzahl, DB.kForeignKeyKandidatID };
-    datenbank.load(erststimmenAggregiertFile, "(1, 2, 3, 4)", columnsErststimmenAggregiert, datenbank.wahlergebnis1());
+    datenbank.load(erststimmenAggregiertFile, "(1, 2, 3, 4)", columnsErststimmenAggregiert, datenbank.erstStimmenNachWahlkreis());
     System.out.println("ErststimmenAggregiert have been imported to the database");
 
     final String[] columnsZweitstimmenAggregiert = { DB.kWahlergebnis2Jahr, DB.kForeignKeyWahlkreisID,
         DB.kWahlergebnis2Anzahl, DB.kForeignKeyParteiID };
     datenbank
-        .load(zweitstimmenAggregiertFile, "(1, 2, 3, 4)", columnsZweitstimmenAggregiert, datenbank.wahlergebnis2());
+        .load(zweitstimmenAggregiertFile, "(1, 2, 3, 4)", columnsZweitstimmenAggregiert, datenbank.zweitStimmenNachWahlkreis());
     System.out.println("ZweitstimmenAggregiert have been imported to the database");
     
     final String[] columnsWahlkreisDaten = {DB.kForeignKeyWahlkreisID, DB.kAnzahlWahlberechtigte,

@@ -53,7 +53,8 @@ public class Q2 extends Query {
 	  "SELECT k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + " " +
 	  "FROM Abgeordnete a, " + db.kandidat() + " k, " + db.partei() + " p " +
 	  "WHERE a." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
-	  "AND (k." + DB.kForeignKeyParteiID + " IS NULL OR k." + DB.kForeignKeyParteiID + " = p." + DB.kID + ") ";
+	  "AND (k." + DB.kForeignKeyParteiID + " IS NULL OR k." + DB.kForeignKeyParteiID + " = p." + DB.kID + ") " +
+	  "ORDER BY k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + "";
 	
 	  return db.executeSQL(qry);
 	}
@@ -61,11 +62,14 @@ public class Q2 extends Query {
 	@Override
 	protected String generateBody(ResultSet resultSet) throws SQLException {
 		
-		String[] headers = new String[] {"Abgeordneter", "Partei"};
+		String[] headers = new String[] {"", "Abgeordneter", "Partei"};
 		List<List<String>> rows = new ArrayList<List<String>>();
 		
+		int i = 0;
 		while (resultSet.next()) {
+			i++;
 			List<String> row = new ArrayList<String>();
+			row.add(i + "");
 			row.add(resultSet.getString(DB.kKandidatVorname) + " " + resultSet.getString(DB.kKandidatNachname));
 			row.add(resultSet.getString(DB.kParteiKuerzel));
 			rows.add(row);

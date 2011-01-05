@@ -41,23 +41,6 @@ public class TableDef {
         "CREATE TABLE " + schemaName + ".PARTEI ( ID BIGINT  NOT NULL , " + "NAME VARCHAR (255) , "
             + "KUERZEL VARCHAR (63)  NOT NULL  , " + "CONSTRAINT CC1288606983948 PRIMARY KEY ( ID) );\n",
 
-        // Direktmandat
-        "CREATE TABLE "
-            + schemaName
-            + ".DIREKTMANDAT "
-            + "( ID "
-            + autoIncrementID
-            + " , "
-            + "PARTEIID BIGINT  NOT NULL , "
-            + "WAHLKREISID BIGINT  NOT NULL  , "
-            + "CONSTRAINT CC1288607225718 PRIMARY KEY ( ID) , "
-            + "CONSTRAINT CC1288607232192 FOREIGN KEY (PARTEIID) REFERENCES "
-            + schemaName
-            + ".PARTEI (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION , CONSTRAINT CC1288607245171 FOREIGN KEY (WAHLKREISID) REFERENCES "
-            + schemaName
-            + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
-            + "ORGANIZE BY DIMENSIONS ( PARTEIID) ;\n",
-
         // Kandidat
         "CREATE TABLE " + schemaName + ".KANDIDAT " + "( ID " + autoIncrementID + " , " + "PARTEIID BIGINT , "
             + "BUNDESLANDID BIGINT ," + "DMWAHLKREISID BIGINT," + "DMPARTEIID BIGINT,"
@@ -91,8 +74,8 @@ public class TableDef {
             // ".WAHLBEZIRK (ID, WAHLKREISID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
             + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLBEZIRKID, WAHLKREISID) ;\n",
 
-        // WAHLERGEBNIS1
-        "CREATE TABLE " + schemaName + ".WAHLERGEBNIS1 " + "("
+        // ERSTSTIMMENNACHWAHLKREIS
+        "CREATE TABLE " + schemaName + ".ERSTSTIMMENNACHWAHLKREIS " + "("
         	  + "KANDIDATID BIGINT NOT NULL, "
             + "WAHLKREISID BIGINT  NOT NULL , "
             + "JAHR INTEGER NOT NULL, "
@@ -103,10 +86,10 @@ public class TableDef {
             + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
             + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
             + "ORGANIZE BY DIMENSIONS ( KANDIDATID, WAHLKREISID) ;\n" + "COMMENT ON TABLE " + schemaName
-            + ".WAHLERGEBNIS1 IS 'Wahlergebnis 1. Stimme';\n",
+            + ".ERSTSTIMMENNACHWAHLKREIS IS 'Wahlergebnis 1. Stimme';\n",
 
-        // WAHLERGEBNIS2
-        "CREATE TABLE " + schemaName + ".WAHLERGEBNIS2 " + "(" + "PARTEIID BIGINT  NOT NULL , "
+        // ZWEITSTIMMENNACHWAHLKREIS
+        "CREATE TABLE " + schemaName + ".ZWEITSTIMMENNACHWAHLKREIS " + "(" + "PARTEIID BIGINT  NOT NULL , "
             + "WAHLKREISID BIGINT  NOT NULL ," + "JAHR INTEGER  NOT NULL  , " + "ANZAHL INTEGER  NOT NULL, "
             + "CONSTRAINT CC1288610976900 PRIMARY KEY ( PARTEIID, WAHLKREISID, JAHR) , "
             + "CONSTRAINT CC1288610983160 FOREIGN KEY (PARTEIID) REFERENCES " + schemaName
@@ -114,7 +97,7 @@ public class TableDef {
             + "CONSTRAINT CC1288610994045 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
             + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
             + "ORGANIZE BY DIMENSIONS ( PARTEIID, WAHLKREISID) ;\n" + "COMMENT ON TABLE " + schemaName
-            + ".WAHLERGEBNIS2 IS 'Wahlergebnis 2. Stimme';\n",
+            + ".ZWEITSTIMMENNACHWAHLKREIS IS 'Wahlergebnis 2. Stimme';\n",
             
         // Wahlberechtigter
         "CREATE TABLE " + schemaName + ".Wahlberechtigter ("

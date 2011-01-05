@@ -19,13 +19,13 @@ public class Q6 extends Query {
 				"WITH " +
 				"MaxStimmen(WahlkreisID, Anzahl) AS ( " +
 					"SELECT we.WahlkreisID, MAX(we.Anzahl) " +
-					"FROM " + db.wahlergebnis1() + " we " +
+					"FROM " + db.erstStimmenNachWahlkreis() + " we " +
 					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"GROUP BY we.WahlkreisID " +
 				"), " +
 				"Erster(WahlkreisID, KandidatID, ParteiID, Anzahl) AS ( " +
 					"SELECT we.WahlkreisID, we.KandidatID, k.ParteiID, we.Anzahl " +
-					"FROM " + db.wahlergebnis1() + " we, MaxStimmen ms, " + db.kandidat() + " k " +
+					"FROM " + db.erstStimmenNachWahlkreis() + " we, MaxStimmen ms, " + db.kandidat() + " k " +
 					"WHERE we.WahlkreisID = ms.WahlkreisID " +
 					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"AND we.KandidatID = k.ID " +
@@ -33,21 +33,21 @@ public class Q6 extends Query {
 				"), " +
 				"RestKandidaten(KandidatID) AS ( " +
 					"SELECT KandidatID " +
-					"FROM " + db.wahlergebnis1() + " " + 
+					"FROM " + db.erstStimmenNachWahlkreis() + " " + 
 					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"EXCEPT " +
 					"SELECT KandidatID FROM Erster " +
 				"), " +
 				"MaxStimmenRest(WahlkreisID, Anzahl) AS ( " +
 					"SELECT we.WahlkreisID, MAX(we.Anzahl) " +
-					"FROM " + db.wahlergebnis1() + " we, RestKandidaten r " +
+					"FROM " + db.erstStimmenNachWahlkreis() + " we, RestKandidaten r " +
 					"WHERE we.KandidatID = r.KandidatID " +
 						"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"GROUP BY we.WahlkreisID " +
 				"), " +
 				"Zweiter(WahlkreisID, KandidatID, ParteiID, Anzahl) AS ( " +
 					"SELECT k.DMWahlkreisID, k.ID, k.ParteiID, we.Anzahl " +
-					"FROM " + db.kandidat() + " k, " + db.wahlergebnis1() + " we, MaxStimmenRest ms " +
+					"FROM " + db.kandidat() + " k, " + db.erstStimmenNachWahlkreis() + " we, MaxStimmenRest ms " +
 					"WHERE we.Anzahl = ms.Anzahl " +
 					"AND we.WahlkreisID = ms.WahlkreisID " +
 					"AND we.KandidatID = k.ID " +
