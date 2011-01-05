@@ -80,21 +80,26 @@ public abstract class Query {
 	}
 
 	protected String createDirektmandateTable() throws SQLException {
+		return createDirektmandateTable(db.erstStimmenNachWahlkreis());
+	}
+
+	
+	protected String createDirektmandateTable(String erstStimmenNachWahlkreisTable) throws SQLException {
 
     db.createOrReplaceTemporaryTable(db.direktmandate(), DB.kForeignKeyKandidatID + " BIGINT, "
         + DB.kForeignKeyParteiID + " BIGINT, " + DB.kKandidatDMWahlkreisID + " BIGINT");
     db.executeUpdate("INSERT INTO " + db.direktmandate() + " " +
         "WITH maxErgebnis(wahlkreisID, maxStimmen) AS ( " + 
-        	"SELECT k." + DB.kKandidatDMWahlkreisID + ", MAX(v." + DB.kWahlergebnis1Anzahl + ") " + 
-        	"FROM " + db.erstStimmenNachWahlkreis() + " v, " + db.kandidat() + " k " + 
+        	"SELECT k." + DB.kKandidatDMWahlkreisID + ", MAX(v." + DB.kAnzahl + ") " + 
+        	"FROM " + erstStimmenNachWahlkreisTable + " v, " + db.kandidat() + " k " + 
         	"WHERE v." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
         		"AND v." + DB.kJahr + " = " + kCurrentElectionYear + " " +
         	"GROUP BY k." + DB.kKandidatDMWahlkreisID + " " + 
         ") " + 
         "SELECT k." + DB.kID + " AS " + DB.kForeignKeyKandidatID + ", k." + DB.kForeignKeyParteiID + ", k." + DB.kKandidatDMWahlkreisID + " " +
-        "FROM maxErgebnis e, " + db.erstStimmenNachWahlkreis() + " v, " + db.kandidat() + " k " + 
+        "FROM maxErgebnis e, " + erstStimmenNachWahlkreisTable + " v, " + db.kandidat() + " k " + 
         "WHERE e.wahlkreisID = v." + DB.kForeignKeyWahlkreisID + " " + 
-        "AND e.maxStimmen = v." + DB.kWahlergebnis1Anzahl + " " + 
+        "AND e.maxStimmen = v." + DB.kAnzahl + " " + 
         "AND k." + DB.kID + " = v." + DB.kForeignKeyKandidatID + " " +
         "AND v." + DB.kJahr + " = " + kCurrentElectionYear
     );
@@ -220,7 +225,7 @@ public abstract class Query {
 		db.executeUpdate("INSERT INTO " + db.wahlkreissieger() + " " +
 				"WITH " +
 				"MaxErstStimmen(WahlkreisID, Anzahl) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis1Anzahl + ") " + 
+					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kAnzahl + ") " + 
 					"FROM " + db.erstStimmenNachWahlkreis() + " we " +
 					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 					"GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
@@ -235,7 +240,7 @@ public abstract class Query {
 					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyKandidatID + " " + 
 					"FROM " + db.erstStimmenNachWahlkreis() + " we, MaxErstStimmen ms " + 
 					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
-					"AND we." + DB.kWahlergebnis1Anzahl + " = ms.Anzahl " +
+					"AND we." + DB.kAnzahl + " = ms.Anzahl " +
 					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
 				"), " +
 				"GewinnerZweitStimmen(WahlkreisID, ParteiID) AS ( " +
