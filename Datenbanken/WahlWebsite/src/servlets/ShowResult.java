@@ -63,6 +63,9 @@ public class ShowResult extends HttpServlet {
 			query = new Q2("Q2 - Abgeordnete");		
 		} else if (queryParam.equalsIgnoreCase("Q3")) {		
 			int randomWahlkreis = new Random().nextInt(299) + 1;
+			if (request.getParameter("wk") != null) {
+				randomWahlkreis = Integer.parseInt(request.getParameter("wk"));
+			}
 			query = new Q3("Q3 - Wahlkreisinfo", randomWahlkreis);			
 		} else if (queryParam.equalsIgnoreCase("Q4")) {	
 			query = new Q4("Q4 - Wahlkreisergebnisse");
@@ -72,6 +75,9 @@ public class ShowResult extends HttpServlet {
 			query = new Q6("Q6 - Knappste Sieger");
 		} else if (queryParam.equalsIgnoreCase("Q7")) {
 			int randomWahlkreis = new Random().nextInt(5) + 213;
+			if (request.getParameter("wk") != null) {
+				randomWahlkreis = Integer.parseInt(request.getParameter("wk"));
+			}
 			query = new Q7("Q7 - Wahlkreisinfo (Einzelstimmen)", randomWahlkreis);
 		}
 		

@@ -26,6 +26,7 @@ public class Q7 extends Q3 {
     			+ DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", " + DB.kAnzahl + ") "
     		+ "SELECT s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
     		+ "FROM " + db.stimme() + " s "
+    		+ "WHERE " + DB.kForeignKeyParteiID + " is not null "
     		+ "GROUP BY s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr);
     return tempZweitStimmenNachWahlkreis();
 	}
@@ -38,6 +39,7 @@ public class Q7 extends Q3 {
     			+ DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", " + DB.kAnzahl + ") "
     		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
     		+ "FROM " + db.stimme() + " s "
+    		+ "WHERE " + DB.kForeignKeyKandidatID + " is not null "
     		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr);
     return tempErstStimmenNachWahlkreis();
 	}

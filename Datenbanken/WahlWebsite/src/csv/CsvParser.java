@@ -163,11 +163,16 @@ public class CsvParser {
       erststimmenQueue.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeErststimmen));
       int ungueltigeZweitstimmen = getInteger(tokens, kUngueltigePos + kOffsetZweitstimmen);
       zweitstimmenQueue.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeZweitstimmen));
-      
       createWahlkreisDaten(wahlkreisID, wahlberechtigte, ungueltigeErststimmen, ungueltigeZweitstimmen,
       		kCurrentElectionYear, fileWriterWahlkreisDaten);
+      
+      Queue<Tuple<Integer, Integer>> erststimmenQueueVorperiode = new LinkedList<Tuple<Integer,Integer>>();
+      Queue<Tuple<Integer, Integer>> zweitstimmenQueueVorperiode = new LinkedList<Tuple<Integer,Integer>>();
+
       int ungueltigeErststimmenVorperiode = getInteger(tokens, kUngueltigePos + kOffsetErststimmenVorperiode);
+      erststimmenQueueVorperiode.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeErststimmenVorperiode));
       int ungueltigeZweitstimmenVorperiode = getInteger(tokens, kUngueltigePos + kOffsetZweitstimmenVorperiode);
+      zweitstimmenQueueVorperiode.add(new Tuple<Integer, Integer>(kInvalidID, ungueltigeZweitstimmenVorperiode));
       createWahlkreisDaten(wahlkreisID, wahlberechtigte, ungueltigeErststimmen, ungueltigeZweitstimmen,
       		kPreviousElectionYear, fileWriterWahlkreisDaten);
       
@@ -181,13 +186,17 @@ public class CsvParser {
       	erststimmenQueue.add(new Tuple<Integer, Integer>(getKandidat(wahlkreisID, parteiID), anzahlErststimmen));
       	zweitstimmenQueue.add(new Tuple<Integer, Integer>(parteiID, anzahlZweitstimmen));
       	
+      	int anzahlErststimmenVorperiode = getInteger(tokens, column + kOffsetErststimmenVorperiode);
+      	int anzahlZweitstimmenVorperiode = getInteger(tokens, column + kOffsetZweitstimmenVorperiode);
+      	erststimmenQueueVorperiode.add(new Tuple<Integer, Integer>(getKandidat(wahlkreisID, parteiID),
+      			anzahlErststimmenVorperiode));
+      	zweitstimmenQueueVorperiode.add(new Tuple<Integer, Integer>(parteiID, anzahlZweitstimmenVorperiode));
+      	
       	// Write aggregated votes.
         writeZweitstimmenAggregiert(kCurrentElectionYear, wahlkreisID, parteiID, anzahlZweitstimmen,
         		fileWriterZweitstimmenAggregiert);
         writeErststimmenAggregiert(kCurrentElectionYear, wahlkreisID, parteiID, anzahlErststimmen,
-        		fileWriterErststimmenAggregiert);
-      	int anzahlErststimmenVorperiode = getInteger(tokens, column + kOffsetErststimmenVorperiode);
-      	int anzahlZweitstimmenVorperiode = getInteger(tokens, column + kOffsetZweitstimmenVorperiode);  
+        		fileWriterErststimmenAggregiert); 
       	writeZweitstimmenAggregiert(kPreviousElectionYear, wahlkreisID, parteiID, anzahlZweitstimmenVorperiode,
       			fileWriterZweitstimmenAggregiert);
       	writeErststimmenAggregiert(kPreviousElectionYear, wahlkreisID, parteiID, anzahlErststimmenVorperiode,
@@ -202,43 +211,10 @@ public class CsvParser {
       	continue;
       }
 
-      Tuple<Integer, Integer> erststimmenTuple;
-      Tuple<Integer, Integer> zweitstimmenTuple;
-      int kandidatID = -1;
-      int parteiID = -1;
-      int remainingErststimmen = 0;
-      int remainingZweitstimmen = 0;
-      int currentWahlbezirk = 0;
-      int remainingVotes = 0;
-      while (!erststimmenQueue.isEmpty()) {
-      	assert(!zweitstimmenQueue.isEmpty());
-      	
-      	while (!erststimmenQueue.isEmpty() && remainingErststimmen <= 0) {
-      		erststimmenTuple = erststimmenQueue.poll();
-      		kandidatID = erststimmenTuple.first;
-      		remainingErststimmen = erststimmenTuple.second;
-      	}
-      	while (!zweitstimmenQueue.isEmpty() && remainingZweitstimmen <= 0) {
-      		zweitstimmenTuple = zweitstimmenQueue.poll();
-      		parteiID = zweitstimmenTuple.first;
-      		remainingZweitstimmen = zweitstimmenTuple.second;
-      	}
-      	
-      	if (remainingVotes <= 0) {
-      		currentWahlbezirk++;
-      		remainingVotes = 2500;
-      	}
-      	
-      	int numVotes = Math.min(Math.min(remainingErststimmen, remainingZweitstimmen), remainingVotes);
-      	createVotes((kandidatID == kInvalidID ? "" : "" + kandidatID),
-      			(parteiID == kInvalidID ? "" : "" + parteiID), currentWahlbezirk, wahlkreisID, kCurrentElectionYear,
-      			numVotes, fileWriterStimmen);
-      	
-      	remainingErststimmen -= numVotes;
-      	remainingZweitstimmen -= numVotes;
-      	remainingVotes -= numVotes;
-      	
-      }
+      createVotesOfQueues(fileWriterStimmen, wahlkreisID,	erststimmenQueue,	zweitstimmenQueue, kCurrentElectionYear);
+      createVotesOfQueues(fileWriterStimmen, wahlkreisID,	erststimmenQueueVorperiode,	zweitstimmenQueueVorperiode,
+      		kPreviousElectionYear);
+      
       assert(zweitstimmenQueue.isEmpty());
   	}
   	
@@ -253,6 +229,51 @@ public class CsvParser {
     fileWriterWahlberechtigte.close();
     fileWriterWahlkreisDaten.close();
   }
+
+	private void createVotesOfQueues(
+			FileWriter fileWriterStimmen,
+			int wahlkreisID,
+			Queue<Tuple<Integer, Integer>> erststimmenQueue,
+			Queue<Tuple<Integer, Integer>> zweitstimmenQueue,
+			int year) {
+		Tuple<Integer, Integer> erststimmenTuple;
+		Tuple<Integer, Integer> zweitstimmenTuple;
+		int kandidatID = -1;
+		int parteiID = -1;
+		int remainingErststimmen = 0;
+		int remainingZweitstimmen = 0;
+		int currentWahlbezirk = 0;
+		int remainingVotes = 0;
+		while (!erststimmenQueue.isEmpty()) {
+			assert(!zweitstimmenQueue.isEmpty());
+			
+			while (!erststimmenQueue.isEmpty() && remainingErststimmen <= 0) {
+				erststimmenTuple = erststimmenQueue.poll();
+				kandidatID = erststimmenTuple.first;
+				remainingErststimmen = erststimmenTuple.second;
+			}
+			while (!zweitstimmenQueue.isEmpty() && remainingZweitstimmen <= 0) {
+				zweitstimmenTuple = zweitstimmenQueue.poll();
+				parteiID = zweitstimmenTuple.first;
+				remainingZweitstimmen = zweitstimmenTuple.second;
+			}
+			
+			if (remainingVotes <= 0) {
+				currentWahlbezirk++;
+				remainingVotes = 2500;
+			}
+			
+			int numVotes = Math.min(Math.min(remainingErststimmen, remainingZweitstimmen), remainingVotes);
+			createVotes((kandidatID == kInvalidID ? "" : "" + kandidatID),
+					(parteiID == kInvalidID ? "" : "" + parteiID), currentWahlbezirk, wahlkreisID, year,
+					numVotes, fileWriterStimmen);
+			
+			remainingErststimmen -= numVotes;
+			remainingZweitstimmen -= numVotes;
+			remainingVotes -= numVotes;
+			
+		}
+	}
 
   /**
    * Creates the single votes based on the overall election results.
@@ -289,32 +310,29 @@ public class CsvParser {
       assert (tokens.length == 5);
 
       final int jahr = Integer.parseInt(tokens[kSpalteJahr]);
-      if (jahr == 2009) { // TODO: support 2005 as well
 
-        final int wahlkreisID = Integer.parseInt(tokens[kSpalteWahlkreisID]);
-        if (wahlkreisID != currentWahlkreis) {
-          lastWahlbezirk = 0;
-          currentWahlkreis = wahlkreisID;
-        }
-
-        if (bundesland == null || bundesland.equals(getBundesland(wahlkreisID))) {
-          final int parteiId = Integer.parseInt(tokens[kSpalteParteiID]);
-          final int anzahlErststimmen = Integer.parseInt("0" + tokens[kSpalteErststimmen]);
-          final int anzahlZweitstimmen = Integer.parseInt("0" + tokens[kSpalteZweitstimmen]);
-          final int anzahlWahlbezirke = Math.max(anzahlErststimmen, anzahlZweitstimmen) / kMaxBewohnerProBezirk;
-
-          writeStimmen(jahr, wahlkreisID, parteiId, anzahlErststimmen, anzahlZweitstimmen, lastWahlbezirk,
-              anzahlWahlbezirke, fileWriterStimmen);
-
-          writeErststimmenAggregiert(jahr, wahlkreisID, parteiId, anzahlErststimmen, fileWriterErststimmenAggregiert);
-          writeZweitstimmenAggregiert(jahr, wahlkreisID, parteiId, anzahlZweitstimmen, fileWriterZweitstimmenAggregiert);
-          fileWriterStimmen.flush();
-          fileWriterErststimmenAggregiert.flush();
-          fileWriterZweitstimmenAggregiert.flush();
-          lastWahlbezirk += anzahlWahlbezirke;
-        }
+      final int wahlkreisID = Integer.parseInt(tokens[kSpalteWahlkreisID]);
+      if (wahlkreisID != currentWahlkreis) {
+        lastWahlbezirk = 0;
+        currentWahlkreis = wahlkreisID;
       }
 
+      if (bundesland == null || bundesland.equals(getBundesland(wahlkreisID))) {
+        final int parteiId = Integer.parseInt(tokens[kSpalteParteiID]);
+        final int anzahlErststimmen = Integer.parseInt("0" + tokens[kSpalteErststimmen]);
+        final int anzahlZweitstimmen = Integer.parseInt("0" + tokens[kSpalteZweitstimmen]);
+        final int anzahlWahlbezirke = Math.max(anzahlErststimmen, anzahlZweitstimmen) / kMaxBewohnerProBezirk;
+
+        writeStimmen(jahr, wahlkreisID, parteiId, anzahlErststimmen, anzahlZweitstimmen, lastWahlbezirk,
+            anzahlWahlbezirke, fileWriterStimmen);
+
+        writeErststimmenAggregiert(jahr, wahlkreisID, parteiId, anzahlErststimmen, fileWriterErststimmenAggregiert);
+        writeZweitstimmenAggregiert(jahr, wahlkreisID, parteiId, anzahlZweitstimmen, fileWriterZweitstimmenAggregiert);
+        fileWriterStimmen.flush();
+        fileWriterErststimmenAggregiert.flush();
+        fileWriterZweitstimmenAggregiert.flush();
+        lastWahlbezirk += anzahlWahlbezirke;
+      }
     }
     fileWriterStimmen.close();
     System.out.println("Stimmen files have been created.");
