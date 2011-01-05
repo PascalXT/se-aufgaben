@@ -176,9 +176,19 @@ public class DB {
     connection.commit();
     executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
   }
+  
+  public String prettyPrintSQL(String sql_statement) {
+  	String result = "\n" + sql_statement;
+  	result = result.replaceAll(" SELECT", " \nSELECT");
+  	result = result.replaceAll(" FROM", " \nFROM");
+  	result = result.replaceAll(" WHERE", " \nWHERE");
+  	result = result.replaceAll(" GROUP BY", " \nGROUP BY");
+  	result = result.replaceAll(" HAVING", " \nHAVING");
+  	return result;
+  }
 
   public ResultSet executeSQL(String sql_statement) throws SQLException {
-    System.out.println(sql_statement);
+    System.out.println(prettyPrintSQL(sql_statement));
     if (statement != null)
       statement.close();
     statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);

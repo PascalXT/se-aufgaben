@@ -120,7 +120,7 @@ public class Q3 extends Query {
     			"(COALESCE(w2009." + DB.kWahlergebnis2Anzahl + ", 0) - COALESCE(w2005." + DB.kWahlergebnis2Anzahl + ", 0)) as Aenderung " +
     		"FROM ZweitStimmenWahlkreis2009 w2009 FULL OUTER JOIN ZweitStimmenWahlkreis2005 w2005 "
     			+ "ON w2009." + DB.kForeignKeyParteiID  + " = w2005." + DB.kForeignKeyParteiID
-    			+ " RIGHT OUTER JOIN " + db.partei() + " p ON p." + DB.kID + " = w2005." + DB.kForeignKeyParteiID + " " +
+    			+ " RIGHT OUTER JOIN " + db.partei() + " p ON p." + DB.kID + " = w2009." + DB.kForeignKeyParteiID + " " +
     		"ORDER BY Absolut2009 DESC, Absolut2005 DESC"
     );
     
