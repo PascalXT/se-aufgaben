@@ -37,7 +37,7 @@ public class Q5 extends Query {
 	protected ResultSet doQuery() throws SQLException {
 		
 		String zweitStimmenNachBundeslandTable = createZweitStimmenNachBundeslandTable();
-		String zweitStimmenNachParteiTable = createZweitStimmenNachParteiTable();
+		String zweitStimmenNachParteiTable = createZweitStimmenNachParteiTable(zweitStimmenNachBundeslandTable);
     String direktMandateTable = createDirektmandateTable();
 	  String fuenfProzentParteienTable = createFuenfProzentParteienTable(zweitStimmenNachBundeslandTable);  
 	  String dreiDirektMandateParteienTable = createDreiDirektmandateParteienTable(direktMandateTable);

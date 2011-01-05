@@ -68,13 +68,13 @@ public abstract class Query {
 	    return db.zweitStimmenNachBundesland();
 	}
 
-	protected String createZweitStimmenNachParteiTable() throws SQLException {
+	protected String createZweitStimmenNachParteiTable(String zweitStimmenNachBundeslandTable) throws SQLException {
     db.createOrReplaceTemporaryTable(db.zweitStimmenNachPartei(), DB.kForeignKeyParteiID
         + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
     db.executeUpdate(""
     		+ "INSERT INTO " + db.zweitStimmenNachPartei() + " "
     		+ "SELECT " + DB.kForeignKeyParteiID + ", SUM(" + DB.kAnzahlStimmen + ") "
-    		+ "FROM " + db.zweitStimmenNachBundesland() + " "
+    		+ "FROM " + zweitStimmenNachBundeslandTable + " "
     		+ "GROUP BY " + DB.kForeignKeyParteiID);
 		return db.zweitStimmenNachPartei();
 	}

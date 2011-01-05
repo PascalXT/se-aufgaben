@@ -18,7 +18,7 @@ public class Q1 extends Query {
 	protected ResultSet doQuery() throws SQLException {
 			
 		String zweitStimmenNachBundeslandTable = createZweitStimmenNachBundeslandTable();
-		String zweitStimmenNachParteiTable = createZweitStimmenNachParteiTable();
+		String zweitStimmenNachParteiTable = createZweitStimmenNachParteiTable(zweitStimmenNachBundeslandTable);
 
     db.printTable(zweitStimmenNachBundeslandTable);
     db.printTable(zweitStimmenNachParteiTable);

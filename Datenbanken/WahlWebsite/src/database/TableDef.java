@@ -107,7 +107,7 @@ public class TableDef {
     
     		// Wahlkreisdaten
     		"CREATE TABLE " + schemaName + ".WahlkreisDaten ("
-    		    + "WahlkreisID BIGINT NOT NULL PRIMARY KEY, "
+    		    + "WahlkreisID BIGINT NOT NULL PRIMARY KEY REFERENCES " + schemaName + ".Wahlkreis, "
     		    + "AnzahlWahlberechtigte BIGINT, "
     		    + "AnzahlUngueltigeErststimmen BIGINT, "
     		    + "AnzahlUngueltigeZweitstimmen BIGINT, "
