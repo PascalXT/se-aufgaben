@@ -41,13 +41,37 @@ public abstract class Query {
 			ResultSet resultSet = doQuery();
 			String body = generateBody(resultSet);
 			body = replaceUmlaute(body);
-			final long processMillis = System.currentTimeMillis() - startTime;
-			final String processMillisHtml = "<br><br>Die Berechnung hat " + processMillis + " Millisekunden gedauert.<br>";
-			return "<html><body><h1>" + headline + "</h1>" + body + processMillisHtml + "</body></html>";
+			String html = "<html>";
+			html += "<head>" + getHtmlHeader() + "</head>";
+			html += "<body><div class=\"container\"><h1>" + headline + "</h1><hr/>";
+			html += "<div class=\"span-6\">" + getNavigation() + "</div>";
+			html += "<div class=\"span-18 last\">" + body + "</div>";
+			html += "<hr/><p>Die Berechnung hat " + (System.currentTimeMillis() - startTime) + " Millisekunden gedauert.<p>";
+			html += "</div></body></html>";
+			return html;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private String getNavigation() {
+		String navigation = "<h3>Navigation</h3>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1\">Q1: Sitzverteilung</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2\">Q2: Abgeordnete</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3\">Q3: Wahlkreisinfo</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q4\">Q4: Wahlkreisergebnisse</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5\">Q5: Überhangsmandate</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q6\">Q6: Knappste Sieger</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q7\">Q7: Wahlkreisinfo (Einzelstimmen)</a><br/>";
+		return navigation;
+	}
+
+	private String getHtmlHeader() {
+		String header = "";
+		header += "<link rel=\"stylesheet\" href=\"css/screen.css\" type=\"text/css\" media=\"screen, projection\">";
+		header += "<link rel=\"stylesheet\" href=\"css/custom.css\" type=\"text/css\" media=\"screen, projection\">";
+		return header;
 	}
 	
 	protected abstract ResultSet doQuery() throws SQLException;

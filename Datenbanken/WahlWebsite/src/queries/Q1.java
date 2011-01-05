@@ -3,7 +3,10 @@ package queries;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import queries.GoogleChart.ChartType;
 import database.DB;
 
@@ -68,6 +71,16 @@ public class Q1 extends Query {
 		List<Integer> data = new ArrayList<Integer>();
 		List<String> labels = new ArrayList<String>();
 		
+		Map<String, String> colorMapping = new HashMap<String, String>();
+		colorMapping.put("CDU", "000000");
+		colorMapping.put("SPD", "FF0000");
+		colorMapping.put("CSU", "00FFFF");
+		colorMapping.put("FDP", "FFFF00");
+		colorMapping.put("GRÜNE", "00FF00");
+		colorMapping.put("DIE LINKE", "FF00FF");
+		
+		List<String> colors = new ArrayList<String>();
+		
 		while(resultSet.next()) {
 			String partei = resultSet.getString(DB.kParteiKuerzel);
 			int sitze = resultSet.getInt(DB.kAnzahlSitze);
@@ -80,11 +93,15 @@ public class Q1 extends Query {
 			
 			data.add(sitze * 100 / 598);
 			labels.add(partei + " (" + sitze + ")");
+			colors.add(colorMapping.get(partei));
 		}
+		
+		
+		
 		GoogleChart chart = new GoogleChart(ChartType.PIE, 400, 240);
 		chart.setData(data);
 		chart.setLabels(labels);
-		
+		chart.setColors(colors);
 		List<String> finalRow = new ArrayList<String>();
 		finalRow.add("Summe");
 		finalRow.add(String.valueOf(sum));
