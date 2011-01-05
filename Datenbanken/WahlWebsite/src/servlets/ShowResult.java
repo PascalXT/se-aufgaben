@@ -71,7 +71,8 @@ public class ShowResult extends HttpServlet {
 		} else if (queryParam.equalsIgnoreCase("Q6")) {
 			query = new Q6("Q6 - Knappste Sieger");
 		} else if (queryParam.equalsIgnoreCase("Q7")) {
-			query = new Q7("Q7 - Wahlkreisinfo (Einzelstimmen)");
+			int randomWahlkreis = new Random().nextInt(5) + 213;
+			query = new Q7("Q7 - Wahlkreisinfo (Einzelstimmen)", randomWahlkreis);
 		}
 		
 		query.setDatabase(database);

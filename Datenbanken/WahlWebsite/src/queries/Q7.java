@@ -10,31 +10,36 @@ public class Q7 extends Q3 {
 		super(headline, wahlkreisID);
 	}
 
-	final String kTempZweitStimmenNachWahlkreis = db.tabellenName("TempZweitStimmenNachWahlkreis");
-	final String kTempErstStimmenNachWahlkreis = db.tabellenName("kTempErstStimmenNachWahlkreis");
+	String tempErstStimmenNachWahlkreis() {
+		return db.tabellenName("TempErstStimmenNachWahlkreis");
+	}
+
+	String tempZweitStimmenNachWahlkreis() {
+		return db.tabellenName("TempZweitStimmenNachWahlkreis");
+	}
 	
 	protected String createTempZweitStimmenNachWahlkreisTable() throws SQLException {
-	 	db.createOrReplaceTemporaryTable(kTempZweitStimmenNachWahlkreis, DB.kForeignKeyParteiID + " BIGINT, "
-	 			+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
+	 	db.createOrReplaceTemporaryTable(tempZweitStimmenNachWahlkreis(), DB.kForeignKeyParteiID + " BIGINT, "
+	 			+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " BIGINT, " + DB.kAnzahl + " BIGINT");
     db.executeUpdate(""
-    		+ "INSERT INTO " + kTempZweitStimmenNachWahlkreis + "(" + DB.kForeignKeyParteiID + ", "
-    			+ DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", " + DB.kAnzahlStimmen + ") "
+    		+ "INSERT INTO " + tempZweitStimmenNachWahlkreis() + "(" + DB.kForeignKeyParteiID + ", "
+    			+ DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", " + DB.kAnzahl + ") "
     		+ "SELECT s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
     		+ "FROM " + db.stimme() + " s "
     		+ "GROUP BY s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr);
-    return kTempZweitStimmenNachWahlkreis;
+    return tempZweitStimmenNachWahlkreis();
 	}
 	
 	protected String createTempErstStimmenNachWahlkreisTable() throws SQLException {
-	 	db.createOrReplaceTemporaryTable(kTempErstStimmenNachWahlkreis, DB.kForeignKeyKandidatID + " BIGINT, "
-	 			+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
+	 	db.createOrReplaceTemporaryTable(tempErstStimmenNachWahlkreis(), DB.kForeignKeyKandidatID + " BIGINT, "
+	 			+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " BIGINT, " + DB.kAnzahl + " BIGINT");
     db.executeUpdate(""
-    		+ "INSERT INTO " + kTempErstStimmenNachWahlkreis + "(" + DB.kForeignKeyKandidatID + ", "
-    			+ DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", " + DB.kAnzahlStimmen + ") "
+    		+ "INSERT INTO " + tempErstStimmenNachWahlkreis() + "(" + DB.kForeignKeyKandidatID + ", "
+    			+ DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", " + DB.kAnzahl + ") "
     		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
     		+ "FROM " + db.stimme() + " s "
     		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr);
-    return kTempErstStimmenNachWahlkreis;
+    return tempErstStimmenNachWahlkreis();
 	}
 	
 	@Override

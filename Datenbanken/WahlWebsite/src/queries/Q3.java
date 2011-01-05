@@ -38,23 +38,27 @@ public class Q3 extends Query {
 		rsWahlkreisName.next();
 		wahlkreisName = rsWahlkreisName.getString(DB.kWahlkreisName);
 		
-    String direktMandateTable = createDirektmandateTable();
+		//TODO: wahlkreisID übergeben und verwenden
+    String direktMandateTable = createDirektmandateTable(erststimmenNachWahlkreisTable);
     
 		// Q3.1 - Wahlbeteiligung
     
 		ResultSet rs1 = db.executeSQL(""
 			+ "SELECT (1.0 * sum(w2." + DB.kWahlergebnis2Anzahl + ") / "
 				+ "max(wd." + DB.kAnzahlWahlberechtigte + ")) as Wahlbeteiligung "
-      + "FROM " + db.wahlkreisDaten() + " wd, " + db.zweitStimmenNachWahlkreis() + " w2 "
+      + "FROM " + db.wahlkreisDaten() + " wd, " + zweitStimmenNachWahlkreisTable + " w2 "
       + "WHERE wd." + DB.kForeignKeyWahlkreisID + " = w2." + DB.kForeignKeyWahlkreisID + " "
       	+ "AND wd." + DB.kJahr + " = w2.jahr AND wd." + DB.kJahr + " = " + kCurrentElectionYear + " "
       	+ "AND wd." + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " "
       + "GROUP BY w2." + DB.kForeignKeyWahlkreisID);
     q1rows = new ArrayList<List<String>>();
     rs1.next();
-    q1rows.add(new ArrayList<String>(Arrays.asList(new String[] {
-    		String.format("%.2f %%", rs1.getFloat("Wahlbeteiligung") * 100)
-    })));
+    String wahlbeteiligung;
+    if (rs1.isClosed())
+    	wahlbeteiligung = "0 %";
+    else
+    	wahlbeteiligung = String.format("%.2f %%", rs1.getFloat("Wahlbeteiligung") * 100);
+    q1rows.add(new ArrayList<String>(Arrays.asList(new String[] {wahlbeteiligung})));
 		
 		// Q3.2 - gewählter Direktkandidat
 		
@@ -67,10 +71,14 @@ public class Q3 extends Query {
     );
     q2rows = new ArrayList<List<String>>();
     rs2.next();
-    q2rows.add(new ArrayList<String>(Arrays.asList(new String[] {
-    		rs2.getString(DB.kKandidatVorname) + " " + rs2.getString(DB.kKandidatNachname),
-    		rs2.getString(DB.kParteiKuerzel)
-    })));
+    if (rs2.isClosed()) {
+      q2rows.add(new ArrayList<String>(Arrays.asList(new String[] {"Keine Daten", ""})));    	
+    } else {
+	    q2rows.add(new ArrayList<String>(Arrays.asList(new String[] {
+	    		rs2.getString(DB.kKandidatVorname) + " " + rs2.getString(DB.kKandidatNachname),
+	    		rs2.getString(DB.kParteiKuerzel)
+	    })));
+    }
 
     
 		// Q3.3 - prozentuale und absolute Anzahl an Stimmen für jede Partei
@@ -78,26 +86,26 @@ public class Q3 extends Query {
     ResultSet rs3 = db.executeSQL("" + 
     		"WITH ZweitStimmenWahlkreis2009 AS ( " + 
     			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
-    			"FROM " + db.zweitStimmenNachWahlkreis() + " " +
+    			"FROM " + zweitStimmenNachWahlkreisTable + " " +
     			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
     				"AND " + DB.kJahr + " = " + kCurrentElectionYear +
     		"), " +
     		"ZweitStimmenWahlkreis2005 AS ( " + 
   			"SELECT " + DB.kForeignKeyParteiID + ", " + DB.kWahlergebnis2Anzahl + " " +
-  			"FROM " + db.zweitStimmenNachWahlkreis() + " " +
+  			"FROM " + zweitStimmenNachWahlkreisTable + " " +
   			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " +
   				"AND " + DB.kJahr + " = " + kPreviousElectionYear +
   			"), " +
     		"SummeZweitStimmenWahlkreis2009 AS ( " + 
   			"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
-  			"FROM " + db.zweitStimmenNachWahlkreis() + " " +
+  			"FROM " + zweitStimmenNachWahlkreisTable + " " +
   			"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
   				"AND " + DB.kJahr + " = " + kCurrentElectionYear + " " +
   			"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 
 	  		"), " +
 	  		"SummeZweitStimmenWahlkreis2005 AS ( " + 
 				"SELECT SUM(" + DB.kWahlergebnis2Anzahl + ") AS Summe " + 
-				"FROM " + db.zweitStimmenNachWahlkreis() + " " +
+				"FROM " + zweitStimmenNachWahlkreisTable + " " +
 				"WHERE " + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " " + 
 					"AND " + DB.kJahr + " = " + kPreviousElectionYear + " " +
 				"GROUP BY " + DB.kForeignKeyWahlkreisID + " " + 

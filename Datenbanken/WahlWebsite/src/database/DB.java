@@ -58,7 +58,7 @@ public class DB {
     return tabellenName("erstStimmenNachWahlkreis");
   }
 
-  public final static String kWahlergebnis1Anzahl = "Anzahl";
+  public final static String kAnzahl = "Anzahl";
   public final static String kWahlergebnis1Jahr = "Jahr";
 
   public String zweitStimmenNachWahlkreis() {
