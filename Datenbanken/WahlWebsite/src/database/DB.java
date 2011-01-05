@@ -68,7 +68,6 @@ public class DB {
   public final static String kWahlergebnis2Anzahl = "Anzahl";
   public final static String kWahlergebnis2Jahr = "Jahr";
 
-  // Temporary tables
   public String zweitStimmenNachBundesland() {
     return tabellenName("ZweitStimmenNachBundesland");
   }
