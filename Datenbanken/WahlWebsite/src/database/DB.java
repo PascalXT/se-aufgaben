@@ -301,8 +301,9 @@ public class DB {
    */
   public void createOrReplaceTemporaryTable(String tableName, String columns) throws SQLException {
     if (tableExists(tableName))
-      dropTable(tableName);
-    if (Flags.isTrue(FlagDefinition.kFlagMakeTemporaryTablesPermanent)) {
+      truncate(tableName);
+    
+    else if (Flags.isTrue(FlagDefinition.kFlagMakeTemporaryTablesPermanent)) {
       executeUpdate("CREATE TABLE " + tableName + " (" + columns + ")");
     } else {
       executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");

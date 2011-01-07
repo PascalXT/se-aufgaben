@@ -4,6 +4,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Kartendeck<T> {
+	
+	public enum KartendeckType {
+		DEBUG, DEBUG2, Q1_Q6, Q7
+	};
+	
+	public static Kartendeck<Karte> createKartendeckByType(KartendeckType type) {
+		Kartendeck<Karte> deck = new Kartendeck<Karte>();
+		if (type == KartendeckType.DEBUG) {
+			deck.addKarte(new Karte("Q3"), 1);
+		}
+		else if (type == KartendeckType.DEBUG2) {
+			deck.addKarte(new Karte("Q3"), 1);
+			deck.addKarte(new Karte("Q4"), 1);
+		}
+		else if (type == KartendeckType.Q1_Q6) {
+			deck.addKarte(new Karte("Q1"), 5);
+			deck.addKarte(new Karte("Q2"), 2);
+			deck.addKarte(new Karte("Q3"), 5);
+			deck.addKarte(new Karte("Q4"), 2);
+			deck.addKarte(new Karte("Q5"), 2);
+			deck.addKarte(new Karte("Q6"), 4);
+		}
+		else if (type == KartendeckType.Q7) {
+			deck.addKarte(new Karte("Q7"), 1);
+		}
+		
+		return deck;
+	}
+	
   Map<T, Integer> deck;
 
   public Kartendeck() {

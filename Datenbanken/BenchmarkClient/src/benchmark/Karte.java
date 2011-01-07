@@ -1,13 +1,18 @@
 package benchmark;
 
 public class Karte {
-  private String url;
+	
+  private String query;
   
-  public Karte(String url) {
-    this.url = url;
+  public Karte(String query) {
+    this.query = query;
   }
-
+  
+  public String getQuery() {
+  	return query;
+  }
+  
   public String getUrl() {
-    return url;
+    return "http://localhost:8080/WahlWebsite/ShowResult?query=" + query;
   }
 }

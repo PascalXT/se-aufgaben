@@ -5,17 +5,46 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import benchmark.Kartendeck.KartendeckType;
+
 public class Benchmark {
-  public static void runBenchmark(int numSimulatedBrowsers, int iterations, int sleepTime) {
+	
+	private int numSimulatedBrowsers;
+	
+	private int sleepTime;
+	
+	private KartendeckType deckType;
+	
+	private BenchmarkResult benchmarkResult;
+	
+	public Benchmark(int numSimulatedBrowsers, int sleepTime, KartendeckType deckType) {
+		this.numSimulatedBrowsers = numSimulatedBrowsers;
+		this.sleepTime = sleepTime;
+		this.deckType = deckType;
+		benchmarkResult = new BenchmarkResult();
+	}
+	
+	public ThreadPoolExecutor run() {
+		BlockingQueue<Runnable> browsers = new LinkedBlockingQueue<Runnable>();
+  	ThreadPoolExecutor texc = new ThreadPoolExecutor(numSimulatedBrowsers, numSimulatedBrowsers, 1000, TimeUnit.MICROSECONDS, browsers);
     
-  	BlockingQueue<Runnable> browsers = new LinkedBlockingQueue<Runnable>();
+    for (int b = 0; b < numSimulatedBrowsers; b++) 
+    	texc.execute(new SimulatedBrowser(this, sleepTime, deckType));
     
-  	ThreadPoolExecutor texc = new ThreadPoolExecutor(1, numSimulatedBrowsers, 1000, TimeUnit.MICROSECONDS, browsers);
+    // all browsers are added, request shutdown so awaitTermination() gets called
+    // when all tasks are complete
+    texc.shutdown();
     
-  	for (int i = 0; i < iterations; i++)
-	    for (int b = 0; b < numSimulatedBrowsers; b++) 
-	    	texc.execute(new SimulatedBrowser(sleepTime));
-    
-    System.out.println("Thread pool has been created.");
+       
+    return texc;
+	}
+
+  public synchronized void addResponseTime(String query, int responseTime) {
+  	benchmarkResult.addData(query, responseTime);
   }
+  
+  public BenchmarkResult getBenchmarkResult() {
+  	return benchmarkResult;
+  }
+  
 }
