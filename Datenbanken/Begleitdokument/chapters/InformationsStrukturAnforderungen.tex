@@ -1,0 +1,98 @@
+\chapter{Informationsstrukturanforderungen}
+
+Die Längenangaben sind jeweils in Byte.
+
+\newcommand{\StartTabelle}[2]{
+	\begin{table}[htbp]
+		\centering
+			\begin{tabular}{llllllll}
+		\textbf{Objektbeschreibung:} & #1\\
+		\textbf{Anzahl:} & #2\\
+		\textbf{Attribute:} \\
+		\textbf{Attributname} & \textbf{type} & \textbf{Länge} & \textbf{Wertebereich} & \textbf{\#Wdh.} & \textbf{Def'heit} & \textbf{Id.} \\
+}
+
+\newcommand{\DefAttribut}[7]{#1 & #2 & #3 & #4 & #5 & #6 & #7 \\}
+
+\newcommand{\EndeTabelle}{
+	\end{tabular}
+	\end{table}
+}
+
+\newcommand{\DefIDTabelle}[2]{
+	\StartTabelle{#1}{#2}
+		\DefAttribut{ID}{int}{4}{0 ... #2}{0}{100\%}{ja}
+	\EndeTabelle
+}
+
+\newcommand{\DefShortString}[1]{\DefAttribut{#1}{char}{50}{*}{0}{100\%}{nein}}
+\newcommand{\DefString}[2]{\DefAttribut{#1}{char}{#2}{*}{0}{100\%}{nein}}
+\newcommand{\DefID}[1]{\DefAttribut{ID}{int}{4}{0 ... #1}{0}{100\%}{ja}}
+
+\DefIDTabelle{Wahlbezirk}{25.000}
+
+\StartTabelle{Wahlkreis}{299}
+	\DefID{299}
+	\DefShortString{Wahlkreisname}
+\EndeTabelle
+
+\StartTabelle{Bundesland}{16}
+	\DefID{16}
+	\DefShortString{Name}
+\EndeTabelle
+
+\StartTabelle{Kandidat}{5000}
+	\DefID{5000}
+	\DefShortString{Name}
+	\DefShortString{Vorname}
+	\DefString{Beruf}{255}
+	\DefString{Anschrift}{2047}
+	\DefAttribut{Geburtsdatum}{date}{4}{*}{0}{100\%}{ja}
+	\DefShortString{Geburtsort}
+\EndeTabelle
+
+\StartTabelle{Partei}{50}
+	\DefID{50}
+	\DefShortString{Name}
+	\DefShortString{Kürzel}
+\EndeTabelle
+
+\StartTabelle{Stimme}{50.000.000}
+	\DefID{50.000.000}
+	\DefAttribut{Jahr}{int}{4}{1900 ... 2100}{0}{100\%}{nein}
+\EndeTabelle
+
+\StartTabelle{Wahlberechtigter}{50.000.000}
+	\DefID{50.000.000}
+	\DefAttribut{Gewählt}{int}{1}{0, 1}{0}{50\%}{nein}
+\EndeTabelle
+
+\StartTabelle{ErstStimmenNachWahlkreis}{10.000}
+	\DefAttribut{Anzahl}{int}{4}{0 ... 200.000}{0}{100\%}{nein}
+	\DefAttribut{Jahr}{int}{4}{1900 ... 2100}{0}{100\%}{nein}
+\EndeTabelle
+
+\StartTabelle{ZweitStimmenNachWahlkreis}{10.000}
+	\DefAttribut{Anzahl}{int}{4}{0 ... 200.000}{0}{100\%}{nein}
+	\DefAttribut{Jahr}{int}{4}{1900 ... 2100}{0}{100\%}{nein}
+\EndeTabelle
+
+\StartTabelle{WahlkreisDaten}{10.000}
+	\DefID{10.000}
+	\DefAttribut{AnzahlWahlberechtigte}{int}{4}{0 ... 200.000}{0}{100\%}{nein}
+	\DefAttribut{AnzahlUngueltigeErststimmen}{int}{4}{0 ... 200.000}{0}{100\%}{nein}
+	\DefAttribut{AnzahlUngueltigeZweitstimmen}{int}{4}{0 ... 200.000}{0}{100\%}{nein}
+	\DefAttribut{Jahr}{int}{4}{1900 ... 2100}{0}{100\%}{nein}
+\EndeTabelle
+
+Beziehungsbeschreibung: wählt (1. Stimme)\\
+- Beteiligte Objekte:\\
+    Stimme als Wähler\\
+    Kandidat als Empfänger der Stimme\\
+- Anzahl: 45.000.000\\
+
+Beziehungsbeschreibung: wählt (2. Stimme)\\
+- Beteiligte Objekte:\\
+    Stimme als Wähler\\
+    Partei als Empfänger der Stimme\\
+- Anzahl: 45.000.000\\

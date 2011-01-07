@@ -1,0 +1,12 @@
+\chapter{Datenschutzanforderungen}
+
+Das Datenbankmodell erlaubt keinen direkten Rückschluss auf den Wähler, da dieser nicht im Modell enthalten ist. Allerdings ist es in Einzelfällen möglich das Stimmverhalten zu erschließen. Dies ist bei einstimmigem Votum innerhalb eines Wahlbezirkes der Fall.
+
+Um die Wahrscheinlichkeit der Rückverfolgbarkeit zu minimieren sollten folgende Rahmenbedingungen gelten:
+
+\begin{itemize}
+    \item Die Wahlbezirke sollten ausreichend groß sein, so dass einstimmige Wahlen unwahrscheinlich sind.
+    \item Es darf keinen Zusammenhang zwischen der ID eines Stimmzettels und dem Wähler geben. Insbesondere darf die ID des Stimmzettels also nicht gleich der ID des Wählers sein.
+    \item Der Vorgang der Stimmabgabe sollte physikalische Mechanismen enthalten um die Anonymität der Stimmen zu gewährleisten. Insbesondere darf der Stimmzettel während der Stimmabgabe nicht von außen einsehbar sein und die Stimmzettel sollten zufällig an die Wähler ausgegeben werden um Nachverfolgbarkeit durch markierte Stimmzettel zu verhindern.
+    \item Bei der Briefwahl muss der Stimmzettel direkt nach der Verifizierung der Berechtigung von den Daten des Wählers getrennt werden. In jedem Fall muss der Stimmzettel vor der Sichtung mit anderen Stimmzetteln vermischt werden.
+\end{itemize}

@@ -1,0 +1,235 @@
+\chapter{Sitzplatzberechnung in SQL}
+
+
+2009 wurde die Sitzverteilung nach dem Verfahren von Sainte-Laguë/Schepers ermittelt. Um dieses Verfahren umzusetzen werden drei verschiedene Algorithmen vorgeschlagen, die rechtlich gleichwertig sind. Wir haben uns für das Höchstzahlverfahren entschieden. Die erforderlichen Eingabewerte für den Algorithmus ermitteln wir durch eine Reihe von temporären Datenbank Tabellen die wir mittels SQL erstellen.
+
+Hinweis zum Verständnis:
+im Folgenden wird ``[var] = SELECT ...'' als Platzhalter für das Erstellen einer SQL-Variablen im Sinne einer temporary table, view oder WITH table verwendet. [var]  ist dann der Name der temporären Tabelle
+
+Funktion: BerechneSitzverteilungBundestag
+Eingabe: Parteien, Bundesländer, Wahlkreise, Stimmen, Kandidaten Landeslisten
+
+1. Aggregiere Stimmen
+
+WahlkreisErgebnis1 = SELECT s.KandidatID, s.WahlkreisID, s.Jahr,
+
+   COUNT(id) AS Anzahl
+
+  FROM Stimmen s
+
+  GROUP BY s.KandidatID, s.wahlkreisid;
+
+WahlkreisErgebnis2 = SELECT s.ParteiID, s.WahlkreisID, s.Jahr,
+
+   COUNT(id) AS Anzahl
+
+  FROM Stimmen s
+
+  GROUP BY s.ParteiID, s.wahlkreisid;
+
+ZweitStimmenNachBundesland = SELECT wk.bundeslandid, w2.parteiid,
+
+sum(w2.anzahl) as AnzahlStimmen
+
+    FROM WahlkreisErgebnis2 w2, Wahlkreis wk
+
+    WHERE w2.wahlkreisid = wk.id
+
+    GROUP BY wk.bundeslandid, w2.parteiid;
+
+ZweitStimmenNachPartei = SELECT ParteiID, SUM(AnzahlStimmen)
+
+FROM ZweitStimmenNachBundesland
+
+GROUP BY ParteiID
+
+ZweitStimmenGesamt = SELECT SUM(s.AnzahlStimmen) AS AnzahlStimmen
+
+  FROM ZweitStimmenNachBundesland
+
+2. Direktmandate
+
+Formal:
+Direktmandate = $\left\{ k \in Kandidaten | k \mbox{hat in seinem Wahlkreis die meisten Erststimmen erhalten} \right\}$
+SQL:
+Direktmandate =    
+WITH maxErgebnis(WahlkreisId, maxStimmen) as (
+SELECT k.dmwahlkreisid, max(w.anzahl)
+FROM Wahlergebnis1 v, Kandidat k
+WHERE v.kandidatid = k.id
+GROUP BY k.dmwahlkreisid)
+ 
+SELECT k.ID, k.ParteiID
+FROM maxErgebnis e, Wahlergebnis1 v, Kandidat k
+WHERE e.wahlkreisID = v.wahlkreisid
+AND e.maxStimmen = v.Anzahl
+AND k.ID = v.KandidatID;
+
+
+
+3. Parteien im Bundestag
+
+Formal:
+ParteienImBundestag = $\left\{p \in Parteien | Hat5Prozent\left(p, ZweitstimmenGesamt\right) \lor
+                       Hat3Direktmate\left(p, WahlkreisergebnisseErststimmen\right)\right\}$
+
+SQL:
+FünfProzentParteien =    
+
+SELECT p.ID
+
+FROM Partei p, WahlkreisErgebnis2 v
+
+WHERE v.ParteiID = p.ID
+
+GROUP BY p.ID
+
+HAVING
+
+CAST(SUM(v.Anzahl) AS FLOAT) /
+
+(SELECT AnzahlStimmen FROM ZweitStimmenGesamt)
+
+>= 0.05
+
+DreiDirektmandatParteien =
+
+SELECT dm.ParteiID
+
+FROM Direktmandate dm
+
+GROUP BY dm.ParteiID
+
+HAVING COUNT(*) >= 3;
+
+
+ParteienImBundestag =
+
+SELECT *
+
+FROM FünfProzentParteien
+
+UNION
+
+SELECT *
+
+FROM DreiDirektmandatParteien
+
+3. Anzahl Sitze im Bundestag
+
+Formal:
+$AnzahlSitze = 598 - \left|\left\{k \in Kandidaten | k \in Direktmandate \land \neg \exists p \in ParteienImBundestag . kandidiertFuer\left(k,p\right)\right\}\right|$
+SQL:
+
+WITH
+AlleinigeDirektmandate AS
+(SELECT dm.ID FROM Direktmandate dm
+EXCEPT
+SELECT dm.ID FROM Direktmandate dm, ParteienImBundestag p
+WHERE p.ID = dm.ParteiID)
+SELECT 598 - COUNT(*) FROM AlleinigeDirektmandate
+
+
+4. Sitzanspruch pro Partei (nach Höchstzahlverfahren)
+
+VerteilungSitzeAufParteien = Höchstzahlverfahren(ZweitStimmenNachPartei, AnzahlSitze)
+
+5. Sitzverteilung nach Landeslisten
+
+For p  Parteien do
+
+VerteilungSitzeAufLandeslisten(p) = Höchstzahlverfahren(
+
+    ZweitStimmenNachBundesland(p), ZweitStimmenNachPartei(p))
+End for
+
+6. Sitzverteilung Bundestag
+
+(ENTWURF)
+
+Formal:
+Abgeordnete = $\left\{k \in Kandidaten | k \in Direktmandate \lor \exists l \in Landeslisten . Listenplatz\left(k, l\right) < VerteilungSitzeAufLandeslisten\left(k.Partei, l\right) - \left|\left\{k \in Direktmandate | k \mbox{kandidiert in l.Bundesland}\right\}\right| \right\}$
+
+Abgeordnete =
+
+SELECT dm.ID
+
+FROM Direktmandate dm
+
+UNION
+
+SELECT k.ID
+
+FROM Kandiat k
+
+WHERE k.Listenplatz <= (
+
+SELECT t.AnzahlSitze
+
+FROM TempSitze t
+
+WHERE t.ParteiID = k.ParteiID
+
+AND t.BundeslandID = k.BundeslandID
+
+) - (
+
+SELECT COUNT(*)
+
+FROM Direktmandate dm
+
+WHERE dm.ParteiID = k.ParteiID
+
+AND dm.BundeslandID = k.BundeslandID
+
+)
+
+Alternativversion (Problem mit Direkmandatsgewinnern auf Landeslisten):
+Abgeordnete =
+    SELECT k.ID
+
+FROM Kandidat k, SitzeNachLandeslisten t
+    WHERE t.ParteiID = k.ParteiID AND t.BundeslandID = k.BundeslandID
+    AND k.Listenplatz - (SELECT COUNT(*)
+
+FROM Direktmandate dm1, Kandidat k1
+
+WHERE dm1.ID = k1.ID
+
+     AND k1.Listenplatz < k.Listenplatz
+
+    AND k1.BundeslandID = k.BundeslandID
+
+    AND k1.ParteiID = k.ParteiID)
+
+<= t.AnzahlSitze -
+
+(SELECT COUNT(*) FROM Direktmandate d2, Kandidat k2 WHERE d2.ID = k2.ID AND k2.ParteiID = k.ParteiID AND k2.BundeslandID = k.BundeslandID)
+    UNION
+
+SELECT dm.ID FROM Direktmandate dm
+
+Funktion: Höchstzahlverfahren
+Eingabe: StimmenNachPartei, AnzahlSitze
+Ausgabe: Sitze
+
+Divisoren = (0.5, ..., 0.5)
+Sitze = (0, ..., 0)
+
+RestSitze = MaxSitze
+while RestSitze > 0
+    SitzKandidaten = { i |  j. StimmenNachPartei[i] / Divisoren[i] <
+
+     StimmenNachPartei[j] / Divisoren[j] }
+   
+    while |SitzKandidaten| > RestSitze
+        SitzKandidaten = SitzKandidaten \ ZufälligesElement(SitzKandidaten)
+    end while
+
+    for all i in SitzKandidaten do
+        Sitze[i] = Sitze[i] + 1
+        Divisoren[i] = Divisoren[i] + 1
+    end for
+end while
+
+     

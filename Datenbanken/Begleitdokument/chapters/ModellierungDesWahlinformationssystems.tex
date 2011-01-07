@@ -1,6 +1,18 @@
 \chapter{Modellierung des Wahlinformationssystems}
 
-Hier wird das ER Modell usw. vorgestellt.
- 
+Das ER Modell \ref{fig:ER-Diagramm-wahlsystem} stellt die verwendeten Klassen der Datenbank für das Wahlinformationssystem dar. Die Klassen enthalten die zunächst zur Verfügung stehenden Daten ohne Vorberechnungen. Aus diesen Daten werden über mehrere Zwischenschritte die Ausgabedaten ermittelt. Die Zwischenschritte werden in eigenen Tabellen abgespreichert. Je nach Konfiguration können diese Tabellen temporäre Tabellen, temporäre Tabellen innerhalb eines SQL Befehls (``with''), materialisierte Anfragen (Materialized Query Tables) oder normale persistente Tabellen sein. Diese Zwischentabellen sind in Abbildung \ref{fig:Temporaere_Tabellen} dargestellt. Die grünen Boxen stellen die Grundklassen dar, wie sie auch im ER Modell \ref{fig:ER-Diagramm-wahlsystem} enthalten sind. Pfeile stellen Berechnungsbeziehungen da. Der Pfeil von ``ErststimmenNachWahlkreis'' nach ``Direktmandate'' bedeutet zum Beispiel, dass die Direktmandate aus den ErststimmenNachWahlkreis durch aggregation berechnet werden. Die Linien mit Beschriftung ``references'' stellen eine Fremdschlüsselbeziehung dar. Dementsprechend bedeutet die Verbindung zwischen ``Kandidat'' und ``Direktmandate'', dass die Tabelle ``Direktmandate'' ein Attribut enthält, dass die ID von ``Kandidat'' referenziert.
 
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.00\textwidth]{figures/ER-Diagramm-wahlsystem.pdf}
+	\caption{ER Modell des Wahlinformationssystems}
+	\label{fig:ER-Diagramm-wahlsystem}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.00\textwidth]{figures/Temporaere_Tabellen.pdf}
+	\caption{Zusammenhang zwischen den Grundtabellen und den temporären Tabellen}
+	\label{fig:Temporaere_Tabellen}
+\end{figure}
 

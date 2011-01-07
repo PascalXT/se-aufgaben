@@ -51,7 +51,6 @@
 	\input{components/cover}
 %	\clearemptydoublepage
 	
-	\clearemptydoublepage
 	
 	\input{components/abstract}
 
@@ -59,18 +58,23 @@
 
 	\mainmatter
 	
-	
-		% ---------------------------------------------------------------------------
-		%
-		%Introduction and Background Theory
-		%
-		% ---------------------------------------------------------------------------
-		\part[Modellierung des Wahlinformationssystems]{Modellierung des Wahlinformationssystemsy}
-		\label{part:ModellierungDesWahlinformationssystems}
-		\input{chapters/ModellierungDesWahlinformationssystems}
+			\input{chapters/ModellierungDesWahlinformationssystems}
 		
-
-  \clearemptydoublepage
+			\input{chapters/InformationsStrukturAnforderungen}
+			
+			\input{chapters/Datenverarbeitungsanforderungen}
+			
+			\input{chapters/VorUndNachteileEinesDBMS}
+			
+			\input{chapters/Integritaetsbedingungen}
+			
+			\input{chapters/Datenschutzanforderungen}
+			
+			\input{chapters/VomERModellZumRelationalenSchema}
+			
+			\input{chapters/SQLBefehleZurTabellenErstellung}
+			
+			\input{chapters/SitzplatzberechnungInSQL}
   
 	\bibliography{bibliography/literature}
 	
