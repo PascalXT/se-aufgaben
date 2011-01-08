@@ -1,3 +1,62 @@
-\chapter{Vom ER Modell ZumRelationalen Schema}
+\chapter{Vom ER-Modell zum relationalen Schema}
 
-TODO
+\section{Übersetzung der Entities}
+
+Wahlberechtigter(\underline{ID}, Gewählt)\\
+Wahlkreis(\underline{ID}, Name)\\
+WahlkreisDaten(\underline{ID}, \#Wahlberechtigter, \#UngültigeErststimmen, \#UngültigeZweitstimmen, Jahr)\\
+Kandidat(\underline{ID}, Vorname, Nachname, Geburtsdatum, Geburtsort, Anschrift, Beruf)\\
+Partei(\underline{ID}, Name, Kürzel)\\
+Bundesland(\underline{ID}, Name)\\
+Stimme(\underline{ID}, gültig, Jahr)\\
+
+\subsection{Spezialbehandlung: schwache Entities}
+
+Der \emph{Wahlbezirk} ist eine schwache Entity und hängt von der starken Entity \emph{Wahlkreis} ab:
+\\
+\\
+Wahlbezirk(\underline{WahlkreisID}, \underline{WahlbezirkNr})\\
+
+\subsection{Spezialbehandlung: Generalisierung}
+
+Die Entity \emph{StimmenNachWahlkreis} ist eine Generalisierung von \emph{ErstStimmenNachWahlkreis} und \emph{ZweitStimmenNachWahlkreis}. 
+Um Joins zu sparen, haben wir daraus zwei anstatt drei Relationen modelliert:
+\\
+\\
+ErstStimmenNachWahlkreis(\#Stimmen, Jahr)\\
+ZweitStimmenNachWahlkreis(\#Stimmen, Jahr)\\
+
+\section{Initial-Entwurf Beziehungen}
+
+wählt\_in(\underline{WahlberechtigterID}, WahlkreisID)\\
+informieren\_über(\underline{WahlkreisDatenID}, WahlkreisID)\\
+ist\_in(\underline{WahlbezirkID}, WahlkreisID)\\
+ist\_abgegeben\_in(\underline{StimmeID}, WahlbezirkID)\\
+sind\_abgegeben\_in1(\underline{\#ErstStimmen}, \underline{Jahr}, \underline{WahlkreisID})\\
+sind\_abgegeben\_in2(\underline{\#ZweitStimmen}, \underline{Jahr}, \underline{WahlkreisID})\\
+liegt\_in(\underline{WahlkreisID}, BundeslandID)\\
+kandidiert\_für\_Direktmandat(\underline{KandidatID}, WahlkreisID)\\
+steht\_auf\_Landesliste(\underline{KandidatID}, BundeslandID, ParteiID, Listenplatz)\\
+ist\_Mitglied\_von(\underline{KandidatID}, ParteiID)\\
+wurde\_abgegeben\_an1(\underline{\#ErstStimmen}, \underline{Jahr}, \underline{KandidatID})\\
+wurde\_abgegeben\_an2(\underline{\#ZweitStimmen}, \underline{Jahr}, \underline{ParteiID})\\
+wählt1(\underline{StimmeID}, KandidatID)\\
+wählt2(\underline{StimmeID}, ParteiID)\\
+
+\section{Verfeinerung des Schemas unter Berücksichtigung der Beziehungen und Kardinalitäten}
+
+Wahlberechtigter(\underline{ID}, Gewählt, WahlkreisID)\\
+Wahlkreis(\underline{ID}, Name, BundeslandID)\\
+WahlkreisDaten(\underline{ID}, \#Wahlberechtigter, \#UngültigeErststimmen, \#UngültigeZweitstimmen, Jahr, WahlkreisID)\\
+\\
+Das Attribut Listenplatz von \emph{steht\_auf\_Landesliste} wird zum Attribut von Kandidat: \\
+Kandidat(\underline{ID}, Vorname, Nachname, Geburtsdatum, Geburtsort, Anschrift, Beruf, ParteiID, BundeslandID, WahlkreisID, ParteiID, Listenplatz)\\
+Partei(\underline{ID}, Name, Kürzel)\\
+Bundesland(\underline{ID}, Name)\\
+Wahlbezirk(\underline{WahlkreisID}, \underline{WahlbezirkNr})\\
+Stimme(\underline{ID}, gültig, Jahr, KandidatID, ParteiID, WahlkreisID, WahlbezirkNr)\\
+\\
+Zusammen mit ihrem Fremdschlüssel erhalten die beiden Wahlkreis-aggregierten Stimm-Relationen ihren Schlüssel:
+\\
+ErstStimmenNachWahlkreis(\underline{KandidatID}, \underline{\#Stimmen}, \underline{Jahr})\\
+ZweitStimmenNachWahlkreis(\underline{ParteiID,} \underline{\#Stimmen}, \underline{Jahr})\\
