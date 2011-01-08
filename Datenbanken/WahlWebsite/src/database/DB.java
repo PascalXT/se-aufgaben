@@ -179,15 +179,30 @@ public class DB {
   
   public String prettyPrintSQL(String sql_statement) {
   	String result = "\n" + sql_statement;
-  	result = result.replaceAll(" SELECT", " \nSELECT");
-  	result = result.replaceAll(" FROM", " \nFROM");
-  	result = result.replaceAll(" WHERE", " \nWHERE");
-  	result = result.replaceAll(" GROUP BY", " \nGROUP BY");
-  	result = result.replaceAll(" HAVING", " \nHAVING");
+  	result = result.replaceAll(" SELECT", "\nSELECT");
+  	result = result.replaceAll(" FROM", "\nFROM");
+  	result = result.replaceAll(" WHERE", "\nWHERE");
+  	result = result.replaceAll(" GROUP BY", "\nGROUP BY");
+  	result = result.replaceAll(" HAVING", "\nHAVING");
+  	result = result.replaceAll(" UNION", "\nUNION");
+  	result = result.replaceAll("UNION ", "UNION ");
+  	
+  	result = result.replaceAll(" ([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "\n$1 $2");
+  	result = result.replaceAll("\\(([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "(\n$1 $2");
+  	result = result.replaceAll("CREATE", "\n\nCREATE");
+  	result = result.replaceAll(" CONSTRAINT", "\nCONSTRAINT");
+  	result = result.replaceAll(" ORGANIZE", "\nORGANIZE");
+  	
+  	result = result.replaceAll(schemaName + "\\.", "");
+  	result = result.replaceAll("  ", " ");
+  	result = result.replaceAll(" ,", ",");
+  	//result = result.replaceAll("(\n[^\n]{60,}) ", "$1\n");
   	return result;
   }
 
   public ResultSet executeSQL(String sql_statement) throws SQLException {
+  	logSQL(sql_statement);
+  	
     System.out.println(prettyPrintSQL(sql_statement));
     if (statement != null)
       statement.close();
@@ -207,15 +222,39 @@ public class DB {
     }
     return result_set;
   }
+  
+  public void logSQL(String sql_statement) {
+  	try {
+  		String sqlLogFile = Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile);
+			if (!Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile).isEmpty() &&
+					!sql_statement.contains("TRUNCATE")) {
+				FileWriter fileWriterSQLlog = new FileWriter(sqlLogFile, true);
+				fileWriterSQLlog.write("\n\n" + prettyPrintSQL(sql_statement));
+				fileWriterSQLlog.close();
+			}
+		} catch (FlagErrorException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+  }
 
   public void executeUpdate(String sql_statement) throws SQLException {
-    System.out.println(sql_statement);
-    Statement statement = connection.createStatement();
-    statement.executeUpdate(sql_statement);
-    statement.close();
+  	logSQL(sql_statement);
+
+    System.out.println(prettyPrintSQL(sql_statement));
+    if (!Flags.isTrue(FlagDefinition.kFlagSimulateSQLUpdate)) {
+	    Statement statement = connection.createStatement();
+	    statement.executeUpdate(sql_statement);
+	    statement.close();
+    }
   }
 
   public void executeDB2(String db2_statement) {
+  	if (Flags.isTrue(FlagDefinition.kFlagSimulateSQLUpdate)) {
+  		System.out.println("\n\ncmd:\n" + prettyPrintSQL(db2_statement));
+  		return;
+  	}
     File file = new File(db2_command_file);
     if (file.exists()) {
       file.delete();
@@ -225,7 +264,7 @@ public class DB {
       file_writer = new FileWriter(file);
       file_writer.write("CONNECT TO " + datenbank_kurzname + ";\n" + db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
-      System.out.println("cmd: " + db2_statement);
+      System.out.println("cmd: " + prettyPrintSQL(db2_statement));
       String cmd = "db2cmd.exe " + dbCommandFlags + " " + db2_command_file;
       Process p = Runtime.getRuntime().exec(cmd);
       p.waitFor();

@@ -23,6 +23,8 @@ public class FlagDefinition {
   final public static String kFlagOnlyVotesForBundesland = "onlyVotesForBundesland";
   final public static String kFlagMakeTemporaryTablesPermanent = "makeTemporaryTablesPermanent";
   final public static String kFlagAllowedWahlkreisIDs = "allowedWahlkreisIDs";
+  final public static String kFlagSimulateSQLUpdate = "simulateSQLUpdate";
+  final public static String kFlagLogSQLFile = "logSQLFile";
   final public static String[][] kFlagDefinition = {
       { kFlagDbName, "WahlSys", "Name of the db2 database." },
       { kFlagDbUser, null, "Username for the db2 database." },
@@ -52,6 +54,9 @@ public class FlagDefinition {
       { kFlagMakeTemporaryTablesPermanent, Flags.kFalse,
           "If true, permanent tables will be used instead of temporary tables." },
       { kFlagAllowedWahlkreisIDs, "", 
-          	"If not empty, only votes of WahlkreisIDs in this comma separated list will be created"} };
+          	"If not empty, only votes of WahlkreisIDs in this comma separated list will be created"},
+      {kFlagSimulateSQLUpdate, Flags.kFalse, "If true, SQL updates won't be executed."},
+          	{ kFlagLogSQLFile, "", "If not empty, some sql statements will be logged to this file." }
+          	};
 
 }
