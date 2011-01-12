@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 import database.DB;
 
-public class Q7 extends Q3 {
-	public Q7(String headline, int wahlkreisID) {
+public class Q7_WITH extends Q3_WITH {
+	public Q7_WITH(String headline, int wahlkreisID) {
 		super(headline, wahlkreisID);
 	}
 
@@ -45,7 +45,7 @@ public class Q7 extends Q3 {
     		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
     		+ "FROM " + db.stimme() + " s "
     		+ "WHERE " + DB.kForeignKeyKandidatID + " is not null "
-    			+ "AND s." + DB.kForeignKeyWahlkreisID + "=" + wahlkreisID + " "
+    			+ "AND s." + DB.kForeignKeyKandidatID + "=" + wahlkreisID + " "
     		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr);
     return tempErstStimmenNachWahlkreis();
 	}
@@ -71,16 +71,5 @@ public class Q7 extends Q3 {
 	 				+ "tmp." + DB.kJahr + " "
 	 			+ "FROM (VALUES(" + kCurrentElectionYear + "), (" + kPreviousElectionYear + ")) tmp(" + DB.kJahr + ")");
     return tempWahlkreisDatenTable();
-	}
-	
-	
-	
-	@Override
-	protected ResultSet doQuery() throws SQLException {
-		// Aggregate Wahlkreis data.	
-		//TODO: WahlkreisDaten Tabelle muss ebenfalls dynamisch erstellt werden können.
-		return doQuery(createTempErstStimmenNachWahlkreisTable(wahlkreisID),
-				createTempZweitStimmenNachWahlkreisTable(wahlkreisID),
-				createTempWahlkreisDatenTable(wahlkreisID));
 	}
 }

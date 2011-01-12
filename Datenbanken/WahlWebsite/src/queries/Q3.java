@@ -25,11 +25,11 @@ public class Q3 extends Query {
 	
 	@Override
 	protected ResultSet doQuery() throws SQLException {
-		return doQuery(db.erstStimmenNachWahlkreis(), db.zweitStimmenNachWahlkreis());
+		return doQuery(db.erstStimmenNachWahlkreis(), db.zweitStimmenNachWahlkreis(), db.wahlkreisDaten());
 	}
 	
 	protected ResultSet doQuery(String erststimmenNachWahlkreisTable, 
-			String zweitStimmenNachWahlkreisTable) throws SQLException {
+			String zweitStimmenNachWahlkreisTable, String wahlkreisDatenTable) throws SQLException {
 		
 		ResultSet rsWahlkreisName = db.executeSQL("" + 
 				"SELECT " + DB.kWahlkreisName + " FROM " + db.wahlkreis() + " " +
@@ -46,7 +46,7 @@ public class Q3 extends Query {
 		ResultSet rs1 = db.executeSQL(""
 			+ "SELECT (1.0 * sum(w2." + DB.kWahlergebnis2Anzahl + ") / "
 				+ "max(wd." + DB.kAnzahlWahlberechtigte + ")) as Wahlbeteiligung "
-      + "FROM " + db.wahlkreisDaten() + " wd, " + zweitStimmenNachWahlkreisTable + " w2 "
+      + "FROM " + wahlkreisDatenTable + " wd, " + zweitStimmenNachWahlkreisTable + " w2 "
       + "WHERE wd." + DB.kForeignKeyWahlkreisID + " = w2." + DB.kForeignKeyWahlkreisID + " "
       	+ "AND wd." + DB.kJahr + " = w2.jahr AND wd." + DB.kJahr + " = " + kCurrentElectionYear + " "
       	+ "AND wd." + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " "

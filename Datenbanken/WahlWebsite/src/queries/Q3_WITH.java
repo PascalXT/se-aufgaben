@@ -10,7 +10,7 @@ import database.DB;
 
 public class Q3_WITH extends Query {
 	
-	private int wahlkreisID;
+	protected int wahlkreisID;
 	
 	private String wahlkreisName;
 	
