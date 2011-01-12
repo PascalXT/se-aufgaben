@@ -132,6 +132,26 @@ public class DB {
     return tabellenName("ZweitStimmenNachPartei");
   }
 
+  public String maxErststimmenNachWahlkreis() {
+  	return tabellenName("MaxErststimmenNachWahlkreis");
+  }
+  
+  public String zugriffsreihenfolgeSitzeNachPartei() {
+  	return tabellenName("ZugriffsreihenfolgeSitzeNachPartei");
+  }
+  
+  public String divisoren() {
+  	return tabellenName("Divisoren");
+  }
+  
+  public String zugriffsreihenfolgeSitzeNachLandeslisten() {
+  	return tabellenName("ZugriffsreihenfolgeSitzeNachLandeslisten");
+  }
+  
+  public String direktMandateProParteiUndBundesland() {
+  	return tabellenName("DirektMandateProParteiUndBundesland");
+  }
+  
   public String tabellenName(String kurzname) {
     return schemaName + "." + kurzname;
   }
@@ -227,7 +247,8 @@ public class DB {
   	try {
   		String sqlLogFile = Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile);
 			if (!Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile).isEmpty() &&
-					!sql_statement.contains("TRUNCATE")) {
+					!sql_statement.contains("TRUNCATE") &&
+					!sql_statement.contains("SYSCAT")) {
 				FileWriter fileWriterSQLlog = new FileWriter(sqlLogFile, true);
 				fileWriterSQLlog.write("\n\n" + prettyPrintSQL(sql_statement));
 				fileWriterSQLlog.close();

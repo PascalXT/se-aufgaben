@@ -42,7 +42,7 @@ public class Q1 extends Query {
         + DB.kForeignKeyParteiID));
 
 	  String parteienImBundestagTable = createParteienImBundestagTable(fuenfProzentParteienTable, dreiDirektMandateParteienTable);
-	  String sitzeNachParteiTable = createSitzeNachParteiTable(zweitStimmenNachParteiTable, parteienImBundestagTable);
+	  String sitzeNachParteiTable = createSitzeNachPartei(zweitStimmenNachParteiTable, parteienImBundestagTable);
     
 	  String sitzeNachLandesListenTable = createSitzeNachLandeslistenTable(parteienImBundestagTable, zweitStimmenNachBundeslandTable, sitzeNachParteiTable);
     

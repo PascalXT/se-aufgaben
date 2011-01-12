@@ -10,8 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import queries.Q1;
+import queries.Q1_WITH;
 import queries.Q2;
 import queries.Q3;
+import queries.Q3_WITH;
 import queries.Q4;
 import queries.Q5;
 import queries.Q6;
@@ -59,6 +61,8 @@ public class ShowResult extends HttpServlet {
 
 		if (queryParam.equalsIgnoreCase("Q1")) {
 			query = new Q1("Q1 - Sitzverteilung");			
+		} else if (queryParam.equalsIgnoreCase("Q1.with")) {
+			query = new Q1_WITH("Q1 - Sitzverteilung");
 		} else if (queryParam.equalsIgnoreCase("Q2")) {			
 			query = new Q2("Q2 - Abgeordnete");		
 		} else if (queryParam.equalsIgnoreCase("Q3")) {		
@@ -67,6 +71,12 @@ public class ShowResult extends HttpServlet {
 				randomWahlkreis = Integer.parseInt(request.getParameter("wk"));
 			}
 			query = new Q3("Q3 - Wahlkreisinfo", randomWahlkreis);			
+		} else if (queryParam.equalsIgnoreCase("Q3.with")) {		
+			int randomWahlkreis = new Random().nextInt(299) + 1;
+			if (request.getParameter("wk") != null) {
+				randomWahlkreis = Integer.parseInt(request.getParameter("wk"));
+			}
+			query = new Q3_WITH("Q3 - Wahlkreisinfo", randomWahlkreis);			
 		} else if (queryParam.equalsIgnoreCase("Q4")) {	
 			query = new Q4("Q4 - Wahlkreisergebnisse");
 		} else if (queryParam.equalsIgnoreCase("Q5")) {

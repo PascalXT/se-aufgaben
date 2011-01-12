@@ -8,9 +8,9 @@ import java.util.List;
 
 import database.DB;
 
-public class Q3 extends Query {
+public class Q3_WITH extends Query {
 	
-	protected int wahlkreisID;
+	private int wahlkreisID;
 	
 	private String wahlkreisName;
 	
@@ -18,18 +18,18 @@ public class Q3 extends Query {
 	private List<List<String>> q2rows;
 	private List<List<String>> q3rows;
 	
-	public Q3(String headline, int wahlkreisID) {
+	public Q3_WITH(String headline, int wahlkreisID) {
 		super(headline);
 		this.wahlkreisID = wahlkreisID;
 	}
 	
 	@Override
 	protected ResultSet doQuery() throws SQLException {
-		return doQuery(db.erstStimmenNachWahlkreis(), db.zweitStimmenNachWahlkreis());
+		return doQuery(db.erstStimmenNachWahlkreis(), db.zweitStimmenNachWahlkreis(), db.wahlkreisDaten());
 	}
 	
 	protected ResultSet doQuery(String erststimmenNachWahlkreisTable, 
-			String zweitStimmenNachWahlkreisTable) throws SQLException {
+			String zweitStimmenNachWahlkreisTable, String wahlkreisDatenTable) throws SQLException {
 		
 		ResultSet rsWahlkreisName = db.executeSQL("" + 
 				"SELECT " + DB.kWahlkreisName + " FROM " + db.wahlkreis() + " " +
@@ -37,16 +37,13 @@ public class Q3 extends Query {
 		); 
 		rsWahlkreisName.next();
 		wahlkreisName = rsWahlkreisName.getString(DB.kWahlkreisName);
-		
-		//TODO: wahlkreisID übergeben und verwenden
-    String direktMandateTable = createDirektmandateTable(erststimmenNachWahlkreisTable);
     
 		// Q3.1 - Wahlbeteiligung
     
 		ResultSet rs1 = db.executeSQL(""
 			+ "SELECT (1.0 * sum(w2." + DB.kWahlergebnis2Anzahl + ") / "
 				+ "max(wd." + DB.kAnzahlWahlberechtigte + ")) as Wahlbeteiligung "
-      + "FROM " + db.wahlkreisDaten() + " wd, " + zweitStimmenNachWahlkreisTable + " w2 "
+      + "FROM " + wahlkreisDatenTable + " wd, " + zweitStimmenNachWahlkreisTable + " w2 "
       + "WHERE wd." + DB.kForeignKeyWahlkreisID + " = w2." + DB.kForeignKeyWahlkreisID + " "
       	+ "AND wd." + DB.kJahr + " = w2.jahr AND wd." + DB.kJahr + " = " + kCurrentElectionYear + " "
       	+ "AND wd." + DB.kForeignKeyWahlkreisID + " = " + wahlkreisID + " "
@@ -62,9 +59,19 @@ public class Q3 extends Query {
 		
 		// Q3.2 - gewählter Direktkandidat
 		
-    ResultSet rs2 = db.executeSQL("" +
+    ResultSet rs2 = db.executeSQL(
+    		"WITH ErstStimmenEinWahlkreis AS (" +
+    			"SELECT * " +
+    			"FROM " + erststimmenNachWahlkreisTable + " " +
+    			"WHERE " + DB.kForeignKeyWahlkreisID + "=" + wahlkreisID +
+    		"), " +
+    		db.maxErststimmenNachWahlkreis() + " AS (" + 
+    			stmtMaxErststimmenNachWahlkreis("ErstStimmenEinWahlkreis") + "), " +
+    		db.direktmandate() + " AS (" + 
+    			stmtDirektmandateTable("ErstStimmenEinWahlkreis", db.maxErststimmenNachWahlkreis()) + ")" +
+    		
     		"SELECT k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + " " + 
-    		"FROM " + direktMandateTable + " dm, " + db.kandidat() + " k, " + db.partei() + " p " + 
+    		"FROM " + db.direktmandate() + " dm, " + db.kandidat() + " k, " + db.partei() + " p " + 
     		"WHERE dm." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " + 
     		"AND dm." + DB.kForeignKeyParteiID + " = p." + DB.kID + " " + 
     		"AND dm." + DB.kKandidatDMWahlkreisID + " = " + wahlkreisID + " "
