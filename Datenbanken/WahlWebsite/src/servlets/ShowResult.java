@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import queries.Q1;
 import queries.Q1_WITH;
 import queries.Q2;
+import queries.Q2_WITH;
 import queries.Q3;
 import queries.Q3_WITH;
 import queries.Q4;
@@ -65,6 +66,8 @@ public class ShowResult extends HttpServlet {
 			query = new Q1_WITH("Q1 - Sitzverteilung");
 		} else if (queryParam.equalsIgnoreCase("Q2")) {			
 			query = new Q2("Q2 - Abgeordnete");		
+		} else if (queryParam.equalsIgnoreCase("Q2.with")) {			
+			query = new Q2_WITH("Q2 - Abgeordnete");		
 		} else if (queryParam.equalsIgnoreCase("Q3")) {		
 			int randomWahlkreis = new Random().nextInt(299) + 1;
 			if (request.getParameter("wk") != null) {
