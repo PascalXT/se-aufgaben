@@ -23,28 +23,41 @@ public class Q1_WITH extends Query {
 	}
 	
 	@Override
-	protected ResultSet doQuery() throws SQLException {
-		LineNumberReader lr = null;
-		try {
-			FileReader fr = new FileReader(new File("H:\\Q1.sql"));
-			lr = new LineNumberReader(fr);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.exit(1);
-		}
-		String query = "";
-		try {
-			final int maxNLines = 10000;
-			for (int i = 0; i < maxNLines; i++) {
-				String nextLine = lr.readLine();
-				if (nextLine == null) break;
-				query += nextLine + "\n";
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	protected ResultSet doQuery() throws SQLException {		
+		String query = "WITH " + db.zweitStimmenNachBundesland() + " AS (" + stmtZweitStimmenNachBundesland() + "), "
+			+ db.zweitStimmenNachPartei() + " AS (" + stmtZweitStimmenNachPartei(db.zweitStimmenNachBundesland()) + "), "
+			+ db.maxErststimmenNachWahlkreis() + " AS ("
+				+ stmtMaxErststimmenNachWahlkreis(db.erstStimmenNachWahlkreis()) + "), "
+			+ db.direktmandate() + " AS ("
+				+ stmtDirektmandateTable(db.erstStimmenNachWahlkreis(), db.maxErststimmenNachWahlkreis()) + "), "
+			+ db.fuenfProzentParteien() + " AS (" + stmtFuenfProzentParteien(db.zweitStimmenNachBundesland()) + "), "
+			+ db.dreiDirektMandatParteien() + " AS (" + stmtDreiDirektmandateParteien(db.direktmandate()) + "), "
+			+ db.parteienImBundestag()
+				+ " AS (" + stmtParteienImBundestag(db.fuenfProzentParteien(), db.dreiDirektMandatParteien()) + "), "
+			+ db.divisoren() + " AS (" + stmtDivisoren() + "), "
+			+ db.zugriffsreihenfolgeSitzeNachPartei() + " AS (" + stmtZugriffsreihenfolgeSitzeNachPartei(
+					db.parteienImBundestag(), db.zweitStimmenNachPartei(), db.divisoren()) + "), "
+			+ db.sitzeNachPartei() + " AS (" + stmtSitzeNachParteiTable(
+					db.zweitStimmenNachPartei(), db.parteienImBundestag(), db.zugriffsreihenfolgeSitzeNachPartei()) + "), "
+			+ db.zugriffsreihenfolgeSitzeNachLandeslisten() + " AS (" + stmtZugriffsreihenfolgeSitzeNachLandeslisten(
+					db.parteienImBundestag(), db.zweitStimmenNachBundesland(), db.divisoren()) + "), "
+			+ db.sitzeNachLandeslisten() + " AS (" + stmtSitzeNachLandeslisten(db.parteienImBundestag(), 
+					db.zweitStimmenNachBundesland(), db.sitzeNachPartei(), db.zugriffsreihenfolgeSitzeNachLandeslisten()) + "), "
+			+ db.direktMandateProParteiUndBundesland() + " AS ("
+				+ stmtDirektMandateProParteiUndBundesland(db.direktmandate()) + "), "
+			+ db.ueberhangsMandate() + " AS (" + stmtUeberhangsmandate(db.direktmandate(), db.sitzeNachLandeslisten(),
+					db.direktMandateProParteiUndBundesland()) + "), "
+					
+			+ "SumUeberhang AS ( " +
+		    	"SELECT " + DB.kForeignKeyParteiID + ", SUM(" + DB.kAnzahlUeberhangsmandate + ") AS " + DB.kAnzahlUeberhangsmandate + " " +
+		    	"FROM " + db.ueberhangsMandate() + " GROUP BY " + DB.kForeignKeyParteiID + " " + 
+		    ") " + 
+		    
+		    "SELECT p." + DB.kParteiKuerzel + ", " + 
+		    	"(s." + DB.kAnzahlSitze + " + COALESCE(u." + DB.kAnzahlUeberhangsmandate + ", 0)) AS " + DB.kAnzahlSitze + " " +
+		    "FROM " + db.partei() + " p, " + db.sitzeNachPartei() + " s " +
+		    	"LEFT OUTER JOIN SumUeberhang u ON s." + DB.kForeignKeyParteiID + " = u." + DB.kForeignKeyParteiID + " " +
+		    "WHERE p." + DB.kID + " = s." + DB.kForeignKeyParteiID;
 			
 
 		System.out.println(query);
