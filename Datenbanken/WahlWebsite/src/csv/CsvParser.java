@@ -339,8 +339,17 @@ public class CsvParser {
   }
 
   public void createWaehlberechtigte(int wahlkreisID, int numWahlberechtigte, FileWriter fileWriterWahlberechtigte) throws IOException {
+  	int bezirk = 1;
+  	int nWaehler = 0;
+  	
   	for (int i = 0; i < numWahlberechtigte; i++) {
-  		fileWriterWahlberechtigte.write(wahlkreisID + "\n");
+  		nWaehler++;
+  		fileWriterWahlberechtigte.write(wahlkreisID + ";" + bezirk + "\n");
+  		if (nWaehler == 2500) {
+  			bezirk++;
+  			nWaehler = 0;
+  		}
+  		}
   	}
   }
   
