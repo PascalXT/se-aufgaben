@@ -16,6 +16,7 @@ import queries.Q2_WITH;
 import queries.Q3;
 import queries.Q3_WITH;
 import queries.Q4;
+import queries.Q4_With;
 import queries.Q5;
 import queries.Q6;
 import queries.Q7;
@@ -82,6 +83,8 @@ public class ShowResult extends HttpServlet {
 			query = new Q3_WITH("Q3 - Wahlkreisinfo", randomWahlkreis);			
 		} else if (queryParam.equalsIgnoreCase("Q4")) {	
 			query = new Q4("Q4 - Wahlkreisergebnisse");
+		} else if (queryParam.equalsIgnoreCase("Q4.with")) {	
+			query = new Q4_With("Q4 - Wahlkreisergebnisse");
 		} else if (queryParam.equalsIgnoreCase("Q5")) {
 			query = new Q5("Q5 - Überhangsmandate");
 		} else if (queryParam.equalsIgnoreCase("Q6")) {

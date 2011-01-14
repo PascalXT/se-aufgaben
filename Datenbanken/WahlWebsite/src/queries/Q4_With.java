@@ -9,15 +9,23 @@ import java.util.Map;
 
 import queries.GoogleChart.ChartType;
 
-public class Q4 extends Query {
+public class Q4_With extends Query {
 
-	public Q4(String headline) {
+	public Q4_With(String headline) {
 		super(headline);
 	}
 
 	@Override
 	protected ResultSet doQuery() throws SQLException {
-		return db.executeSQL("SELECT * FROM " + createWahlkreissiegerTable());
+		return db.executeSQL("WITH "
+				+ db.maxZweitStimmenNachWahlkreis() + " AS (" + stmtMaxZweitStimmenNachWahlkreis() + "), "
+				+ db.maxErststimmenNachWahlkreis() + " AS ("
+					+ stmtMaxErststimmenNachWahlkreis(db.erstStimmenNachWahlkreis()) + "), "
+				+ db.gewinnerZweitstimmen() + " AS (" + stmtGewinnerZweitStimmen(db.maxZweitStimmenNachWahlkreis()) + "), "
+				+ db.gewinnerErststimmen() + " AS (" + stmtGewinnerErststimmen(db.maxErststimmenNachWahlkreis()) + "), "
+				+ db.wahlkreisSieger() + " AS ("
+					+ stmtWahlkreissieger(db.gewinnerErststimmen(), db.gewinnerZweitstimmen()) + ")"
+				+ "SELECT * FROM " + db.wahlkreisSieger());
 	}
 
 	@Override

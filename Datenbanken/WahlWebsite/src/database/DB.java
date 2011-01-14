@@ -100,10 +100,6 @@ public class DB {
 		return tabellenName("Ueberhangsmandate");
 	}
   
-  public String wahlkreissieger() {
-		return tabellenName("Wahlkreissieger");
-	}
-  
   public String wahlberechtigter() {
 		return tabellenName("Wahlberechtigter");
 	}
@@ -116,6 +112,7 @@ public class DB {
   
   public final static String kAnzahlStimmen = "AnzahlStimmen";
   public final static String kAnzahlSitze = "AnzahlSitze";
+  public final static String kMaxStimmen = "MaxStimmen";
   
   public String wahlkreisDaten() {
   	return tabellenName("WahlkreisDaten");
@@ -150,6 +147,22 @@ public class DB {
   
   public String direktMandateProParteiUndBundesland() {
   	return tabellenName("DirektMandateProParteiUndBundesland");
+  }
+  
+  public String maxZweitStimmenNachWahlkreis() {
+  	return tabellenName("MaxZweitStimmenNachWahlkreis");
+  }
+  
+  public String wahlkreisSieger() {
+  	return tabellenName("WahlkreisSieger");
+  }
+  
+  public String gewinnerErststimmen() {
+  	return tabellenName("GewinnerErststimmen");
+  }
+  
+  public String gewinnerZweitstimmen() {
+  	return tabellenName("GewinnerZweitstimmen");
   }
   
   public String tabellenName(String kurzname) {
@@ -198,14 +211,33 @@ public class DB {
   }
   
   public String prettyPrintSQL(String sql_statement) {
-  	String result = "\n" + sql_statement;
-  	result = result.replaceAll(" SELECT", "\nSELECT");
-  	result = result.replaceAll(" FROM", "\nFROM");
-  	result = result.replaceAll(" WHERE", "\nWHERE");
-  	result = result.replaceAll(" GROUP BY", "\nGROUP BY");
-  	result = result.replaceAll(" HAVING", "\nHAVING");
-  	result = result.replaceAll(" UNION", "\nUNION");
-  	result = result.replaceAll("UNION ", "UNION ");
+  	String endSign = "##END##";
+  	String result = sql_statement + endSign;
+  	
+  	// New line before and after union
+  	result = result.replaceAll(" UNION ", "\n\nUNION\n\n");
+  	
+  	// Line break for with tables
+  	String kNoBracket = "[^\\(\\)]";
+  	String kNoOrOneBracket = "(?:" + kNoBracket + "|\\(" + kNoBracket + "*\\))";
+  	String kAtMostTwoBrackets = "(?:" + kNoOrOneBracket + "|\\(" + kNoOrOneBracket + "*\\))";
+  	String kAtMostThreeBrackets = "(?:" + kAtMostTwoBrackets + "|\\(" + kAtMostTwoBrackets + "*\\))";
+  	result = result.replaceAll("([A-Za-z]+ AS \\(" + kAtMostThreeBrackets + "*\\))", "\n\n$1");
+  	
+  	String kSelectEtc = "SELECT|FROM|WHERE|GROUP BY|HAVING|UNION|ORDER BY";
+  	// Indent Sub Select clauses
+  	result = result.replaceAll("\\(SELECT", "( SELECT");
+  	for (int i = 0; i < 10; i++) {
+	  	result = result.replaceAll("( AS \\(" + kAtMostThreeBrackets + "*)" + "( |\n)(" + kSelectEtc + ")", "$1\n\t$3");
+  	}
+  	
+  	// Line break for last SELECT FROM WHERE Clause
+  	for (int i = 0; i < 10; i++) {
+	  	result = result.replaceAll(" (" + kSelectEtc + ")(" + kAtMostThreeBrackets + "*" + endSign + ")", "\n$1$2");
+  	}
+  	
+
+
   	
   	result = result.replaceAll(" ([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "\n$1 $2");
   	result = result.replaceAll("\\(([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "(\n$1 $2");
@@ -217,6 +249,23 @@ public class DB {
   	result = result.replaceAll("  ", " ");
   	result = result.replaceAll(" ,", ",");
   	//result = result.replaceAll("(\n[^\n]{60,}) ", "$1\n");
+  	
+  	// New Line for AND
+  	result = result.replaceAll("\n(\t?)(\t?)WHERE([^\n]*?)AND", "\n$1$2WHERE$3\n$1$2\tAND");
+  	for (int i = 1; i < 10; i++) 
+  		result = result.replaceAll("\n(\t?)(\t?)AND([^\n]*?)AND", "\n$1$2AND$3\n$1$2AND");
+  	
+  	// Line breaks of full lines (More than 63 characters)  	
+  	for (int i = 5; i < 30; i += 5)
+  		result = result.replaceAll("\n(\t?)(\t?)((?:" + kSelectEtc + "|AND)[^\n\t]{" + (55 - i) + ",55}) ([^\n]{" + i + ",})",
+  				"\n$1$2$3\n\t$1$2$4");
+  	for (int i = 5; i < 30; i += 5)
+  		result = result.replaceAll("\n(\t?)(\t?)([^\n\t]{" + (60 - i) + ",60}) ([^\n]{" + i + ",})",
+  				"\n$1$2$3\n$1$2$4");
+  	
+  	result = result.replaceAll("\n\n\n", "\n\n");
+  	// Remove END SIGN
+  	result = result.replaceAll(endSign, "");
   	return result;
   }
 
@@ -250,7 +299,7 @@ public class DB {
 					!sql_statement.contains("TRUNCATE") &&
 					!sql_statement.contains("SYSCAT")) {
 				FileWriter fileWriterSQLlog = new FileWriter(sqlLogFile, true);
-				fileWriterSQLlog.write("\n\n" + prettyPrintSQL(sql_statement));
+				fileWriterSQLlog.write(prettyPrintSQL(sql_statement) + "\n\n");
 				fileWriterSQLlog.close();
 			}
 		} catch (FlagErrorException e) {

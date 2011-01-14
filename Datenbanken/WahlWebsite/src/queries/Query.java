@@ -121,7 +121,7 @@ public abstract class Query {
 	protected String stmtMaxErststimmenNachWahlkreis(String erstStimmenNachWahlkreisTable) {
 		return "" +
   	"SELECT k." + DB.kKandidatDMWahlkreisID + " AS " + DB.kForeignKeyWahlkreisID + ", " + 
-  				 "MAX(v." + DB.kAnzahl + ") AS maxStimmen " + 
+  				 "MAX(v." + DB.kAnzahl + ") AS " + DB.kMaxStimmen + " " + 
   	"FROM " + erstStimmenNachWahlkreisTable + " v, " + db.kandidat() + " k " + 
   	"WHERE v." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
   		"AND v." + DB.kJahr + " = " + kCurrentElectionYear + " " +
@@ -323,52 +323,62 @@ public abstract class Query {
 		return db.ueberhangsMandate();
 	}
 	
+	protected String stmtMaxZweitStimmenNachWahlkreis() {
+		return "" +
+			"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis2Anzahl + ") AS " + DB.kMaxStimmen + " " +
+			"FROM " + db.zweitStimmenNachWahlkreis() + " we " +
+			"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
+			"GROUP BY " + DB.kForeignKeyWahlkreisID;
+	}
+	
+	protected String stmtGewinnerErststimmen(String maxErstStimmenNachWahlkreisTable) {
+		return "" +
+			"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyKandidatID + " " + 
+			"FROM " + db.erstStimmenNachWahlkreis() + " we, " + maxErstStimmenNachWahlkreisTable + " ms " + 
+			"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
+				"AND we." + DB.kAnzahl + " = ms." + DB.kMaxStimmen + " " +
+				"AND we." + DB.kJahr + " = " + kCurrentElectionYear;
+	}
+	
+	protected String stmtGewinnerZweitStimmen(String maxZweitStimmenNachWahlkreisTable) {
+		return "" +
+			"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyParteiID + " " + 
+			"FROM " + db.zweitStimmenNachWahlkreis() + " we, " + maxZweitStimmenNachWahlkreisTable + " ms " + 
+			"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
+				"AND we." + DB.kWahlergebnis2Anzahl + " = ms." + DB.kMaxStimmen + " " +
+				"AND we." + DB.kJahr + " = " + kCurrentElectionYear; 
+	}
+	
+	protected String stmtWahlkreissieger(String gewinnerErstStimmenTable, String gewinnerZweitStimmenTable) {
+		return "" +
+			"SELECT g1.WahlkreisID, wk." + DB.kForeignKeyBundeslandID + ", " +
+				"p1." + DB.kParteiKuerzel + " AS P1, p2." + DB.kParteiKuerzel + " AS P2 " +
+			"FROM " + gewinnerErstStimmenTable + " g1, " + gewinnerZweitStimmenTable + " g2, " + db.partei() + " p1, " + 
+				db.partei() + " p2, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " + 
+			"WHERE g1.WahlkreisID = g2.WahlkreisID " + 
+				"AND g1.KandidatID = k." + DB.kID + " " +
+				"AND k.ParteiID = p1." + DB.kID + " " +
+				"AND g2.ParteiID = p2." + DB.kID + " " + 
+				"AND wk." + DB.kID + " = g1." + DB.kForeignKeyWahlkreisID;
+	}
 	
 	public String createWahlkreissiegerTable() throws SQLException {
-		db.createOrReplaceTemporaryTable(db.wahlkreissieger(), 
+		db.createOrReplaceTemporaryTable(db.wahlkreisSieger(), 
 				DB.kForeignKeyWahlkreisID + " BIGINT, " +
 				DB.kForeignKeyBundeslandID + " BIGINT, " +
 				"P1 VARCHAR(64), " +
 				"P2 VARCHAR(64) ");
 
-		db.executeUpdate("INSERT INTO " + db.wahlkreissieger() + " " +
-				"WITH " +
-				"MaxErstStimmen(WahlkreisID, Anzahl) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kAnzahl + ") " + 
-					"FROM " + db.erstStimmenNachWahlkreis() + " we " +
-					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
-					"GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
-				"), " +
-				"MaxZweitStimmen(WahlkreisID, Anzahl) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", MAX(we." + DB.kWahlergebnis2Anzahl + ") " + 
-					"FROM " + db.zweitStimmenNachWahlkreis() + " we " +
-					"WHERE we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
-					"GROUP BY " + DB.kForeignKeyWahlkreisID + " " +
-				"), " +
-				"GewinnerErstStimmen(WahlkreisID, KandidatID) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyKandidatID + " " + 
-					"FROM " + db.erstStimmenNachWahlkreis() + " we, MaxErstStimmen ms " + 
-					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
-					"AND we." + DB.kAnzahl + " = ms.Anzahl " +
-					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
-				"), " +
-				"GewinnerZweitStimmen(WahlkreisID, ParteiID) AS ( " +
-					"SELECT we." + DB.kForeignKeyWahlkreisID + ", we." + DB.kForeignKeyParteiID + " " + 
-					"FROM " + db.zweitStimmenNachWahlkreis() + " we, MaxZweitStimmen ms " + 
-					"WHERE we." + DB.kForeignKeyWahlkreisID + " = ms.WahlkreisID " + 
-					"AND we." + DB.kWahlergebnis2Anzahl + " = ms.Anzahl " +
-					"AND we." + DB.kJahr + " = " + kCurrentElectionYear + " " +
-				") " +
-				"SELECT g1.WahlkreisID, wk." + DB.kForeignKeyBundeslandID + ", p1." + DB.kParteiKuerzel + " AS P1, p2." + DB.kParteiKuerzel + " AS P2 " +
-				"FROM GewinnerErstStimmen g1, GewinnerZweitStimmen g2, " + db.partei() + " p1, " + db.partei() + " p2, " + db.kandidat() + " k, " + db.wahlkreis() + " wk " + 
-				"WHERE g1.WahlkreisID = g2.WahlkreisID " + 
-				"AND g1.KandidatID = k." + DB.kID + " " +
-				"AND k.ParteiID = p1." + DB.kID + " " +
-				"AND g2.ParteiID = p2." + DB.kID + " " + 
-				"AND wk." + DB.kID + " = g1.WahlkreisID "
-		);
+		db.executeUpdate("INSERT INTO " + db.wahlkreisSieger() + " " +
+				"WITH "
+				+ db.maxZweitStimmenNachWahlkreis() + " AS (" + stmtMaxZweitStimmenNachWahlkreis() + "), "
+				+ db.maxErststimmenNachWahlkreis() + " AS ("
+					+ stmtMaxErststimmenNachWahlkreis(db.erstStimmenNachWahlkreis()) + "), "
+				+ db.gewinnerZweitstimmen() + " AS (" + stmtGewinnerZweitStimmen(db.maxZweitStimmenNachWahlkreis()) + "), "
+				+ db.gewinnerErststimmen() + " AS (" + stmtGewinnerErststimmen(db.maxErststimmenNachWahlkreis()) + ") "
+				+ stmtWahlkreissieger(db.gewinnerErststimmen(), db.gewinnerZweitstimmen()));
 		
-		return db.wahlkreissieger();
+		return db.wahlkreisSieger();
 	}
 
 }
