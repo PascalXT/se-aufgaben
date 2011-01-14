@@ -349,7 +349,6 @@ public class CsvParser {
   			bezirk++;
   			nWaehler = 0;
   		}
-  		}
   	}
   }
   
