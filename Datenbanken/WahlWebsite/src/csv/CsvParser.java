@@ -450,8 +450,8 @@ public class CsvParser {
   }
 
   public void importVoters() throws SQLException {
-    final String[] columnsWahlberechtigter = { DB.kForeignKeyWahlkreisID };
-    datenbank.load(wahlberechtigteFile, "(1)", columnsWahlberechtigter, datenbank.wahlberechtigter());
+    final String[] columnsWahlberechtigter = { DB.kForeignKeyWahlkreisID, DB.kForeignKeyWahlbezirkID };
+    datenbank.load(wahlberechtigteFile, "(1, 2)", columnsWahlberechtigter, datenbank.wahlberechtigter());
     System.out.println("Wahlberechtigte have been imported to the database");
   }
 

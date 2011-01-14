@@ -103,6 +103,7 @@ public class TableDef {
         "CREATE TABLE " + schemaName + ".Wahlberechtigter ("
         	  + "ID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE ), "
         	  + "WahlkreisID BIGINT REFERENCES " + schemaName + ".Wahlkreis, "
+        	  + "WahlbezirkID BIGINT, "
         	  + "Gewaehlt INTEGER WITH DEFAULT 0);\n",
     
     		// Wahlkreisdaten
