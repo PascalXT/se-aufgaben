@@ -23,6 +23,10 @@ public class DB {
   private Statement statement;
 
   // Tabellen
+  public String wahlbezirk() {
+    return tabellenName("Wahlbezirk");
+  }
+
   public String wahlkreis() {
     return tabellenName("Wahlkreis");
   }
@@ -45,6 +49,8 @@ public class DB {
 
   public final static String kKandidatNachname = "Nachname";
   public final static String kKandidatVorname = "Vorname";
+  public final static String kKandidatBeruf = "Beruf";
+  public final static String kKandidatAnschrift = "Anschrift";
   public final static String kKandidatListenplatz = "Listenplatz";
   public final static String kKandidatDMParteiID = "DMParteiID";
   public final static String kKandidatDMWahlkreisID = "DMWahlkreisID";

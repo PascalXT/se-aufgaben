@@ -1,1 +1,34 @@
 body { margin:50px 0; }
+body#ChooseWahllokal, 
+body#Wahlraum, 
+body#Wahlzettel #WahlkreisInfo, 
+body#Wahlzettel #WahlzettelTableContainer { margin-left:50px; margin-right:50px; }
+
+body#Wahlzettel { text-align:center; }
+
+label { width:255px; text-align:right; padding-right:25px; }
+
+#Wahlzettel #WahlzettelTable { border-collapse:collapse; }
+#Wahlzettel #WahlzettelTable th { background-color:#fff; }
+
+#Wahlzettel #WahlzettelTable th#erststimme { width:49%; text-align:right; }
+#Wahlzettel #WahlzettelTable th.spacer { width:2%; }
+#Wahlzettel #WahlzettelTable th#zweitstimme { width:49%; }
+
+#Wahlzettel #WahlzettelTable td { background-color:#fff; }
+#Wahlzettel #WahlzettelTable td.erstNum,
+#Wahlzettel #WahlzettelTable td.zweitNum,
+#Wahlzettel #WahlzettelTable td.radioErststimme,
+#Wahlzettel #WahlzettelTable td.radioZweitstimme { text-align:center; vertical-align:center; }
+
+#Wahlzettel #WahlzettelTable td.erstNum,
+#Wahlzettel #WahlzettelTable td.zweitNum { font-size:2.2em; }
+
+#Wahlzettel #WahlzettelTable td.erstNum,
+#Wahlzettel #WahlzettelTable td.radioErststimme,
+#Wahlzettel #WahlzettelTable td.kandidat { border:2px solid #111; }
+
+#Wahlzettel #WahlzettelTable td.zweitNum,
+#Wahlzettel #WahlzettelTable td.radioZweitstimme,
+#Wahlzettel #WahlzettelTable td.partei { border:2px solid #0059a9; color:#0059a9; }
+#Wahlzettel #WahlzettelTable td.partei h2 { color:#0059a9; } 

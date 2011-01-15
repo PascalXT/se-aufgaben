@@ -9,14 +9,21 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-    <!-- Use the URL http://hostName/appName/test2 for
-       testPackage.TestServlet -->
   <servlet>
     <servlet-name>ShowResult</servlet-name>
     <servlet-class>servlets.ShowResult</servlet-class>
+    
   </servlet>
   <servlet-mapping>
     <servlet-name>ShowResult</servlet-name>
     <url-pattern>/ShowResult</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ChooseWahllokal</servlet-name>
+    <servlet-class>servlets.ChooseWahllokal</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ChooseWahllokal</servlet-name>
+    <url-pattern>/ChooseWahllokal</url-pattern>
   </servlet-mapping>
 </web-app>
