@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
+import java.util.Arrays;
 
 import flags.FlagDefinition;
 import flags.FlagErrorException;
@@ -18,6 +19,7 @@ public class DB {
   public String schemaName;
   private String dbCommandFlags;
   public String messagePath;
+  public boolean MQTmode = false;
 
   private Connection connection;
   private Statement statement;
@@ -171,8 +173,21 @@ public class DB {
   	return tabellenName("GewinnerZweitstimmen");
   }
   
+  public boolean isBaseTable(String kurzname) {
+  	for (String table : TableDef.baseTables()) {
+  		if (table.equalsIgnoreCase(kurzname)) {
+  			return true;
+  		}
+  	}
+  	return false;
+  }
+  
   public String tabellenName(String kurzname) {
-    return schemaName + "." + kurzname;
+  	if (MQTmode && !isBaseTable(kurzname)) {
+  		return schemaName + ".MQT" + kurzname;
+  	} else {
+  		return schemaName + "." + kurzname;
+  	}
   }
   
   public static DB getDatabaseByFlags() throws FlagErrorException {
@@ -359,7 +374,8 @@ public class DB {
 
   public boolean tableIntegrityIsUnchecked(String tableName) throws SQLException {
     ResultSet rs = executeSQL("SELECT Status FROM SYSCAT.TABLES WHERE TABNAME='"
-        + getTableShortName(tableName).toUpperCase() + "' AND TABSCHEMA='" + schemaName.toUpperCase() + "'");
+        + getTableShortName(tableName).toUpperCase() + "' AND TABSCHEMA='" + schemaName.toUpperCase()
+        + "' AND STATUS<>'N'");
     return rs.next();
   }
 
@@ -414,18 +430,45 @@ public class DB {
    *          "Column_1 type_1, [...] Column_n type_n"
    * @throws SQLException
    */
-  public void createOrReplaceTemporaryTable(String tableName, String columns) throws SQLException {
-    if (tableExists(tableName))
-      truncate(tableName);
-    
-    else if (Flags.isTrue(FlagDefinition.kFlagMakeTemporaryTablesPermanent)) {
+  public void createOrReplaceTemporaryTable(String tableName, String columns) throws SQLException { 	
+  	createOrReplaceTable(tableName, columns, Flags.isTrue(FlagDefinition.kFlagMakeTemporaryTablesPermanent));
+  }
+ 
+  public void createOrReplaceTable(String tableName, String columns, boolean permanentTable) throws SQLException { 	
+    if (tableExists(tableName)) {
+    	truncate(tableName);
+    	return;
+    }
+      
+    else if (permanentTable) {
       executeUpdate("CREATE TABLE " + tableName + " (" + columns + ")");
     } else {
       executeUpdate("CREATE GLOBAL TEMPORARY TABLE " + tableName + " (" + columns + ") ON COMMIT PRESERVE ROWS");
     }
   }
 
-  public Connection getConnection() {
+  
+  public void createFilledTemporaryTable(String tableName, String columns, String sql_statement) throws SQLException {	
+  	if (MQTmode) {
+  		createOrUpdateMQT(tableName, columns, sql_statement);
+  	} else {
+	  	createOrReplaceTemporaryTable(tableName, columns);
+	  	executeUpdate("INSERT INTO " + tableName + "(" + columnsWithoutType(columns) + ") " + sql_statement);
+  	}
+  }
+
+	private String columnsWithoutType(String columns) {
+		return columns.replaceAll("([^ ]+) [^ ,]+ *(,|$)", "$1$2");
+	}
+
+  private void createOrUpdateMQT(String tableName, String columns, String sql_statement) throws SQLException {
+		if (!tableExists(tableName)) {
+			createMQT(tableName, columns, sql_statement);
+		}
+		setIntegrityChecked(tableName);
+	}
+
+	public Connection getConnection() {
     return connection;
   }
 
@@ -446,5 +489,42 @@ public class DB {
   public void printTable(String table) throws SQLException {
     printResultSet(executeSQL("SELECT * FROM " + table));
   }
-
+  
+  public void createMQT(String tableName, String columnList, String query) throws SQLException {
+  	executeUpdate("CREATE TABLE " + tableName + " (" + columnsWithoutType(columnList) + ") AS (" + query + ") "
+  		+ "DATA INITIALLY DEFERRED "
+  		+ "REFRESH DEFERRED "
+  		+ "DISABLE QUERY OPTIMIZATION "
+  		+ "MAINTAINED BY USER");
+  }
+  
+	public String stmtZweitstimmenNachWahlkreis() {
+		return ""
+		+ "SELECT s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
+		+ "FROM " + stimme() + " s "
+		+ "WHERE " + DB.kForeignKeyParteiID + " IS NOT NULL "
+		+ "GROUP BY s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr;
+	}
+  
+	public String stmtErststimmenNachWahlkreis() {
+		return ""
+		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
+		+ "FROM " + stimme() + " s "
+		+ "WHERE " + DB.kForeignKeyKandidatID + " IS NOT NULL "
+		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr;
+	}
+  
+	public String updateZweitstimmenNachWahlkreisTable() throws SQLException {
+		createFilledTemporaryTable(zweitStimmenNachWahlkreis(), DB.kForeignKeyParteiID + " BIGINT, "
+				+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " INTEGER, " + DB.kAnzahl + " INTEGER" , 
+				stmtZweitstimmenNachWahlkreis());
+		return zweitStimmenNachWahlkreis();
+	}
+	
+	public String updateErststimmenNachWahlkreisTable() throws SQLException {
+		createFilledTemporaryTable(erstStimmenNachWahlkreis(), DB.kForeignKeyKandidatID + " BIGINT, "
+				+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " INTEGER, " + DB.kAnzahl + " INTEGER" , 
+				stmtErststimmenNachWahlkreis());
+		return erstStimmenNachWahlkreis();
+	}
 }

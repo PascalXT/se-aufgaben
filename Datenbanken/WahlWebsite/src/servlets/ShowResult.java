@@ -1,6 +1,8 @@
 package servlets;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Random;
 
 import javax.servlet.ServletException;
@@ -18,8 +20,10 @@ import queries.Q3_WITH;
 import queries.Q4;
 import queries.Q4_With;
 import queries.Q5;
+import queries.Q5_WITH;
 import queries.Q6;
 import queries.Q7;
+import queries.Q7_WITH;
 import queries.Query;
 import database.DB;
 import flags.FlagDefinition;
@@ -61,6 +65,13 @@ public class ShowResult extends HttpServlet {
 			System.exit(0);
 		}
 
+		if (request.getParameter("mqt") != null) {
+			database.MQTmode = true;
+		} else {
+			database.MQTmode = false;
+		}
+		
+		query = null;
 		if (queryParam.equalsIgnoreCase("Q1")) {
 			query = new Q1("Q1 - Sitzverteilung");			
 		} else if (queryParam.equalsIgnoreCase("Q1.with")) {
@@ -87,6 +98,8 @@ public class ShowResult extends HttpServlet {
 			query = new Q4_With("Q4 - Wahlkreisergebnisse");
 		} else if (queryParam.equalsIgnoreCase("Q5")) {
 			query = new Q5("Q5 - Überhangsmandate");
+		} else if (queryParam.equalsIgnoreCase("Q5.with")) {
+			query = new Q5_WITH("Q5 - Überhangsmandate");
 		} else if (queryParam.equalsIgnoreCase("Q6")) {
 			query = new Q6("Q6 - Knappste Sieger");
 		} else if (queryParam.equalsIgnoreCase("Q7")) {
@@ -95,13 +108,29 @@ public class ShowResult extends HttpServlet {
 				randomWahlkreis = Integer.parseInt(request.getParameter("wk"));
 			}
 			query = new Q7("Q7 - Wahlkreisinfo (Einzelstimmen)", randomWahlkreis);
+		} else if (queryParam.equalsIgnoreCase("Q7.with")) {
+			int randomWahlkreis = new Random().nextInt(5) + 213;
+			if (request.getParameter("wk") != null) {
+				randomWahlkreis = Integer.parseInt(request.getParameter("wk"));
+			}
+			query = new Q7_WITH("Q7 - Wahlkreisinfo (Einzelstimmen)", randomWahlkreis);
+		} else if (queryParam.equalsIgnoreCase("RefreshVotes")) {
+			try {
+				response.getWriter().write("Refreshing...");
+				database.updateErststimmenNachWahlkreisTable();
+				database.updateZweitstimmenNachWahlkreisTable();
+				response.getWriter().write("Done.");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		query.setDatabase(database);
-		String html = query.generateHtmlOutput();
-		response.getWriter().write(html);
-			
-
+		if (query != null) {
+			query.setDatabase(database);
+			String html = query.generateHtmlOutput();
+			response.getWriter().write(html);
+		} else {
+			response.getWriter().write("Query was NULL.");
+		}
 	}
 
 }
