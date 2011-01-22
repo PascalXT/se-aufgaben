@@ -112,7 +112,13 @@ public class TableDef {
     		    + "AnzahlWahlberechtigte BIGINT, "
     		    + "AnzahlUngueltigeErststimmen BIGINT, "
     		    + "AnzahlUngueltigeZweitstimmen BIGINT, "
-    		    + "Jahr BIGINT);\n"};
+    		    + "Jahr BIGINT);\n",
+    
+    		// SESSION IDs 
+    		"CREATE TABLE " + schemaName + ".SessionIDs ( "
+    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL);\n"
+    		
+    		};
   };
 
 }

@@ -8,6 +8,10 @@ body#Wahlzettel { text-align:center; }
 
 label { width:255px; text-align:right; padding-right:25px; }
 
+#Wahlraum .createSessionID { text-align:center; }
+#Wahlraum .createSessionID button { padding:20px 60px; font-size:2em; }
+#Wahlraum .createSessionID input { width:60%; font-size:3em; }
+
 #Wahlzettel #WahlzettelTable { border-collapse:collapse; }
 #Wahlzettel #WahlzettelTable th { background-color:#fff; }
 
@@ -32,3 +36,7 @@ label { width:255px; text-align:right; padding-right:25px; }
 #Wahlzettel #WahlzettelTable td.radioZweitstimme,
 #Wahlzettel #WahlzettelTable td.partei { border:2px solid #0059a9; color:#0059a9; }
 #Wahlzettel #WahlzettelTable td.partei h2 { color:#0059a9; } 
+
+#Wahlzettel .voteButton { text-align:center; margin:50px 0; font-size:2em; }
+#Wahlzettel .voteButton input { font-size:1em; width:37%; }
+#Wahlzettel .voteButton button { padding:50px 250px; font-size:2.5em; }
