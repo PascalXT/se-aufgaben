@@ -11,14 +11,12 @@
 <script src="js/jquery-1.4.4.min.js" type="text/javascript"></script>
 <script>
 $(function(){
-	$("select[name='wahlkreis']").change(function() {
-		var wk = $("select[name='wahlkreis'] option:selected").val();
-		window.location = "/WahlWebsite/ChooseWahllokal.jsp?wk=" + wk;
-	});
-	$("select[name='wahlbezirk']").change(function() {
-		var wk = $("select[name='wahlkreis'] option:selected").val();
-		var wb = $("select[name='wahlbezirk'] option:selected").val();
-		window.location = "/WahlWebsite/Wahlraum.jsp?wk=" + wk + "&wb=" + wb;
+	$(".createSessionID button").click(function() {
+		$("#ajaxload").show();
+		$.getJSON('/WahlWebsite/async/generateSessionID.jsp', function(json) {
+			$(".createSessionID input").val(json.sessionID);
+			$("#ajaxload").hide();
+		});
 	});
 });
 </script>
@@ -39,9 +37,14 @@ try {
 <h1>Wahlraum Administration</h1>
 <hr/>
 
-<div>
-	<label for="waehlerID">Personalausweis-Nr:</label>
-	<input name="waehlerID" type="text"/> 
+<div class="createSessionID">
+	<p> <button type="button">Erzeuge Session-ID</button> </p>
+	<p> <input type="text"/> </p>
+	
+	<p id="ajaxload" style="display:none">
+		<img src="/WahlWebsite/img/ajaxload.gif" alt=""/>
+	</p>
+	
 </div>
 
 

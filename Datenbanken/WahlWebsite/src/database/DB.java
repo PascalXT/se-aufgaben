@@ -112,6 +112,10 @@ public class DB {
 		return tabellenName("Wahlberechtigter");
 	}
   
+  public String sessionIDs() {
+  	return tabellenName("SessionIDs");
+  }
+  
   public final static String kForeignKeyParteiID = "ParteiID";
   public final static String kForeignKeyBundeslandID = "BundeslandID";
   public final static String kForeignKeyWahlbezirkID = "WahlbezirkID";
