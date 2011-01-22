@@ -1,27 +1,48 @@
-\chapter{SQL-Befehle}
+\chapter{SQL-Befehle zur Auswertung der Wahl}
 
-Im eigentlichen Informationssystem sind die Queries modular aufgebaut. Das bedeutet, sie greifen auf dieselben Tabellen zu, die zentral erstellt werden. Um das für dieses Projekt gewünschte Verhalten zu erzielen, werden die zentralen Tabellen für jedes Query neu erzeugt. Im Folgenden sind für jedes Query die SQL statements vermerkt, die zur Berechnung dieses Queries verwendet wurden. Zwischen den Queries gibt es dabei eine Überlappung.
+In der Implementierung des Wahlinformationssystem sind die Queries modular aufgebaut. Das bedeutet, sie greifen auf dieselben Tabellen zu, die zentral erstellt werden. Um das für dieses Projekt gewünschte Verhalten zu erzielen, werden die zentralen Tabellen für jedes Query neu erzeugt. Im Folgenden sind für jedes Query die SQL statements vermerkt, die zur Berechnung dieses Queries verwendet wurden. Zwischen den Queries gibt es dabei eine Überlappung, also untertabellen, die in mehreren Queries verwendet werden.
 
 \lstset{language=SQL}
 
-\section{Query 1}
+\section{Query 1 - Sitzverteilung}
+Stellt die Sitzverteilung im Bundestag als Tortendiagramm und tabellarisch (Partei, Anzahl der Sitze) dar.
 \lstinputlisting{chapters/queries/Q1.sql}
 
-\section{Query 2}
+\clearpage
+\section{Query 2 - Mitglieder des Bundestages}
+Stellt alle Mitglieder des Bundestages als Liste dar.
 \lstinputlisting{chapters/queries/Q2.sql}
 
-\section{Query 3}
+\clearpage
+\section{Query 3 - Wahlkreisübersicht}
+Stellt für einen zufällig ausgewählten Wahlkreis folgende Informationen dar:
+\begin{enumerate}
+	\item die Wahlbeteiligung
+	\item den gewählten Direktkandidaten
+	\item die prozentuale und absolute Anzahl an Stimmen für jede Partei
+	\item die Entwicklung der Stimmen im Vergleich zum Vorjahr
+\end{enumerate}
 \lstinputlisting{chapters/queries/Q3.sql}
 
-\section{Query 4}
+\clearpage
+\section{Query 4 - Wahlkreissieger}
+Stellt die Siegerparteien (Erst-/Zweitstimme) auf einer eingefärbten Deutschlandkartedar. Alternativ dürfen Sie auch eine Tabelle verwenden.
 \lstinputlisting{chapters/queries/Q4.sql}
 
-\section{Query 5}
+\clearpage
+\section{Query 5 - Überhangmandate}
+Stellt die Überhangmandate pro Partei und Bundesland dar.
 \lstinputlisting{chapters/queries/Q5.sql}
 
-\section{Query 6}
+\clearpage
+\section{Query 6 - Knappste Sieger}
+Stellt die Top 10 der knappsten Sieger für alle Parteien dar. Die knappstenSieger sind die gewählten Erstkandidaten, welche mit dem geringsten Vorsprung gegenüber ihren Konkurrenten gewonnen haben. Sollte eine Partei keinenWahlkreis gewonnen haben, sollen stattdessen die Wahlkreise ausgegeben werden, in denen
+sie am knappsten verloren hat.
 \lstinputlisting{chapters/queries/Q6.sql}
 
-\section{Query 7}
+\clearpage
+\section{Query 7 - Wahlkreisübersicht (Einzelstimmen)}
+Diese Anfrage soll die gleichen Informationen wie Q3 darstellen, aber auf Einzelstimmen durchgeführt werden. Die Zufallsauswahl können Sie auf die ersten 5
+bayrischen Wahlkreise (213, ..., 217) beschränken.
 \lstinputlisting{chapters/queries/Q7.sql}
 
