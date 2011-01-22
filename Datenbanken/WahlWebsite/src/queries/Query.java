@@ -91,10 +91,9 @@ public abstract class Query {
 	}
 	
 	protected String createZweitStimmenNachBundeslandTable() throws SQLException {
-		 	db.createOrReplaceTemporaryTable(db.zweitStimmenNachBundesland(), DB.kForeignKeyParteiID + " BIGINT, "
-		 			+ DB.kForeignKeyBundeslandID + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
-	    db.executeUpdate("INSERT INTO " + db.zweitStimmenNachBundesland() + " " + stmtZweitStimmenNachBundesland());
-	    return db.zweitStimmenNachBundesland();
+		db.createFilledTemporaryTable(db.zweitStimmenNachBundesland(), DB.kForeignKeyParteiID + " BIGINT, "
+		 			+ DB.kForeignKeyBundeslandID + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT", stmtZweitStimmenNachBundesland());
+	  return db.zweitStimmenNachBundesland();
 	}
 	
 	protected String stmtZweitStimmenNachPartei(String zweitStimmenNachBundeslandTable) {
@@ -105,12 +104,8 @@ public abstract class Query {
 	}
 
 	protected String createZweitStimmenNachParteiTable(String zweitStimmenNachBundeslandTable) throws SQLException {
-    db.createOrReplaceTemporaryTable(db.zweitStimmenNachPartei(), DB.kForeignKeyParteiID
-        + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT");
-    db.executeUpdate(""
-    		+ "INSERT INTO " + db.zweitStimmenNachPartei() + " "
-    			+ "(" + DB.kForeignKeyParteiID + ", " + DB.kAnzahlStimmen + ") "
-    		+ stmtZweitStimmenNachPartei(zweitStimmenNachBundeslandTable));
+		db.createFilledTemporaryTable(db.zweitStimmenNachPartei(), DB.kForeignKeyParteiID
+        + " BIGINT, " + DB.kAnzahlStimmen + " BIGINT", stmtZweitStimmenNachPartei(zweitStimmenNachBundeslandTable));
 		return db.zweitStimmenNachPartei();
 	}
 
@@ -141,13 +136,11 @@ public abstract class Query {
 	}
 	
 	protected String createDirektmandateTable(String erstStimmenNachWahlkreisTable) throws SQLException {
-    db.createOrReplaceTemporaryTable(db.direktmandate(), DB.kForeignKeyKandidatID + " BIGINT, "
-        + DB.kForeignKeyParteiID + " BIGINT, " + DB.kKandidatDMWahlkreisID + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.direktmandate()
-    		+	" WITH " + db.maxErststimmenNachWahlkreis() 
-    		+ " AS ( " + stmtMaxErststimmenNachWahlkreis(erstStimmenNachWahlkreisTable) + ") "
-    		+	stmtDirektmandateTable(erstStimmenNachWahlkreisTable, db.maxErststimmenNachWahlkreis())
-    );
+		db.createFilledTemporaryTable(db.direktmandate(), DB.kForeignKeyKandidatID + " BIGINT, "
+        	+ DB.kForeignKeyParteiID + " BIGINT, " + DB.kKandidatDMWahlkreisID + " BIGINT",
+        "WITH " + db.maxErststimmenNachWahlkreis() 
+    			+ " AS ( " + stmtMaxErststimmenNachWahlkreis(erstStimmenNachWahlkreisTable) + ") "
+    			+	stmtDirektmandateTable(erstStimmenNachWahlkreisTable, db.maxErststimmenNachWahlkreis()));
     return db.direktmandate();
 	}
 
@@ -164,13 +157,8 @@ public abstract class Query {
 	}
 	
 	protected String createFuenfProzentParteienTable(String zweitStimmenNachBundeslandTable) throws SQLException {
-		db.createOrReplaceTemporaryTable(db.fuenfProzentParteien(), DB.kForeignKeyParteiID + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.fuenfProzentParteien() + " " 
-    		+ stmtFuenfProzentParteien(zweitStimmenNachBundeslandTable));
-
-//    db.printResultSet(db.executeSQL("SELECT p." + DB.kParteiKuerzel + " FROM " + db.partei()
-//        + " p, " + db.fuenfProzentParteien() + " fpp" + " WHERE p." + DB.kID + " = fpp."
-//        + DB.kForeignKeyParteiID));
+		db.createFilledTemporaryTable(db.fuenfProzentParteien(), DB.kForeignKeyParteiID + " BIGINT",
+				stmtFuenfProzentParteien(zweitStimmenNachBundeslandTable));
     return db.fuenfProzentParteien();
 	}
 
@@ -181,11 +169,8 @@ public abstract class Query {
     	+ DB.kForeignKeyParteiID + " HAVING COUNT(*) >= 3";
 	}
 	protected String createDreiDirektmandateParteienTable(String direktMandateTable) throws SQLException {
-
-		db.createOrReplaceTemporaryTable(db.dreiDirektMandatParteien(), DB.kForeignKeyParteiID
-        + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.dreiDirektMandatParteien() + " "
-    		+ stmtDreiDirektmandateParteien(direktMandateTable));
+		db.createFilledTemporaryTable(db.dreiDirektMandatParteien(), DB.kForeignKeyParteiID + " BIGINT",
+				stmtDreiDirektmandateParteien(direktMandateTable));
     return db.dreiDirektMandatParteien();
 	}
 	
@@ -194,9 +179,8 @@ public abstract class Query {
 	}
 	
 	protected String createParteienImBundestagTable(String fuenfProzentParteienTable, String dreiDirektMandateTable) throws SQLException {
-		db.createOrReplaceTemporaryTable(db.parteienImBundestag(), DB.kForeignKeyParteiID + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.parteienImBundestag()
-    		+ " " + stmtParteienImBundestag(fuenfProzentParteienTable, dreiDirektMandateTable));
+		db.createFilledTemporaryTable(db.parteienImBundestag(), DB.kForeignKeyParteiID + " BIGINT",
+				stmtParteienImBundestag(fuenfProzentParteienTable, dreiDirektMandateTable));
     return db.parteienImBundestag();
 	}
 	
@@ -231,10 +215,9 @@ public abstract class Query {
 	}
 	
 	protected String createSitzeNachPartei(String zweitStimmenNachParteiTable, String parteienImBundestagTable) throws SQLException {
-		db.createOrReplaceTemporaryTable(db.sitzeNachPartei(), DB.kForeignKeyParteiID + " BIGINT, "
-        + DB.kAnzahlSitze + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.sitzeNachPartei() + " "
-        + "WITH " + db.divisoren() + " AS (" + stmtDivisoren() + "), "
+		db.createFilledTemporaryTable(db.sitzeNachPartei(), DB.kForeignKeyParteiID + " BIGINT, "
+        + DB.kAnzahlSitze + " BIGINT",
+        "WITH " + db.divisoren() + " AS (" + stmtDivisoren() + "), "
         + db.zugriffsreihenfolgeSitzeNachPartei() + " AS ("
          + stmtZugriffsreihenfolgeSitzeNachPartei(parteienImBundestagTable, zweitStimmenNachParteiTable, db.divisoren())
          + ") "
@@ -269,10 +252,9 @@ public abstract class Query {
 	
 	protected String createSitzeNachLandeslistenTable(String parteienImBundestagTable, 
 			String zweitStimmenNachBundeslandTable, String sitzeNachParteiTable) throws SQLException {
-		db.createOrReplaceTemporaryTable(db.sitzeNachLandeslisten(), DB.kForeignKeyParteiID
-        + " BIGINT, " + DB.kForeignKeyBundeslandID + " BIGINT, " + DB.kAnzahlSitze + " BIGINT");
-    db.executeUpdate("INSERT INTO " + db.sitzeNachLandeslisten() + " "
-    		+ "WITH " + db.divisoren() + " AS (" + stmtDivisoren() + "), "
+		db.createFilledTemporaryTable(db.sitzeNachLandeslisten(), DB.kForeignKeyParteiID
+        + " BIGINT, " + DB.kForeignKeyBundeslandID + " BIGINT, " + DB.kAnzahlSitze + " BIGINT",
+        "WITH " + db.divisoren() + " AS (" + stmtDivisoren() + "), "
     		+ db.zugriffsreihenfolgeSitzeNachLandeslisten() + " AS ("
     			+ stmtZugriffsreihenfolgeSitzeNachLandeslisten(
     					parteienImBundestagTable, zweitStimmenNachBundeslandTable, db.divisoren()) + ") "
@@ -306,20 +288,16 @@ public abstract class Query {
 	}
 
 	protected String createUeberhangsmandateTable(String direktMandateTable, String sitzeNachLandeslistenTable) throws SQLException {
-		db.createOrReplaceTemporaryTable(db.ueberhangsMandate(), 
-				DB.kForeignKeyBundeslandID + " BIGINT, " +
+		db.createFilledTemporaryTable(db.ueberhangsMandate(), DB.kForeignKeyBundeslandID + " BIGINT, " +
 				DB.kBundeslandName + " VARCHAR(255), " + 
 				DB.kForeignKeyParteiID + " BIGINT, " +
 				DB.kParteiKuerzel + " VARCHAR(64), " +
-				DB.kAnzahlUeberhangsmandate + " BIGINT ");
-	
-		db.executeUpdate(""
-				+ "INSERT INTO " + db.ueberhangsMandate() + " "
-				+ "WITH " + db.direktMandateProParteiUndBundesland() + " AS ("
-					+ stmtDirektMandateProParteiUndBundesland(direktMandateTable) + ") "
-				+ stmtUeberhangsmandate(direktMandateTable, sitzeNachLandeslistenTable,
-						db.direktMandateProParteiUndBundesland()));
-		
+				DB.kAnzahlUeberhangsmandate + " BIGINT ", 
+
+				"WITH " + db.direktMandateProParteiUndBundesland() + " AS ("
+				+ stmtDirektMandateProParteiUndBundesland(direktMandateTable) + ") "
+			+ stmtUeberhangsmandate(direktMandateTable, sitzeNachLandeslistenTable,
+					db.direktMandateProParteiUndBundesland()));
 		return db.ueberhangsMandate();
 	}
 	
@@ -363,13 +341,8 @@ public abstract class Query {
 	}
 	
 	public String createWahlkreissiegerTable() throws SQLException {
-		db.createOrReplaceTemporaryTable(db.wahlkreisSieger(), 
-				DB.kForeignKeyWahlkreisID + " BIGINT, " +
-				DB.kForeignKeyBundeslandID + " BIGINT, " +
-				"P1 VARCHAR(64), " +
-				"P2 VARCHAR(64) ");
-
-		db.executeUpdate("INSERT INTO " + db.wahlkreisSieger() + " " +
+		db.createFilledTemporaryTable(db.wahlkreisSieger(), DB.kForeignKeyWahlkreisID + " BIGINT, " +
+				DB.kForeignKeyBundeslandID + " BIGINT, " + "P1 VARCHAR(64), " + "P2 VARCHAR(64)",
 				"WITH "
 				+ db.maxZweitStimmenNachWahlkreis() + " AS (" + stmtMaxZweitStimmenNachWahlkreis() + "), "
 				+ db.maxErststimmenNachWahlkreis() + " AS ("
@@ -378,7 +351,11 @@ public abstract class Query {
 				+ db.gewinnerErststimmen() + " AS (" + stmtGewinnerErststimmen(db.maxErststimmenNachWahlkreis()) + ") "
 				+ stmtWahlkreissieger(db.gewinnerErststimmen(), db.gewinnerZweitstimmen()));
 		
+		db.createOrReplaceTemporaryTable(db.wahlkreisSieger(), 
+				DB.kForeignKeyWahlkreisID + " BIGINT, " +
+				DB.kForeignKeyBundeslandID + " BIGINT, " +
+				"P1 VARCHAR(64), " +
+				"P2 VARCHAR(64) ");
 		return db.wahlkreisSieger();
 	}
-
 }

@@ -14,6 +14,20 @@ public class TableDef {
       sql += statement;
     return sql;
   }
+  
+  public static String[] baseTables() {
+  	return new String[] {
+  			"BUNDESLAND",
+  			"WAHLKREIS",
+  			"WAHLBEZIRK",
+  			"PARTEI",
+  			"STIMME",
+  			"KANDIDAT",
+  			"ERSTSTIMMENNACHWAHLKREIS",
+  			"ZWEITSTIMMENNACHWAHLKREIS",
+  			"WAHLBERECHTIGTER",
+  			"WAHLKREISDATEN"};
+  }
 
   private String[] getStatements() {
     final String autoIncrementID = "BIGINT  NOT NULL  GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1, NO CACHE )";
