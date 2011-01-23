@@ -13,8 +13,14 @@
 $(function(){
 	$(".createSessionID button").click(function() {
 		$("#ajaxload").show();
-		$.getJSON('/WahlWebsite/async/generateSessionID.jsp', function(json) {
-			$(".createSessionID input").val(json.sessionID);
+		var persoID = $("input[name='persoID']").val();
+		$.post('/WahlWebsite/async/generateSessionID.jsp', { persoID:persoID }, function(jsonResponse) {
+			var json = jQuery.parseJSON(jsonResponse);
+			if (json.success == true) {
+				$("#sessionID").val(json.sessionID);
+			} else {
+				alert('Personalausweisnummer entweder ungültig oder bereits gewählt');
+			}
 			$("#ajaxload").hide();
 		});
 	});
@@ -38,8 +44,9 @@ try {
 <hr/>
 
 <div class="createSessionID">
-	<p> <button type="button">Erzeuge Session-ID</button> </p>
-	<p> <input type="text"/> </p>
+	<p> <label for="persoID">Personalausweis-Nummer:</label> <input name="persoID" type="text"/> </p>
+	<p> <button type="button">Erzeuge Wählpasswort</button> </p>
+	<p> <input id="sessionID" type="text"/> </p>
 	
 	<p id="ajaxload" style="display:none">
 		<img src="/WahlWebsite/img/ajaxload.gif" alt=""/>

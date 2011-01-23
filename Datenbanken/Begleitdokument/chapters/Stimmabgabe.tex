@@ -1,4 +1,35 @@
 \chapter{Stimmabgabe}
-Die Stimmabgabe im Wahlinformationssystem läuft folgendermaßen ab. Der Wähler erscheint im Wahllokal seines Wahlbezirkes. Dort legt er seinen Personalausweis vor. Der Wahlhelfer vor Ort gibt die Personalausweisnummer in der Vorgesehenen Weboberfläche (Abbildung TODO1) ein. Um zu verhindern, dass unbefugte Stimmen eintragen, muss außerdem noch eine geheime Kennung des Wahllokales übertragen werden. Diese Kennung wird gleichzeitig als ID des Wahlbezirkes verwendet.
+Die Stimmabgabe im Wahlinformationssystem läuft folgendermaßen ab. Der Wähler erscheint im Wahllokal seines Wahlbezirkes. 
+Dort legt er seinen Personalausweis vor. Durch die Vorlage des Personalausweises wird verhindert dass eine nicht-autorisierte
+Person eine Stimme abgeben kann. Der Wahlhelfer vor Ort gibt die Personalausweisnummer in der vorgesehenen Weboberfläche ein: 
 
-Alle Übertragungen vom Wahllokal zum Server müssen gesichert sein. Da sichere Verbindungen nicht Thema dieses Projektes sind, wird in der Implementierung davon ausgangen, dass die Sicherung der Verbindung außerhalb erfolgt.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/wahlraum-screenshot.png}
+\caption{Webschnittstelle zur Eingabe der Personalausweis-Nummer}
+\label{fig:wahlraum-screenshot}
+\end{figure}
+
+Das System prüft ob die Personalausweisnummer ein stimmberechtigter Wähler ist (Ausweisnummer vorhanden). Wenn ja, wird geprüft ob dieser nicht 
+bereits seine Stimme abgegeben hat (Flag \emph{gewählt} muss auf \emph{false} gesetzt sein). Hat er noch nicht gewählt, generiert das System ein 
+zufälliges, zentral auf dem Server gespeichertes Wählpasswort, das der Wahlhelfer dem Wähler auf einem Zettel übergibt. 
+Durch die Generierung des Wählpassworts wird das Flag \emph{gewählt} auf \emph{true} gesetzt. Dadurch wird verhindert dass der gleiche 
+Wähler mehrfach wählen kann. 
+
+\newpage
+
+Das Wählpasswort berechtigt den Wähler an einem Wahlcomputer seine Stimme abzugeben:
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/wahlzettel-screenshot.png}
+\caption{Digitaler Wahlzettel mit Wählpasswort}
+\label{fig:wahlzettel-screenshot}
+\end{figure}
+
+Sobald der Wähler seine Kreuze gemacht hat, überprüft das
+System das eingegebene Wählpasswort. Wenn es korrekt ist, wird die Stimme gezählt und das Wählpasswort erlischt. Durch die Indirektion über das anonyme Wählpasswort wird
+maximaler Datenschutz gewährleistet. 
+
+Alle Übertragungen vom Wahllokal zum Server müssen gesichert sein. Da sichere Verbindungen nicht Thema dieses Projektes sind, 
+wird in der Implementierung davon ausgangen, dass die Sicherung der Verbindung außerhalb erfolgt.

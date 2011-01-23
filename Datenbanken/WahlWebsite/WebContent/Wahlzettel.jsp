@@ -41,7 +41,7 @@ $(function(){
 				$("#ajaxload").hide();
 				if (json.success === false) {
 					$(btn).show();
-					alert('Error: ' + success.error);
+					alert('Error: ' + json.error);
 				} else {
 					alert('Ihre Stimme wurde abgegeben');
 				}
@@ -167,9 +167,9 @@ ResultSet wahlzettel = db.executeSQL("" +
 </div>
 
 <div class="voteButton">
-	<label for="sessionID">Session ID:</label>
+	<label for="sessionID">Wählpasswort:</label>
 	<input name="sessionID" type="text"/>
-	<p>Sobald geklickt, gibt es kein Zurück mehr!</p>
+	<p>Sobald Sie klicken gilt Ihre Stimme als abgegeben!</p>
 	<button type="button">Wählen</button>
 	<p id="ajaxload" style="display:none">
 		<img src="/WahlWebsite/img/ajaxload.gif" alt=""/>

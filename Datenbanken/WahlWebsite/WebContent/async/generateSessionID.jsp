@@ -17,10 +17,28 @@ try {
 %>
 
 <%
-String sessionID = UUID.randomUUID().toString();
-db.executeUpdate("INSERT INTO " + db.sessionIDs() + " VALUES '" + sessionID + "'");
+
+String persoID = request.getParameter("persoID");
+boolean found = db.executeSQL("" + 
+	"SELECT * FROM " + db.wahlberechtigter() + " " + 
+	"WHERE " + DB.kID + " = '" + persoID + "' " + 
+	"AND " + DB.kWahlberechtigterGewaehlt + " = '0'"
+).next();
+
 JSONObject json = new JSONObject();
-json.put("sessionID", sessionID);
+
+if (found == true) {
+	String sessionID = UUID.randomUUID().toString();
+	db.executeUpdate("INSERT INTO " + db.sessionIDs() + " VALUES '" + sessionID + "'");
+	db.executeUpdate("" + 
+		"UPDATE " + db.wahlberechtigter() + " " + 
+		"SET " + DB.kWahlberechtigterGewaehlt + " = '1' " + 
+		"WHERE " + DB.kID + " = '" + persoID + "'"
+	);
+	json.put("sessionID", sessionID);
+} 
+
+json.put("success", found);
 out.print(json);
 out.flush();
 %>

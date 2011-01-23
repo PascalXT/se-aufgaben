@@ -3,8 +3,12 @@ package database;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.*;
-import java.util.Arrays;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import flags.FlagDefinition;
 import flags.FlagErrorException;
@@ -111,6 +115,8 @@ public class DB {
   public String wahlberechtigter() {
 		return tabellenName("Wahlberechtigter");
 	}
+  
+  public final static String kWahlberechtigterGewaehlt = "gewaehlt";
   
   public String sessionIDs() {
   	return tabellenName("SessionIDs");
