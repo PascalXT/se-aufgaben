@@ -50,7 +50,7 @@ public class CsvParser {
   	datenbank.executeUpdate(""
   			+ "INSERT INTO " + datenbank.wahlbezirk() + " "
   			+ "SELECT DISTINCT " + DB.kForeignKeyWahlbezirkID + " as " + DB.kID + ", " + DB.kForeignKeyWahlkreisID + " "
-  			+ "FROM " + datenbank.stimme());
+  			+ "FROM " + datenbank.wahlberechtigter());
   }
 
   private int getKandidat(int wahlkreisID, int parteiID) throws SQLException {
