@@ -5,7 +5,7 @@ Person eine Stimme abgeben kann. Der Wahlhelfer vor Ort gibt die Personalausweis
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.4\textwidth]{figures/wahlraum-screenshot.png}
+\includegraphics[width=0.6\textwidth]{figures/wahlraum-screenshot.png}
 \caption{Webschnittstelle zur Eingabe der Personalausweis-Nummer}
 \label{fig:wahlraum-screenshot}
 \end{figure}
@@ -16,7 +16,8 @@ zufälliges, zentral auf dem Server gespeichertes Wählpasswort, das der Wahlhelfe
 Durch die Generierung des Wählpassworts wird das Flag \emph{gewählt} auf \emph{true} gesetzt. Dadurch wird verhindert dass der gleiche 
 Wähler mehrfach wählen kann. 
 
-\newpage
+
+\section{Wahlzettel}
 
 Das Wählpasswort berechtigt den Wähler an einem Wahlcomputer seine Stimme abzugeben:
 
@@ -28,8 +29,10 @@ Das Wählpasswort berechtigt den Wähler an einem Wahlcomputer seine Stimme abzuge
 \end{figure}
 
 Sobald der Wähler seine Kreuze gemacht hat, überprüft das
-System das eingegebene Wählpasswort. Wenn es korrekt ist, wird die Stimme gezählt und das Wählpasswort erlischt. Durch die Indirektion über das anonyme Wählpasswort wird
-maximaler Datenschutz gewährleistet. 
+System das eingegebene Wählpasswort. Wenn es korrekt ist, wird die Stimme gezählt und das Wählpasswort erlischt. Durch die Indirektion über das anonyme Wählpasswort wird maximaler Datenschutz gewährleistet. 
 
 Alle Übertragungen vom Wahllokal zum Server müssen gesichert sein. Da sichere Verbindungen nicht Thema dieses Projektes sind, 
 wird in der Implementierung davon ausgangen, dass die Sicherung der Verbindung außerhalb erfolgt.
+
+\section{Auswertung}
+Durch einen bestimmten Befehl im Webinterface kann die Auszählung der Stimmen auf Wahlkreisebene angestoßen werden. Es wird davon ausgegangen, dass der Befehl nur dem Organisator bekannt ist und nur von physisch geschützten Orten aus gegeben werden kann. In unserer Implementierung wird die Auszählung durch \url{http://localhost:8080/WahlWebsite/ShowResult?query=refreshvotes} ausgelöst. Der Begriff refreshvotes steht dabei als Beispiel für einen möglichen geheimen Befehl. Tatsächlich sollte dieser Befehl einem langen Passwort entsprechen. Die Auszählung darf erst nach Schließung des letzten Wahllokales ausgelöst werden. Die Sicherung der Auswertungsfunktion ist nötig, um zu verhindern, dass ständig hochaktuelle Ergebnisse verfügbar sind. Hochaktuelle Ergebnisse würden es in Einzelfällen möglich machen, auf die Stimmabgabe von Einzelpersonen zu schließen, indem das Ergebnis vor der Stimmabgabe mit dem Ergebnis nach der Stimmabgabe verglichen wird.

@@ -45,7 +45,7 @@ public class TableDef {
             + "ORGANIZE BY DIMENSIONS ( BUNDESLANDID) ;\n",
 
         // Wahlbezirk
-        "CREATE TABLE " + schemaName + ".WAHLBEZIRK " + "( ID " + autoIncrementID + " , "
+        "CREATE TABLE " + schemaName + ".WAHLBEZIRK " + "( ID BIGINT NOT NULL, "
             + "WAHLKREISID BIGINT  NOT NULL  , " + "CONSTRAINT CC1288606788792 PRIMARY KEY ( ID, WAHLKREISID) , "
             + "CONSTRAINT CC1288606799462 FOREIGN KEY (WAHLKREISID) REFERENCES " + schemaName
             + ".WAHLKREIS (ID)  ON DELETE NO ACTION ON UPDATE NO ACTION ENFORCED  ENABLE QUERY OPTIMIZATION  ) "
