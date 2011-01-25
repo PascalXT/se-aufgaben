@@ -119,7 +119,9 @@ public class TableDef {
         	  + "WahlkreisID BIGINT REFERENCES " + schemaName + ".Wahlkreis, "
         	  + "WahlbezirkID BIGINT, "
         	  + "Gewaehlt INTEGER WITH DEFAULT 0);\n",
-    
+        "CREATE  INDEX " + schemaName + ".WAHLKREISIDINDEX ON KORBI.WAHLBERECHTIGTER (WAHLKREISID ASC)  "
+        		+ "PCTFREE 10 ALLOW REVERSE SCANS  PAGE SPLIT SYMMETRIC COLLECT  SAMPLED DETAILED  STATISTICS ;\n",
+
     		// Wahlkreisdaten
     		"CREATE TABLE " + schemaName + ".WahlkreisDaten ("
     		    + "WahlkreisID BIGINT NOT NULL PRIMARY KEY REFERENCES " + schemaName + ".Wahlkreis, "
@@ -130,8 +132,12 @@ public class TableDef {
     
     		// SESSION IDs 
     		"CREATE TABLE " + schemaName + ".SessionIDs ( "
-    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL);\n",
-    			
+    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL, " 
+    				+ "WahlkreisID BIGINT NOT NULL REFERENCES " + schemaName + ".Wahlkreis, "
+    				+ "WahlbezirkID BIGINT NOT NULL" 
+    				+ ");\n",
+
+
     		// Zufallszahlen
     		"CREATE TABLE " + schemaName + ".Zufallszahlen ( "
     				+ "Zeile BIGINT PRIMARY KEY NOT NULL,"

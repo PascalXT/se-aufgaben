@@ -20,7 +20,6 @@ if (wk == null) {
 $(function(){
 	var btn = ".voteButton button";
 	$(btn).click(function() {
-		var wk = <%= wk %>;
 		var erststimme = $("input[name='erststimme']:checked").val();
 		var zweitstimme = $("input[name='zweitstimme']:checked").val();
 		var sessionID = $("input[name='sessionID']").val();
@@ -33,7 +32,6 @@ $(function(){
 			$("#ajaxload").show();
 			$.post('/WahlWebsite/async/vote.jsp', {
 				sessionID:sessionID, 
-				wk:wk,
 				erststimme:erststimme, 
 				zweitstimme:zweitstimme
 			}, function(jsonResponse) {
@@ -69,7 +67,8 @@ wahlkreis.next();
 %>
 <img src="img/wahlzettel-header.png" alt=""/>
 <h2 id="WahlkreisInfo">
-für die Wahl zum Deutschen Bundestag im Wahlkreis <%= wahlkreis.getString(DB.kID) %> <%= wahlkreis.getString(DB.kWahlkreisName) %>
+für die Wahl zum Deutschen Bundestag im Wahlkreis <%= wahlkreis.getString(DB.kID) %> 
+<%= wahlkreis.getString(DB.kWahlkreisName) %>
 am 27. September 2009
 </h2>
 <img src="img/wahlzettel-subheader.png" alt=""/>
@@ -88,12 +87,12 @@ ResultSet wahlzettel = db.executeSQL("" +
 				"AND k0." + DB.kKandidatListenplatz + " IS NOT NULL " + 
 			") " + 
 		"), " + 
-		"ErststimmenKandidaten(ParteiID, Vorname, Nachname) AS ( " + 
-			"SELECT k." + DB.kKandidatDMParteiID + ", k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + " " + 
+		"ErststimmenKandidaten(ID, ParteiID, Vorname, Nachname) AS ( " + 
+			"SELECT k." + DB.kID + ", k." + DB.kKandidatDMParteiID + ", k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + " " + 
 			"FROM " + db.kandidat() + " k " + 
 			"WHERE k." + DB.kKandidatDMWahlkreisID + " = " + wk + " " + 
 		") " + 
-		"SELECT p.Kuerzel, p.Name, k.Vorname, k.Nachname " + 
+		"SELECT p.ID AS ParteiID, p.Kuerzel, p.Name, k.ID AS KandidatID, k.Vorname, k.Nachname " + 
 		"FROM ZweitstimmenParteien p  " + 
 		"FULL OUTER JOIN ErststimmenKandidaten k ON k.ParteiID = p.ID "
 	);
@@ -125,6 +124,8 @@ ResultSet wahlzettel = db.executeSQL("" +
 				if (parteiKuerzel == null)
 					parteiKuerzel = "Parteilos";
 				String parteiName = wahlzettel.getString("Name");
+				String kandidatID = wahlzettel.getString("KandidatID");
+				String parteiID = wahlzettel.getString("ParteiID");
 			%>
 			<tr>
 				<td class="erstNum">
@@ -138,7 +139,7 @@ ResultSet wahlzettel = db.executeSQL("" +
 				</td>
 				<td class="radioErststimme">
 					<% if (vorname != null && nachname != null) { %>
-						<input type="radio" name="erststimme" value="<%= parteiKuerzel %>"/>
+						<input type="radio" name="erststimme" value="<%= kandidatID %>"/>
 					<% } %>
 				</td>
 				<td class="spacer">
@@ -146,7 +147,7 @@ ResultSet wahlzettel = db.executeSQL("" +
 				</td>
 				<td class="radioZweitstimme zweitstimmenBlau">
 					<% if (parteiName != null) { %>
-						<input type="radio" name="zweitstimme" value="<%= parteiKuerzel %>"/>
+						<input type="radio" name="zweitstimme" value="<%= parteiID %>"/>
 					<% } %>
 				</td>
 				<td class="partei zweitstimmenBlau">

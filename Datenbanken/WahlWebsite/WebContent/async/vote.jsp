@@ -17,22 +17,46 @@ try {
 %><%
 
 String sessionID = request.getParameter("sessionID");
-String wk = request.getParameter("wk");
 String erststimme = request.getParameter("erststimme");
 String zweitstimme = request.getParameter("zweitstimme");
 
 JSONObject json = new JSONObject();
 
-boolean found = db.executeSQL("" + 
+ResultSet rs = db.executeSQL("" + 
 	"SELECT * FROM " + db.sessionIDs() + " WHERE " + DB.kID + " = '" + sessionID + "'"
-).next();
+);
 
-if (found == false) {
+if (rs.next() == false) {
 	json.put("success", false);
-	json.put("error", "Session-ID ungültig");
+	json.put("error", "Wählpasswort ungültig");
 } else {
-	db.executeUpdate("DELETE FROM " + db.sessionIDs() + " WHERE " + DB.kID + " = '" + sessionID + "'");
-	json.put("success", true);
+	
+	int wk = rs.getInt(DB.kForeignKeyWahlkreisID);
+	int wb = rs.getInt(DB.kForeignKeyWahlbezirkID);
+	
+	// prüfe ob Erststimme im Wahlkreis gültig
+	ResultSet kandidatResultSet = db.executeSQL("SELECT * FROM " + db.kandidat() + " " +  
+		"WHERE " + DB.kKandidatDMWahlkreisID + " = " + wk + " " + 
+		"AND " + DB.kID + " = " + erststimme+ " ");
+
+	if (kandidatResultSet.next() == false) {
+		json.put("success", false);
+		json.put("error", "Abgegebene Stimme stimmt nicht mit dem im Wählpasswort verknüpften Wahlkreis antretenden Parteien überein. Stimme wurde nicht gezählt. Wählpasswort weiterhin gültig.");
+	}
+	else {
+
+		db.executeUpdate("DELETE FROM " + db.sessionIDs() + " WHERE " + DB.kID + " = '" + sessionID + "'");
+		
+		// 1583559
+		db.executeUpdate("INSERT INTO " + db.stimme() + " " + 
+			"(" + DB.kForeignKeyKandidatID + ", " + DB.kForeignKeyParteiID + ", " +
+          	DB.kForeignKeyWahlbezirkID + ", " + DB.kForeignKeyWahlkreisID + ") " + 
+          	"VALUES " + 
+          	"(" + erststimme + ", " + zweitstimme + ", " + wb + ", " + wk + ")"
+		);
+		
+		json.put("success", true);
+	}
 }
 
 out.print(json);

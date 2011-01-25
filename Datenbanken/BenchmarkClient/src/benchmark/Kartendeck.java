@@ -6,7 +6,7 @@ import java.util.Map;
 public class Kartendeck<T> {
 	
 	public enum KartendeckType {
-		DEBUG, DEBUG2, Q1_Q6, Q7
+		DEBUG, DEBUG2, Q1_Q6, Q7, Q1_Q6WITH
 	};
 	
 	public static Kartendeck<Karte> createKartendeckByType(KartendeckType type) {
@@ -25,6 +25,14 @@ public class Kartendeck<T> {
 			deck.addKarte(new Karte("Q4"), 2);
 			deck.addKarte(new Karte("Q5"), 2);
 			deck.addKarte(new Karte("Q6"), 4);
+		}
+		else if (type == KartendeckType.Q1_Q6WITH) {
+			deck.addKarte(new Karte("Q1.WITH"), 5);
+			deck.addKarte(new Karte("Q2.WITH"), 2);
+			deck.addKarte(new Karte("Q3.WITH"), 5);
+			deck.addKarte(new Karte("Q4.WITH"), 2);
+			deck.addKarte(new Karte("Q5.WITH"), 2);
+			deck.addKarte(new Karte("Q6.WITH"), 4);
 		}
 		else if (type == KartendeckType.Q7) {
 			deck.addKarte(new Karte("Q7"), 1);
