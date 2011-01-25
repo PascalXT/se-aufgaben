@@ -15,6 +15,11 @@ String wb = request.getParameter("wb");
 <script src="js/jquery-1.4.4.min.js" type="text/javascript"></script>
 <script>
 $(function(){
+	
+	$(".voters select option").dblclick(function() {
+		$("input[name='persoID']").val($(this).val());
+	});
+	
 	$(".createSessionID button").click(function() {
 		$("#ajaxload").show();
 		var persoID = $("input[name='persoID']").val();
@@ -45,9 +50,27 @@ try {
 	e.printStackTrace();
 	System.exit(0);
 } 
+
+ResultSet wahlkreis = db.executeSQL("SELECT * FROM " + db.wahlkreis() + " WHERE " + DB.kID + " = " + wk);
+wahlkreis.next();
 %>
 <h1>Wahlraum Administration</h1>
+<h2>Wahlkreis: <%= wahlkreis.getString(DB.kID) %> <%= wahlkreis.getString(DB.kWahlkreisName) %></h2>
+<h2>Wahlbezirk: <%= wb %></h2>
 <hr/>
+
+<div class="voters">
+	<select multiple="multiple">
+	<%
+	ResultSet voters = db.executeSQL("SELECT * FROM " + db.wahlberechtigter() + " " + 
+		"WHERE " + DB.kForeignKeyWahlbezirkID + " = " + wb + " " + 
+		"AND " + DB.kForeignKeyWahlkreisID + " = " + wk);
+	while (voters.next()) {
+	%>
+		<option><%= voters.getString(DB.kID) %></option>
+	<% } %>
+	</select>
+</div>
 
 <div class="createSessionID">
 	<p> <label for="persoID">Personalausweis-Nummer:</label> <input name="persoID" type="text"/> </p>

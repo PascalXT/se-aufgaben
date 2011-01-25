@@ -30,23 +30,30 @@ if (rs.next() == false) {
 	json.put("success", false);
 	json.put("error", "Wählpasswort ungültig");
 } else {
+	
 	int wk = rs.getInt(DB.kForeignKeyWahlkreisID);
 	int wb = rs.getInt(DB.kForeignKeyWahlbezirkID);
 	
-	// check if votes are correct for this Wahlkreis
-	boolean erststimmeValid = db.executeSQL("SELECT * FROM " + db.kandidat() + " k, " + db.partei() + " p " +  
-		"WHERE k." + DB.kKandidatDMWahlkreisID + " = " + wk + " " + 
-		"AND k." + DB.kKandidatDMParteiID + " = p." + DB.kID + " " +
-		"AND p." + DB.kParteiKuerzel + " = '" + erststimme + "'").next();
-	
-	if (erststimmeValid == false) {
+	// prüfe ob Erststimme im Wahlkreis gültig
+	ResultSet kandidatResultSet = db.executeSQL("SELECT * FROM " + db.kandidat() + " " +  
+		"WHERE " + DB.kKandidatDMWahlkreisID + " = " + wk + " " + 
+		"AND " + DB.kID + " = " + erststimme+ " ");
+
+	if (kandidatResultSet.next() == false) {
 		json.put("success", false);
 		json.put("error", "Abgegebene Stimme stimmt nicht mit dem im Wählpasswort verknüpften Wahlkreis antretenden Parteien überein. Stimme wurde nicht gezählt. Wählpasswort weiterhin gültig.");
 	}
 	else {
+
 		db.executeUpdate("DELETE FROM " + db.sessionIDs() + " WHERE " + DB.kID + " = '" + sessionID + "'");
 		
-		//TODO insert statement
+		// 1583559
+		db.executeUpdate("INSERT INTO " + db.stimme() + " " + 
+			"(" + DB.kForeignKeyKandidatID + ", " + DB.kForeignKeyParteiID + ", " +
+          	DB.kForeignKeyWahlbezirkID + ", " + DB.kForeignKeyWahlkreisID + ") " + 
+          	"VALUES " + 
+          	"(" + erststimme + ", " + zweitstimme + ", " + wb + ", " + wk + ")"
+		);
 		
 		json.put("success", true);
 	}

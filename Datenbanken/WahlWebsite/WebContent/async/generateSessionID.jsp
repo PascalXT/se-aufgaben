@@ -31,10 +31,16 @@ if (persoID == null || wk == null || wb == null) {
 	boolean found = db.executeSQL("" + 
 		"SELECT * FROM " + db.wahlberechtigter() + " " + 
 		"WHERE " + DB.kID + " = '" + persoID + "' " + 
-		"AND " + DB.kWahlberechtigterGewaehlt + " = '0'"
+		"AND " + DB.kWahlberechtigterGewaehlt + " = '0' " + 
+		"AND " + DB.kForeignKeyWahlkreisID + " = " + wk + " " +  
+		"AND " + DB.kForeignKeyWahlbezirkID + " = " + wb
 	).next();
 	
-	if (found == true) {
+	if (found == false) {
+		json.put("error", "Perso-ID ungültig (hat entweder bereits gewählt oder in diesem Wahlkreis nicht wahlberechtigt)");
+		json.put("success", false);
+		
+	} else {
 		String sessionID = UUID.randomUUID().toString();
 		db.executeUpdate("INSERT INTO " + db.sessionIDs() + " " +
 			"(" + DB.kID + ", " + DB.kForeignKeyWahlkreisID + ", " + DB.kForeignKeyWahlbezirkID + ")" + 
@@ -47,9 +53,6 @@ if (persoID == null || wk == null || wb == null) {
 		);
 		json.put("sessionID", sessionID);
 		json.put("success", true);
-	} else {
-		json.put("error", "Perso-ID ungültig");
-		json.put("success", false);
 	}
 }
 

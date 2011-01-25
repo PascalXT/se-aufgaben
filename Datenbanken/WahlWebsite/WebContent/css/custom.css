@@ -8,6 +8,9 @@ body#Wahlzettel { text-align:center; }
 
 label { width:255px; text-align:right; padding-right:25px; }
 
+#Wahlraum .voters { text-align:center; }
+#Wahlraum .voters select { width:500px; }
+
 #Wahlraum .createSessionID { text-align:center; }
 #Wahlraum .createSessionID button { padding:20px 60px; font-size:2em; }
 #Wahlraum .createSessionID input#sessionID { width:60%; font-size:3em; }
