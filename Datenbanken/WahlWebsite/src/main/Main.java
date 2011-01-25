@@ -44,6 +44,8 @@ public class Main {
     	csvParser.importVoters();
     if (Flags.isTrue(FlagDefinition.kFlagImportAggregatedVotes))
       csvParser.importAggregatedVotes();
+    if (Flags.isTrue(FlagDefinition.kFlagCreateWahlbezirke))
+    	csvParser.createWahlbezirke();
     
     db.disconnect();
   }

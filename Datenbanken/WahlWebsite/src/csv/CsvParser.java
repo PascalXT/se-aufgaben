@@ -44,6 +44,14 @@ public class CsvParser {
     this.wahlberechtigteFile = wahlberechtigteFile;
     this.wahlkreisdatenFile = wahlkreisdatenFile;
   }
+  
+  public void createWahlbezirke() throws SQLException {
+  	datenbank.truncate(datenbank.wahlbezirk());
+  	datenbank.executeUpdate(""
+  			+ "INSERT INTO " + datenbank.wahlbezirk() + " "
+  			+ "SELECT DISTINCT " + DB.kForeignKeyWahlbezirkID + " as " + DB.kID + ", " + DB.kForeignKeyWahlkreisID + " "
+  			+ "FROM " + datenbank.stimme());
+  }
 
   private int getKandidat(int wahlkreisID, int parteiID) throws SQLException {
     final int kKeineParteiID = 99;
