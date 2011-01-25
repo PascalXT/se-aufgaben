@@ -142,6 +142,10 @@ public class DB {
   public final static String kAnzahlUeberhangsmandate = "AnzahlUeberhangsmandate";
   
   public final static String kJahr = "Jahr";
+  public final static String kZeile = "Zeile";
+  public final static String kZahl = "Zahl";
+  public final static String kNummer = "Nummer";
+  public final static String kMaxNummer = "kMaxNummer";
 
   public String zweitStimmenNachPartei() {
     return tabellenName("ZweitStimmenNachPartei");
@@ -181,6 +185,18 @@ public class DB {
   
   public String gewinnerZweitstimmen() {
   	return tabellenName("GewinnerZweitstimmen");
+  }
+  
+  public String zufallsZahlen() {
+  	return tabellenName("zufallsZahlen");
+  }
+  
+  public String direktMandateNummer() {
+  	return tabellenName("direktmandateNummer");
+  }
+  
+  public String direktMandateMaxNummer() {
+  	return tabellenName("direktmandateMaxNummer");
   }
   
   public boolean isBaseTable(String kurzname) {

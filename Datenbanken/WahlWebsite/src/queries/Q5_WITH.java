@@ -35,12 +35,14 @@ public class Q5_WITH extends Query {
 
 	@Override
 	protected ResultSet doQuery() throws SQLException {
-		
 		String query = "WITH " + db.zweitStimmenNachBundesland() + " AS (" + stmtZweitStimmenNachBundesland() + "), "
 			+ db.zweitStimmenNachPartei() + " AS (" + stmtZweitStimmenNachPartei(db.zweitStimmenNachBundesland()) + "), "
+  		+ db.direktMandateNummer() + " AS ( "
+			+ stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), db.erstStimmenNachWahlkreis()) + "), "
+			+ db.direktMandateMaxNummer() + " AS ( "
+				+ stmtDirektmandateMaxNummer(db.direktMandateNummer()) + "), "
 			+ db.direktmandate() + " AS ("
-				+ stmtDirektmandateTable(db.erstStimmenNachWahlkreis(), db.maxErststimmenNachWahlkreis()) + "), "
-			+ db.fuenfProzentParteien() + " AS (" + stmtFuenfProzentParteien(db.zweitStimmenNachBundesland()) + "), "
+				+ stmtDirektmandate(db.direktMandateNummer(), db.direktMandateMaxNummer()) + "), "			+ db.fuenfProzentParteien() + " AS (" + stmtFuenfProzentParteien(db.zweitStimmenNachBundesland()) + "), "
 			+ db.dreiDirektMandatParteien() + " AS (" + stmtDreiDirektmandateParteien(db.direktmandate()) + "), "
 			+ db.parteienImBundestag() + " AS ("
 				+ stmtParteienImBundestag(db.fuenfProzentParteien(), db.dreiDirektMandatParteien()) + "), "

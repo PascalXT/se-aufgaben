@@ -130,8 +130,12 @@ public class TableDef {
     
     		// SESSION IDs 
     		"CREATE TABLE " + schemaName + ".SessionIDs ( "
-    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL);\n"
-    		
+    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL);\n",
+    			
+    		// Zufallszahlen
+    		"CREATE TABLE " + schemaName + ".Zufallszahlen ( "
+    				+ "Zeile BIGINT PRIMARY KEY NOT NULL,"
+    				+ "Zahl BIGINT NOT NULL);\n"
     		};
   };
 

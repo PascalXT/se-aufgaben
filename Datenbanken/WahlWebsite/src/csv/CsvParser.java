@@ -52,6 +52,11 @@ public class CsvParser {
   			+ "SELECT DISTINCT " + DB.kForeignKeyWahlbezirkID + " as " + DB.kID + ", " + DB.kForeignKeyWahlkreisID + " "
   			+ "FROM " + datenbank.wahlberechtigter());
   }
+  
+  public void fillZufallsZahlenTable() throws SQLException {
+  	datenbank.truncate(datenbank.zufallsZahlen());
+  	datenbank.executeUpdate("INSERT INTO " + datenbank.zufallsZahlen() + " VALUES (0,0)");
+  }
 
   private int getKandidat(int wahlkreisID, int parteiID) throws SQLException {
     final int kKeineParteiID = 99;

@@ -122,25 +122,47 @@ public abstract class Query {
   		"AND v." + DB.kJahr + " = " + kCurrentElectionYear + " " +
   	"GROUP BY k." + DB.kKandidatDMWahlkreisID;
 	}
-
-	protected String stmtDirektmandateTable(String erstStimmenNachWahlkreisTable,
-			String maxErststimmenNachWahlkreisTable) {
+	
+	protected String stmtDirektmandateNummer(String maxErstStimmenNachWahlkreisTable,
+			String erstStimmenNachWahlkreisTable) {
 		return ""
-		  + "SELECT k." + DB.kID + " AS " + DB.kForeignKeyKandidatID + ", k." + DB.kForeignKeyParteiID + ", "
-		  			 + "k." + DB.kKandidatDMWahlkreisID + " "
-			+ "FROM " + maxErststimmenNachWahlkreisTable + " e, " + erstStimmenNachWahlkreisTable + " v, " + db.kandidat() + " k "
-			+ "WHERE e.wahlkreisID = v." + DB.kForeignKeyWahlkreisID + " " + 
-				  "AND e.maxStimmen = v." + DB.kAnzahl + " " + 
-				  "AND k." + DB.kID + " = v." + DB.kForeignKeyKandidatID + " " +
-				  "AND v." + DB.kJahr + " = " + kCurrentElectionYear;
+			+ "SELECT e." + DB.kForeignKeyKandidatID + ", e." + DB.kForeignKeyWahlkreisID
+				+ ", Row_Number() OVER (PARTITION BY e." + DB.kForeignKeyWahlkreisID + ") AS " + DB.kNummer + " "
+			+ "FROM " + maxErstStimmenNachWahlkreisTable + " m, " + erstStimmenNachWahlkreisTable + " e "
+			+ "WHERE e." + DB.kForeignKeyWahlkreisID + " = m." + DB.kForeignKeyWahlkreisID + " "
+				+ "AND	m." + DB.kMaxStimmen + " = e." + DB.kAnzahl + " AND e." + DB.kJahr + " = " + kCurrentElectionYear;
+	}
+	
+	protected String stmtDirektmandateMaxNummer(String direktmandateNummerTable) {
+		return ""
+			+ "SELECT " + DB.kForeignKeyWahlkreisID + ", MAX(" + DB.kNummer + ") AS " + DB.kMaxNummer + " "
+			+ "FROM " + direktmandateNummerTable + " "
+			+ "GROUP BY " + DB.kForeignKeyWahlkreisID;
+	}
+
+	protected String stmtDirektmandate(String direkmandateNummerTable, String direktMandateMaxNummerTable) {
+		return ""
+			+ "SELECT n." + DB.kForeignKeyKandidatID + ", k." + DB.kForeignKeyParteiID + ", "
+				+ "k." + DB.kKandidatDMWahlkreisID + " "
+			+ "FROM " + direkmandateNummerTable + " n, " + direktMandateMaxNummerTable + " mn, " + db.zufallsZahlen() + " z, "
+				+ db.kandidat() + " k "
+			+ "WHERE n." + DB.kForeignKeyWahlkreisID + " = mn." + DB.kForeignKeyWahlkreisID + " "
+				+ "AND k." + DB.kID + " = n." + DB.kForeignKeyKandidatID + " "
+				+ "AND z." + DB.kZeile + " = mod(n." + DB.kForeignKeyWahlkreisID + ", "
+					+ "(SELECT Count(*) FROM " + db.zufallsZahlen()+ ")) "
+				+ "AND n." + DB.kNummer + " = mod(z." + DB.kZahl + ", mn." + DB.kMaxNummer + ") + 1";
 	}
 	
 	protected String createDirektmandateTable(String erstStimmenNachWahlkreisTable) throws SQLException {
 		db.createFilledTemporaryTable(db.direktmandate(), DB.kForeignKeyKandidatID + " BIGINT, "
         	+ DB.kForeignKeyParteiID + " BIGINT, " + DB.kKandidatDMWahlkreisID + " BIGINT",
         "WITH " + db.maxErststimmenNachWahlkreis() 
-    			+ " AS ( " + stmtMaxErststimmenNachWahlkreis(erstStimmenNachWahlkreisTable) + ") "
-    			+	stmtDirektmandateTable(erstStimmenNachWahlkreisTable, db.maxErststimmenNachWahlkreis()));
+    			+ " AS ( " + stmtMaxErststimmenNachWahlkreis(erstStimmenNachWahlkreisTable) + "), "
+  			+ db.direktMandateNummer() + " AS ( "
+  				+ stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), erstStimmenNachWahlkreisTable) + "), "
+  			+ db.direktMandateMaxNummer() + " AS ( "
+  				+ stmtDirektmandateMaxNummer(db.direktMandateNummer()) + ") "
+    		+	stmtDirektmandate(erstStimmenNachWahlkreisTable, db.maxErststimmenNachWahlkreis()));
     return db.direktmandate();
 	}
 
@@ -350,12 +372,6 @@ public abstract class Query {
 				+ db.gewinnerZweitstimmen() + " AS (" + stmtGewinnerZweitStimmen(db.maxZweitStimmenNachWahlkreis()) + "), "
 				+ db.gewinnerErststimmen() + " AS (" + stmtGewinnerErststimmen(db.maxErststimmenNachWahlkreis()) + ") "
 				+ stmtWahlkreissieger(db.gewinnerErststimmen(), db.gewinnerZweitstimmen()));
-		
-		db.createOrReplaceTemporaryTable(db.wahlkreisSieger(), 
-				DB.kForeignKeyWahlkreisID + " BIGINT, " +
-				DB.kForeignKeyBundeslandID + " BIGINT, " +
-				"P1 VARCHAR(64), " +
-				"P2 VARCHAR(64) ");
 		return db.wahlkreisSieger();
 	}
 }

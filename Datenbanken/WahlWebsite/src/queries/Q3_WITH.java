@@ -67,9 +67,12 @@ public class Q3_WITH extends Query {
     		"), " +
     		db.maxErststimmenNachWahlkreis() + " AS (" + 
     			stmtMaxErststimmenNachWahlkreis("ErstStimmenEinWahlkreis") + "), " +
-    		db.direktmandate() + " AS (" + 
-    			stmtDirektmandateTable("ErstStimmenEinWahlkreis", db.maxErststimmenNachWahlkreis()) + ")" +
-    		
+    		db.direktMandateNummer() + " AS ( " +
+  				stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), db.erstStimmenNachWahlkreis()) + "), " +
+  			db.direktMandateMaxNummer() + " AS ( " +
+  				stmtDirektmandateMaxNummer(db.direktMandateNummer()) + "), " +
+  			db.direktmandate() + " AS (" +
+  				stmtDirektmandate(db.direktMandateNummer(), db.direktMandateMaxNummer()) + ") " +    		
     		"SELECT k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + " " + 
     		"FROM " + db.direktmandate() + " dm, " + db.kandidat() + " k, " + db.partei() + " p " + 
     		"WHERE dm." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " + 

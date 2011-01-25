@@ -26,6 +26,7 @@ public class FlagDefinition {
   final public static String kFlagSimulateSQLUpdate = "simulateSQLUpdate";
   final public static String kFlagLogSQLFile = "logSQLFile";
   final public static String kFlagCreateWahlbezirke  = "createWahlbezirke";
+  final public static String kFlagCreateZufallszahlen = "createZufallszahlen";
   final public static String[][] kFlagDefinition = {
       { kFlagDbName, "WahlSys", "Name of the db2 database." },
       { kFlagDbUser, null, "Username for the db2 database." },
@@ -58,7 +59,8 @@ public class FlagDefinition {
           	"If not empty, only votes of WahlkreisIDs in this comma separated list will be created"},
       {kFlagSimulateSQLUpdate, Flags.kFalse, "If true, SQL updates won't be executed."},
           	{ kFlagLogSQLFile, "", "If not empty, some sql statements will be logged to this file." },
-      {kFlagCreateWahlbezirke, Flags.kFalse, "If true, the Wahlbezirke will be created using the Stimmen table."}
+      {kFlagCreateWahlbezirke, Flags.kFalse, "If true, the Wahlbezirke will be created using the Stimmen table."},
+      {kFlagCreateZufallszahlen, Flags.kFalse, "If true, the zufallszahlen table will be recreated."}
           	};
 
 }
