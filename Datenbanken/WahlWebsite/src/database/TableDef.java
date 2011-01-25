@@ -130,8 +130,10 @@ public class TableDef {
     
     		// SESSION IDs 
     		"CREATE TABLE " + schemaName + ".SessionIDs ( "
-    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL);\n"
-    		
+    				+ "ID VARCHAR (128) PRIMARY KEY NOT NULL, " 
+    				+ "WahlkreisID BIGINT NOT NULL REFERENCES " + schemaName + ".Wahlkreis, "
+    				+ "WahlbezirkID BIGINT NOT NULL" 
+    				+ ");\n"
     		};
   };
 

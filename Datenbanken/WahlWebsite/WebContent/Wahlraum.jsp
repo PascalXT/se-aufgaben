@@ -4,6 +4,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<%
+String wk = request.getParameter("wk");
+String wb = request.getParameter("wb");
+%>
 <title>Wahlraum Administration</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen, projection">
@@ -14,12 +18,14 @@ $(function(){
 	$(".createSessionID button").click(function() {
 		$("#ajaxload").show();
 		var persoID = $("input[name='persoID']").val();
-		$.post('/WahlWebsite/async/generateSessionID.jsp', { persoID:persoID }, function(jsonResponse) {
+		var wk = <%= wk %>;
+		var wb = <%= wb %>;
+		$.post('/WahlWebsite/async/generateSessionID.jsp', { persoID:persoID, wk:wk, wb:wb }, function(jsonResponse) {
 			var json = jQuery.parseJSON(jsonResponse);
 			if (json.success == true) {
 				$("#sessionID").val(json.sessionID);
 			} else {
-				alert('Personalausweisnummer entweder ungültig oder bereits gewählt');
+				alert('Fehler ' + json.error);
 			}
 			$("#ajaxload").hide();
 		});
@@ -54,6 +60,9 @@ try {
 	
 </div>
 
+<p>
+<a href="/WahlWebsite/Wahlzettel.jsp?wk=<%= wk %>" target="_blank">zum Wahlzettel</a>
+</p>
 
 </body>
 

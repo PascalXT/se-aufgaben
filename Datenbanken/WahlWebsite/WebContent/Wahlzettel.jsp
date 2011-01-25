@@ -20,7 +20,6 @@ if (wk == null) {
 $(function(){
 	var btn = ".voteButton button";
 	$(btn).click(function() {
-		var wk = <%= wk %>;
 		var erststimme = $("input[name='erststimme']:checked").val();
 		var zweitstimme = $("input[name='zweitstimme']:checked").val();
 		var sessionID = $("input[name='sessionID']").val();
@@ -33,7 +32,6 @@ $(function(){
 			$("#ajaxload").show();
 			$.post('/WahlWebsite/async/vote.jsp', {
 				sessionID:sessionID, 
-				wk:wk,
 				erststimme:erststimme, 
 				zweitstimme:zweitstimme
 			}, function(jsonResponse) {
@@ -69,7 +67,8 @@ wahlkreis.next();
 %>
 <img src="img/wahlzettel-header.png" alt=""/>
 <h2 id="WahlkreisInfo">
-für die Wahl zum Deutschen Bundestag im Wahlkreis <%= wahlkreis.getString(DB.kID) %> <%= wahlkreis.getString(DB.kWahlkreisName) %>
+für die Wahl zum Deutschen Bundestag im Wahlkreis <%= wahlkreis.getString(DB.kID) %> 
+<%= wahlkreis.getString(DB.kWahlkreisName) %>
 am 27. September 2009
 </h2>
 <img src="img/wahlzettel-subheader.png" alt=""/>

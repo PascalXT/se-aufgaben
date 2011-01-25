@@ -18,27 +18,41 @@ try {
 
 <%
 
-String persoID = request.getParameter("persoID");
-boolean found = db.executeSQL("" + 
-	"SELECT * FROM " + db.wahlberechtigter() + " " + 
-	"WHERE " + DB.kID + " = '" + persoID + "' " + 
-	"AND " + DB.kWahlberechtigterGewaehlt + " = '0'"
-).next();
-
 JSONObject json = new JSONObject();
 
-if (found == true) {
-	String sessionID = UUID.randomUUID().toString();
-	db.executeUpdate("INSERT INTO " + db.sessionIDs() + " VALUES '" + sessionID + "'");
-	db.executeUpdate("" + 
-		"UPDATE " + db.wahlberechtigter() + " " + 
-		"SET " + DB.kWahlberechtigterGewaehlt + " = '1' " + 
-		"WHERE " + DB.kID + " = '" + persoID + "'"
-	);
-	json.put("sessionID", sessionID);
-} 
+String persoID = request.getParameter("persoID");
+String wk = request.getParameter("wk");
+String wb = request.getParameter("wb");
+if (persoID == null || wk == null || wb == null) {
+	json.put("success", false);
+	json.put("error", "PersoID, Wahlkreis oder Wahlbezirk Parameter fehlen");
+} else {
 
-json.put("success", found);
+	boolean found = db.executeSQL("" + 
+		"SELECT * FROM " + db.wahlberechtigter() + " " + 
+		"WHERE " + DB.kID + " = '" + persoID + "' " + 
+		"AND " + DB.kWahlberechtigterGewaehlt + " = '0'"
+	).next();
+	
+	if (found == true) {
+		String sessionID = UUID.randomUUID().toString();
+		db.executeUpdate("INSERT INTO " + db.sessionIDs() + " " +
+			"(" + DB.kID + ", " + DB.kForeignKeyWahlkreisID + ", " + DB.kForeignKeyWahlbezirkID + ")" + 
+			"VALUES ('" + sessionID + "', '" + wk + "', '" + wb + "')"
+		);
+		db.executeUpdate("" + 
+			"UPDATE " + db.wahlberechtigter() + " " + 
+			"SET " + DB.kWahlberechtigterGewaehlt + " = '1' " + 
+			"WHERE " + DB.kID + " = '" + persoID + "'"
+		);
+		json.put("sessionID", sessionID);
+		json.put("success", true);
+	} else {
+		json.put("error", "Perso-ID ungültig");
+		json.put("success", false);
+	}
+}
+
 out.print(json);
 out.flush();
 %>
