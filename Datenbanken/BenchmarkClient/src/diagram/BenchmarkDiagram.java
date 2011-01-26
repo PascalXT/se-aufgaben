@@ -24,12 +24,19 @@ public class BenchmarkDiagram {
 
 	static {
 		colorMapping.put("Q1", "FF0000");
+		colorMapping.put("Q1.WITH", "FF0000");
 		colorMapping.put("Q2", "FFFF00");
+		colorMapping.put("Q2.WITH", "FFFF00");
 		colorMapping.put("Q3", "00FF00");
+		colorMapping.put("Q3.WITH", "00FF00");
 		colorMapping.put("Q4", "0000FF");
+		colorMapping.put("Q4.WITH", "0000FF");
 		colorMapping.put("Q5", "00FFFF");
+		colorMapping.put("Q5.WITH", "00FFFF");
 		colorMapping.put("Q6", "FF00FF");
+		colorMapping.put("Q6.WITH", "FF00FF");
 		colorMapping.put("Q7", "000000");
+		colorMapping.put("Q7.WITH", "000000");
 	}
 
 	private Map<Integer, BenchmarkResult> results;
