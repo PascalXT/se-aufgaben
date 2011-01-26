@@ -188,15 +188,15 @@ public class DB {
   }
   
   public String zufallsZahlen() {
-  	return tabellenName("zufallsZahlen");
+  	return tabellenName("ZufallsZahlen");
   }
   
   public String direktMandateNummer() {
-  	return tabellenName("direktmandateNummer");
+  	return tabellenName("DirektmandateNummer");
   }
   
   public String direktMandateMaxNummer() {
-  	return tabellenName("direktmandateMaxNummer");
+  	return tabellenName("DirektmandateMaxNummer");
   }
   
   public boolean isBaseTable(String kurzname) {
