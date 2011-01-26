@@ -166,23 +166,19 @@ public abstract class Query {
     return db.direktmandate();
 	}
 
-	protected String stmtFuenfProzentParteien(String zweitStimmenNachBundeslandTable,
-			String zweitStimmenNachParteiTable) {
+	protected String stmtFuenfProzentParteien(String zweitStimmenNachParteiTable) {
 		return ""
-			+ "SELECT p." + DB.kID + " as " + DB.kForeignKeyParteiID + " "
-			+ "FROM " + db.partei() + " p, " + db.zweitStimmenNachWahlkreis() + " v "
-	    + "WHERE v." + DB.kForeignKeyParteiID + " = p." + DB.kID + " "
-	    	+ "AND v." + DB.kJahr + " = " + kCurrentElectionYear + " "
-	    + "GROUP BY p." + DB.kID + " "
-	    + "HAVING CAST(SUM(v." + DB.kWahlergebnis2Anzahl + ") AS FLOAT)" + " / "
-	    	+ "(SELECT SUM(" + DB.kAnzahlStimmen + ") "	+ "FROM " + zweitStimmenNachBundeslandTable + ")"
-	    	+ " >= 0.05";
+			+ "SELECT z." + DB.kForeignKeyParteiID + " "
+			+ "FROM " + zweitStimmenNachParteiTable + " z "
+	    + "GROUP BY z." + DB.kForeignKeyParteiID + " "
+	    + "HAVING CAST(SUM(z." + DB.kAnzahlStimmen + ") AS FLOAT)" + " / "
+	    	+ "(SELECT SUM(" + DB.kAnzahlStimmen + ") "	+ "FROM " + zweitStimmenNachParteiTable + ") >= 0.05";
 	}
 	
 	protected String createFuenfProzentParteienTable(String zweitStimmenNachBundeslandTable,
 			String zweitStimmenNachParteiTable) throws SQLException {
 		db.createFilledTemporaryTable(db.fuenfProzentParteien(), DB.kForeignKeyParteiID + " BIGINT",
-				stmtFuenfProzentParteien(zweitStimmenNachBundeslandTable, zweitStimmenNachParteiTable));
+				stmtFuenfProzentParteien(zweitStimmenNachParteiTable));
     return db.fuenfProzentParteien();
 	}
 
