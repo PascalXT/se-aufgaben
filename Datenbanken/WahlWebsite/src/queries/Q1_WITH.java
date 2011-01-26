@@ -34,7 +34,8 @@ public class Q1_WITH extends Query {
 				+ stmtDirektmandateMaxNummer(db.direktMandateNummer()) + "), "
 			+ db.direktmandate() + " AS ("
 				+ stmtDirektmandate(db.direktMandateNummer(), db.direktMandateMaxNummer()) + "), "
-			+ db.fuenfProzentParteien() + " AS (" + stmtFuenfProzentParteien(db.zweitStimmenNachBundesland()) + "), "
+			+ db.fuenfProzentParteien() + " AS ("
+				+ stmtFuenfProzentParteien(db.zweitStimmenNachBundesland(), db.zweitStimmenNachPartei()) + "), "
 			+ db.dreiDirektMandatParteien() + " AS (" + stmtDreiDirektmandateParteien(db.direktmandate()) + "), "
 			+ db.parteienImBundestag()
 				+ " AS (" + stmtParteienImBundestag(db.fuenfProzentParteien(), db.dreiDirektMandatParteien()) + "), "

@@ -19,11 +19,14 @@ public class Q2 extends Query {
 		String zweitStimmenNachBundeslandTable = createZweitStimmenNachBundeslandTable();
 		String zweitStimmenNachParteiTable = createZweitStimmenNachParteiTable(zweitStimmenNachBundeslandTable);
     String direktMandateTable = createDirektmandateTable();
-	  String fuenfProzentParteienTable = createFuenfProzentParteienTable(zweitStimmenNachBundeslandTable);
+	  String fuenfProzentParteienTable = createFuenfProzentParteienTable(zweitStimmenNachBundeslandTable,
+	  		zweitStimmenNachParteiTable);
 	  String dreiDirektMandateParteienTable = createDreiDirektmandateParteienTable(direktMandateTable);
-	  String parteienImBundestagTable = createParteienImBundestagTable(fuenfProzentParteienTable, dreiDirektMandateParteienTable);
+	  String parteienImBundestagTable = createParteienImBundestagTable(fuenfProzentParteienTable,
+	  		dreiDirektMandateParteienTable);
     String sitzeNachParteiTable = createSitzeNachPartei(zweitStimmenNachParteiTable, parteienImBundestagTable);
-    String sitzeNachLandesListenTable = createSitzeNachLandeslistenTable(parteienImBundestagTable, zweitStimmenNachBundeslandTable, sitzeNachParteiTable);
+    String sitzeNachLandesListenTable = createSitzeNachLandeslistenTable(parteienImBundestagTable,
+    		zweitStimmenNachBundeslandTable, sitzeNachParteiTable);
     
     String qry = "WITH ListenKandidaten AS (" +
   		"SELECT " + DB.kID + " FROM " + db.kandidat() + " WHERE " + DB.kForeignKeyBundeslandID + " IS NOT NULL " + 

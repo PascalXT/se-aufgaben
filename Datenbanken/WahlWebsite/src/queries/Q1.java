@@ -33,7 +33,8 @@ public class Q1 extends Query {
     String direktMandateTable = createDirektmandateTable();
 	  db.printResultSet(db.executeSQL("SELECT COUNT(*) FROM " + direktMandateTable));
 
-	  String fuenfProzentParteienTable = createFuenfProzentParteienTable(zweitStimmenNachBundeslandTable);
+	  String fuenfProzentParteienTable = createFuenfProzentParteienTable(zweitStimmenNachBundeslandTable,
+	  		zweitStimmenNachParteiTable);
 	  
 	  String dreiDirektMandateParteienTable = createDreiDirektmandateParteienTable(direktMandateTable);
 

@@ -162,11 +162,12 @@ public abstract class Query {
   				+ stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), erstStimmenNachWahlkreisTable) + "), "
   			+ db.direktMandateMaxNummer() + " AS ( "
   				+ stmtDirektmandateMaxNummer(db.direktMandateNummer()) + ") "
-    		+	stmtDirektmandate(erstStimmenNachWahlkreisTable, db.maxErststimmenNachWahlkreis()));
+    		+	stmtDirektmandate(db.direktMandateNummer(), db.direktMandateMaxNummer()));
     return db.direktmandate();
 	}
 
-	protected String stmtFuenfProzentParteien(String zweitStimmenNachBundeslandTable) {
+	protected String stmtFuenfProzentParteien(String zweitStimmenNachBundeslandTable,
+			String zweitStimmenNachParteiTable) {
 		return ""
 			+ "SELECT p." + DB.kID + " as " + DB.kForeignKeyParteiID + " "
 			+ "FROM " + db.partei() + " p, " + db.zweitStimmenNachWahlkreis() + " v "
@@ -178,9 +179,10 @@ public abstract class Query {
 	    	+ " >= 0.05";
 	}
 	
-	protected String createFuenfProzentParteienTable(String zweitStimmenNachBundeslandTable) throws SQLException {
+	protected String createFuenfProzentParteienTable(String zweitStimmenNachBundeslandTable,
+			String zweitStimmenNachParteiTable) throws SQLException {
 		db.createFilledTemporaryTable(db.fuenfProzentParteien(), DB.kForeignKeyParteiID + " BIGINT",
-				stmtFuenfProzentParteien(zweitStimmenNachBundeslandTable));
+				stmtFuenfProzentParteien(zweitStimmenNachBundeslandTable, zweitStimmenNachParteiTable));
     return db.fuenfProzentParteien();
 	}
 
