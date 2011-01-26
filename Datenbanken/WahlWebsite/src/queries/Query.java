@@ -79,6 +79,10 @@ public abstract class Query {
 	protected abstract ResultSet doQuery() throws SQLException;
 	
 	protected abstract String generateBody(ResultSet resultSet) throws SQLException;
+	
+	protected String stmtCount(String table) {
+		return "(SELECT COUNT(*) FROM " + table + ")";
+	}
 
 	protected String stmtZweitStimmenNachBundesland() {
 		return ""
@@ -148,8 +152,7 @@ public abstract class Query {
 				+ db.kandidat() + " k "
 			+ "WHERE n." + DB.kForeignKeyWahlkreisID + " = mn." + DB.kForeignKeyWahlkreisID + " "
 				+ "AND k." + DB.kID + " = n." + DB.kForeignKeyKandidatID + " "
-				+ "AND z." + DB.kZeile + " = mod(n." + DB.kForeignKeyWahlkreisID + ", "
-					+ "(SELECT Count(*) FROM " + db.zufallsZahlen()+ ")) "
+				+ "AND z." + DB.kZeile + " = mod(n." + DB.kForeignKeyWahlkreisID + ", " + stmtCount(db.zufallsZahlen()) + ") "
 				+ "AND n." + DB.kNummer + " = mod(z." + DB.kZahl + ", mn." + DB.kMaxNummer + ") + 1";
 	}
 	
@@ -209,7 +212,7 @@ public abstract class Query {
 			+ "SELECT (ROW_NUMBER() OVER (order by w." + DB.kID + ")  - 0.5) as Wert "
 			+ "FROM " + db.wahlkreis() + " w "
 			+ "UNION "
-			+ "SELECT (ROW_NUMBER() OVER (order by w." + DB.kID + ") + (SELECT COUNT(*) FROM " + db.wahlkreis() + ") - 0.5) AS Wert "
+			+ "SELECT (ROW_NUMBER() OVER (order by w." + DB.kID + ") + " + stmtCount(db.wahlkreis()) + " - 0.5) AS Wert "
 			+ "FROM " + db.wahlkreis() + " w";
 	}
 	
@@ -218,11 +221,13 @@ public abstract class Query {
 		return ""
 			+ "SELECT p." + DB.kForeignKeyParteiID + ", z." + DB.kAnzahlStimmen + ", "
 			+ "(z." + DB.kAnzahlStimmen + " / d.wert) as DivWert, "
-			+ "ROW_NUMBER() OVER (ORDER BY (z." + DB.kAnzahlStimmen + " / d.wert) DESC) as Rang "
-			+ "FROM " + parteienImBundestagTable + " p, " + zweitStimmenNachParteiTable + " z, " + DivisorenTable + " d "
-			+ "WHERE p." + DB.kForeignKeyParteiID + " = z."
-		  + DB.kForeignKeyParteiID + " "
-		  + "ORDER BY DivWert desc";
+			+ "ROW_NUMBER() OVER (ORDER BY (z." + DB.kAnzahlStimmen + " / d.wert) DESC, rnd." + DB.kZahl + " DESC) as Rang "
+			+ "FROM " + parteienImBundestagTable + " p, " + zweitStimmenNachParteiTable + " z, " + DivisorenTable + " d, "
+				+ db.zufallsZahlen() + " rnd "
+			+ "WHERE p." + DB.kForeignKeyParteiID + " = z." + DB.kForeignKeyParteiID + " "
+				+ "AND rnd." + DB.kZeile + " = MOD(p." + DB.kForeignKeyParteiID	+ " + (d.wert / 1)*" + stmtCount(db.partei())
+					+ ", " + stmtCount(db.zufallsZahlen()) + ")";
+	
 	}
 	
 	protected String stmtSitzeNachParteiTable(String zweitStimmenNachParteiTable, String parteienImBundestagTable,
@@ -230,7 +235,7 @@ public abstract class Query {
 		return ""
 		+ "SELECT " + DB.kForeignKeyParteiID + ", COUNT(Rang) as " + DB.kAnzahlSitze + " "
 		+ "FROM " + zugriffsreihenfolgeSitzeNachParteiTable + " "
-		+ "WHERE Rang <= 2*(SELECT COUNT(*) FROM " + db.wahlkreis() + ") "
+		+ "WHERE Rang <= 2*" + stmtCount(db.wahlkreis()) + " "
     + "GROUP BY " + DB.kForeignKeyParteiID;
 	}
 	
@@ -252,10 +257,14 @@ public abstract class Query {
 		+ "SELECT p." + DB.kForeignKeyParteiID + ", z." + DB.kForeignKeyBundeslandID + ", z." + DB.kAnzahlStimmen + ", "
 		  		 + "(z." + DB.kAnzahlStimmen + " / d.wert) as DivWert, "
 		  		 + "ROW_NUMBER() OVER (PARTITION BY p." + DB.kForeignKeyParteiID + " "
-		  		 	 + "ORDER BY (z." + DB.kAnzahlStimmen + " / d.wert) DESC) as Rang "
-		+ "FROM " + parteienImBundestagTable + " p, " + zweitStimmenNachBundeslandTable + " z, " + divisorenTable + " d "
+		  		 	 + "ORDER BY (z." + DB.kAnzahlStimmen + " / d.wert) DESC, rnd." + DB.kZahl + " DESC) as Rang "
+		+ "FROM " + parteienImBundestagTable + " p, " + zweitStimmenNachBundeslandTable + " z, " + divisorenTable + " d, "
+			+ db.zufallsZahlen() + " rnd "
 		+ "WHERE p." + DB.kForeignKeyParteiID + " = z." + DB.kForeignKeyParteiID + " "
-		+ "ORDER BY " + DB.kForeignKeyParteiID + ", DivWert DESC";
+			+ "AND rnd." + DB.kZeile + " = MOD(" + "p." + DB.kForeignKeyParteiID + "*" + stmtCount(db.partei())
+				+ "*(z." + DB.kForeignKeyBundeslandID + " + " + stmtCount(db.bundesland()) + "*(d.wert / 1)), "
+				+ stmtCount(db.zufallsZahlen()) + ")";
+
 	}
 	
 	protected String stmtSitzeNachLandeslisten(String parteienImBundestagTable, 
