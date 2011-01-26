@@ -232,12 +232,11 @@ public class DB {
   	try {
   		String sqlLogFile = Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile);
 			if (!sqlLogFile.isEmpty()) {
-        File file = new File("sqlLogFile");
-        if(file.exists()){
-            file.delete();
-        }
+				new FileWriter(sqlLogFile, false);
 			}
 		} catch (FlagErrorException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
   }
