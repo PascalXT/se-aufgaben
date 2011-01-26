@@ -279,7 +279,9 @@ public class DB {
     executeUpdate("TRUNCATE TABLE " + table + " DROP STORAGE IMMEDIATE");
   }
   
-  public String prettyPrintSQL(String sql_statement) {
+  public String prettyPrintSQL(String sql_statement) {  	
+  	if (!Flags.isTrue(FlagDefinition.kPrettyPrintSQL)) return sql_statement;
+  	
   	String endSign = "##END##";
   	String result = sql_statement + endSign;
   	
@@ -287,27 +289,25 @@ public class DB {
   	result = result.replaceAll(" UNION ", "\n\nUNION\n\n");
   	
   	// Line break for with tables
-  	String kNoBracket = "[^\\(\\)]";
-  	String kNoOrOneBracket = "(?:" + kNoBracket + "|\\(" + kNoBracket + "*\\))";
-  	String kAtMostTwoBrackets = "(?:" + kNoOrOneBracket + "|\\(" + kNoOrOneBracket + "*\\))";
-  	String kAtMostThreeBrackets = "(?:" + kAtMostTwoBrackets + "|\\(" + kAtMostTwoBrackets + "*\\))";
-  	result = result.replaceAll("([A-Za-z]+ AS \\(" + kAtMostThreeBrackets + "*\\))", "\n\n$1");
+  	String kAtMostNBrackets = "[^\\(\\)]";
+  	for (int i = 0; i < 4; i++) {
+  		kAtMostNBrackets = "(?:" + kAtMostNBrackets + "|\\(" + kAtMostNBrackets + "*\\))";
+  	}
+  	
+  	result = result.replaceAll("([A-Za-z]+ AS \\(" + kAtMostNBrackets + "*\\))", "\n\n$1");
   	
   	String kSelectEtc = "SELECT|FROM|WHERE|GROUP BY|HAVING|UNION|ORDER BY";
   	// Indent Sub Select clauses
   	result = result.replaceAll("\\(SELECT", "( SELECT");
   	for (int i = 0; i < 10; i++) {
-	  	result = result.replaceAll("( AS \\(" + kAtMostThreeBrackets + "*)" + "( |\n)(" + kSelectEtc + ")", "$1\n\t$3");
+	  	result = result.replaceAll("( AS \\(" + kAtMostNBrackets + "*)" + "( |\n)(" + kSelectEtc + ")", "$1\n\t$3");
   	}
   	
   	// Line break for last SELECT FROM WHERE Clause
   	for (int i = 0; i < 10; i++) {
-	  	result = result.replaceAll(" (" + kSelectEtc + ")(" + kAtMostThreeBrackets + "*" + endSign + ")", "\n$1$2");
+	  	result = result.replaceAll(" (" + kSelectEtc + ")(" + kAtMostNBrackets + "*" + endSign + ")", "\n$1$2");
   	}
-  	
-
-
-  	
+	
   	result = result.replaceAll(" ([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "\n$1 $2");
   	result = result.replaceAll("\\(([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "(\n$1 $2");
   	result = result.replaceAll("CREATE", "\n\nCREATE");

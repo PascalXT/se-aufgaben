@@ -27,6 +27,7 @@ public class FlagDefinition {
   final public static String kFlagLogSQLFile = "logSQLFile";
   final public static String kFlagCreateWahlbezirke  = "createWahlbezirke";
   final public static String kFlagCreateZufallszahlen = "createZufallszahlen";
+  final public static String kPrettyPrintSQL = "prettyPrintSQL";
   final public static String[][] kFlagDefinition = {
       { kFlagDbName, "WahlSys", "Name of the db2 database." },
       { kFlagDbUser, null, "Username for the db2 database." },
@@ -60,7 +61,8 @@ public class FlagDefinition {
       {kFlagSimulateSQLUpdate, Flags.kFalse, "If true, SQL updates won't be executed."},
           	{ kFlagLogSQLFile, "", "If not empty, some sql statements will be logged to this file." },
       {kFlagCreateWahlbezirke, Flags.kFalse, "If true, the Wahlbezirke will be created using the Stimmen table."},
-      {kFlagCreateZufallszahlen, Flags.kFalse, "If true, the zufallszahlen table will be recreated."}
+      {kFlagCreateZufallszahlen, Flags.kFalse, "If true, the zufallszahlen table will be recreated."},
+      {kPrettyPrintSQL, Flags.kFalse, "If true, the sql statements will be formatted before logging."}
           	};
 
 }
