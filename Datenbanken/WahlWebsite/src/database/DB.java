@@ -228,6 +228,20 @@ public class DB {
     return new DB(dbName, dbUser, dbPwd, dbSchemaName, dbCommandFile, dbCommandFlags, logFile);
   }
 
+  public void deleteSQLLog() {
+  	try {
+  		String sqlLogFile = Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile);
+			if (!sqlLogFile.isEmpty()) {
+        File file = new File("sqlLogFile");
+        if(file.exists()){
+            file.delete();
+        }
+			}
+		} catch (FlagErrorException e) {
+			e.printStackTrace();
+		}
+  }
+  
   public DB(String name, String user, String pwd, String schemaName, String commandFile, String dbCommandFlags,
       String messagePath) {
     this.datenbank_kurzname = name;
@@ -342,7 +356,7 @@ public class DB {
   public void logSQL(String sql_statement) {
   	try {
   		String sqlLogFile = Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile);
-			if (!Flags.getFlagValue(FlagDefinition.kFlagLogSQLFile).isEmpty() &&
+			if (!sqlLogFile.isEmpty() &&
 					!sql_statement.contains("TRUNCATE") &&
 					!sql_statement.contains("SYSCAT")) {
 				FileWriter fileWriterSQLlog = new FileWriter(sqlLogFile, true);
