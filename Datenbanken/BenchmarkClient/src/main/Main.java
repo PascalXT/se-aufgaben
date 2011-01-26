@@ -18,7 +18,7 @@ public class Main {
 		BenchmarkDiagram diagram = new BenchmarkDiagram();
 		
 		for (int clients : clientDistribution) {
-			Benchmark benchmark = new Benchmark(clients, sleepTime, KartendeckType.Q1_Q6);
+			Benchmark benchmark = new Benchmark(clients, sleepTime, KartendeckType.Q1_Q6WITH);
 			ThreadPoolExecutor tpexc = benchmark.run();
 			System.out.println("Benchmark started with " + clients + " clients and " + sleepTime + " ms sleeptime");
 			try {

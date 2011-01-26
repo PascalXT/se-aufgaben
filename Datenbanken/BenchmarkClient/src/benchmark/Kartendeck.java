@@ -32,7 +32,7 @@ public class Kartendeck<T> {
 			deck.addKarte(new Karte("Q3.WITH"), 5);
 			deck.addKarte(new Karte("Q4.WITH"), 2);
 			deck.addKarte(new Karte("Q5.WITH"), 2);
-			deck.addKarte(new Karte("Q6.WITH"), 4);
+			deck.addKarte(new Karte("Q6"), 4);
 		}
 		else if (type == KartendeckType.Q7) {
 			deck.addKarte(new Karte("Q7"), 1);
