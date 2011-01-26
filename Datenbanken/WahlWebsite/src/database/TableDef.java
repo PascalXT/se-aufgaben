@@ -137,12 +137,21 @@ public class TableDef {
     				+ "WahlbezirkID BIGINT NOT NULL" 
     				+ ");\n",
 
-
-    		// Zufallszahlen
-    		"CREATE TABLE " + schemaName + ".Zufallszahlen ( "
-    				+ "Zeile BIGINT PRIMARY KEY NOT NULL,"
-    				+ "Zahl BIGINT NOT NULL);\n"
-    		};
+    		// Zufallszahlen für Direktmandate
+    		"CREATE TABLE " + schemaName + ".ZUFALLSZAHLENDIREKTMANDATE ( "
+    				+ "ZEILE " + autoIncrementID + ", "
+    				+ "ZAHL BIGINT NOT NULL);\n",
+    				
+    		// Zufallszahlen für SitzeNachPartei
+    		"CREATE TABLE " + schemaName + ".ZUFALLSZAHLENSitzeNachPartei ( "
+    				+ "ZEILE " + autoIncrementID + ", "
+    				+ "ZAHL BIGINT NOT NULL);\n",
+    				
+    		// Zufallszahlen für SitzeNachLandeslisten
+    		"CREATE TABLE " + schemaName + ".ZUFALLSZAHLENSitzeNachLandeslisten ( "
+    				+ "ZEILE " + autoIncrementID + ", "
+    				+ "ZAHL BIGINT NOT NULL);\n"
+		};
   };
 
 }

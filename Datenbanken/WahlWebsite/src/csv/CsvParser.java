@@ -54,8 +54,12 @@ public class CsvParser {
   }
   
   public void fillZufallsZahlenTable() throws SQLException {
-  	datenbank.truncate(datenbank.zufallsZahlen());
-  	datenbank.executeUpdate("INSERT INTO " + datenbank.zufallsZahlen() + " VALUES (0,0)");
+  	datenbank.truncate(datenbank.zufallsZahlenDirektmandate());
+  	datenbank.truncate(datenbank.zufallsZahlenSitzeNachLandeslisten());
+  	datenbank.truncate(datenbank.zufallsZahlenSitzeNachPartei());
+  	datenbank.executeUpdate("INSERT INTO " + datenbank.zufallsZahlenDirektmandate() + " VALUES (default,0)");
+  	datenbank.executeUpdate("INSERT INTO " + datenbank.zufallsZahlenSitzeNachLandeslisten() + " VALUES (default,0)");
+  	datenbank.executeUpdate("INSERT INTO " + datenbank.zufallsZahlenSitzeNachPartei() + " VALUES (default,0)");
   }
 
   private int getKandidat(int wahlkreisID, int parteiID) throws SQLException {

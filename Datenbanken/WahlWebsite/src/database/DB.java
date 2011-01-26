@@ -187,8 +187,16 @@ public class DB {
   	return tabellenName("GewinnerZweitstimmen");
   }
   
-  public String zufallsZahlen() {
-  	return tabellenName("ZufallsZahlen");
+  public String zufallsZahlenDirektmandate() {
+  	return tabellenName("ZufallsZahlenDirektmandate");
+  }
+  
+  public String zufallsZahlenSitzeNachPartei() {
+  	return tabellenName("ZufallsZahlenSitzeNachPartei");
+  }
+  
+  public String zufallsZahlenSitzeNachLandeslisten() {
+  	return tabellenName("ZufallsZahlenSitzeNachLandeslisten");
   }
   
   public String direktMandateNummer() {
