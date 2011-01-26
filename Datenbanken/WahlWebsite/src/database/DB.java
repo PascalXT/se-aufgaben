@@ -67,14 +67,14 @@ public class DB {
   public final static String kStimmeJahr = "Jahr";
 
   public String erstStimmenNachWahlkreis() {
-    return tabellenName("erstStimmenNachWahlkreis");
+    return tabellenName("ErstStimmenNachWahlkreis");
   }
 
   public final static String kAnzahl = "Anzahl";
   public final static String kWahlergebnis1Jahr = "Jahr";
 
   public String zweitStimmenNachWahlkreis() {
-    return tabellenName("zweitStimmenNachWahlkreis");
+    return tabellenName("ZweitStimmenNachWahlkreis");
   }
 
   public final static String kWahlergebnis2Anzahl = "Anzahl";

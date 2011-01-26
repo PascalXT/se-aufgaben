@@ -172,7 +172,7 @@ public abstract class Query {
 			+ "SELECT p." + DB.kID + " as " + DB.kForeignKeyParteiID + " "
 			+ "FROM " + db.partei() + " p, " + db.zweitStimmenNachWahlkreis() + " v "
 	    + "WHERE v." + DB.kForeignKeyParteiID + " = p." + DB.kID + " "
-	    	+ "AND v." + DB.kJahr + "=" + kCurrentElectionYear + " "
+	    	+ "AND v." + DB.kJahr + " = " + kCurrentElectionYear + " "
 	    + "GROUP BY p." + DB.kID + " "
 	    + "HAVING CAST(SUM(v." + DB.kWahlergebnis2Anzahl + ") AS FLOAT)" + " / "
 	    	+ "(SELECT SUM(" + DB.kAnzahlStimmen + ") "	+ "FROM " + zweitStimmenNachBundeslandTable + ")"
