@@ -37,6 +37,8 @@ public class Q5_WITH extends Query {
 	protected ResultSet doQuery() throws SQLException {
 		String query = "WITH " + db.zweitStimmenNachBundesland() + " AS (" + stmtZweitStimmenNachBundesland() + "), "
 			+ db.zweitStimmenNachPartei() + " AS (" + stmtZweitStimmenNachPartei(db.zweitStimmenNachBundesland()) + "), "
+			+ db.maxErststimmenNachWahlkreis() + " AS ("
+				+ stmtMaxErststimmenNachWahlkreis(db.erstStimmenNachWahlkreis()) + "), "
   		+ db.direktMandateNummer() + " AS ( "
 			+ stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), db.erstStimmenNachWahlkreis()) + "), "
 			+ db.direktMandateMaxNummer() + " AS ( "
@@ -52,11 +54,13 @@ public class Q5_WITH extends Query {
 			+ db.zugriffsreihenfolgeSitzeNachPartei() + " AS (" + stmtZugriffsreihenfolgeSitzeNachPartei(
 					db.parteienImBundestag(), db.zweitStimmenNachPartei(), db.divisoren()) + "), "
 			+ db.sitzeNachPartei() + " AS (" + stmtSitzeNachParteiTable(
-					db.zweitStimmenNachPartei(), db.parteienImBundestag(), db.zugriffsreihenfolgeSitzeNachPartei()) + ", "
+					db.zweitStimmenNachPartei(), db.parteienImBundestag(), db.zugriffsreihenfolgeSitzeNachPartei()) + "), "
 			+ db.zugriffsreihenfolgeSitzeNachLandeslisten() + " AS (" + stmtZugriffsreihenfolgeSitzeNachLandeslisten(
-					db.parteienImBundestag(), db.zweitStimmenNachBundesland(), db.divisoren()) + ", "
+					db.parteienImBundestag(), db.zweitStimmenNachBundesland(), db.divisoren()) + "), "
 			+ db.sitzeNachLandeslisten() + " AS (" + stmtSitzeNachLandeslisten(db.parteienImBundestag(),
-					db.zweitStimmenNachBundesland(), db.sitzeNachPartei(), db.zugriffsreihenfolgeSitzeNachLandeslisten()) + ", "
+					db.zweitStimmenNachBundesland(), db.sitzeNachPartei(), db.zugriffsreihenfolgeSitzeNachLandeslisten()) + "), "
+			+ db.direktMandateProParteiUndBundesland() + " AS ("
+				+ stmtDirektMandateProParteiUndBundesland(db.direktmandate()) + "), "
 			+ db.ueberhangsMandate() + " AS (" + stmtUeberhangsmandate(db.direktmandate(), db.sitzeNachLandeslisten(),
 					db.direktMandateProParteiUndBundesland()) + ") "
 			+ "SELECT * FROM " + db.ueberhangsMandate();
