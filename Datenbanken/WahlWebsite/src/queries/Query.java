@@ -230,7 +230,7 @@ public abstract class Query {
 		return ""
 		+ "SELECT " + DB.kForeignKeyParteiID + ", COUNT(Rang) as " + DB.kAnzahlSitze + " "
 		+ "FROM " + zugriffsreihenfolgeSitzeNachParteiTable + " "
-		+ "WHERE Rang <= 598 "
+		+ "WHERE Rang <= 2*(SELECT COUNT(*) FROM " + db.wahlkreis() + ") "
     + "GROUP BY " + DB.kForeignKeyParteiID;
 	}
 	
