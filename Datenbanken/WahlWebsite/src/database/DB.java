@@ -243,6 +243,7 @@ public class DB {
   
   public DB(String name, String user, String pwd, String schemaName, String commandFile, String dbCommandFlags,
       String messagePath) {
+  	deleteSQLLog();
     this.datenbank_kurzname = name;
     this.datenbank_name = "jdbc:db2:" + name;
     this.user = user;
