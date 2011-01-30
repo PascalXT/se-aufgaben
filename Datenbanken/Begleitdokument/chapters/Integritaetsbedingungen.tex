@@ -1,9 +1,12 @@
 \section{Integritätsbedingungen}
+
+Die Datenbank sollte folgende Integritätsbedingunen erfüllen:
+
 \begin{itemize}
     \item Jeder Listenplatz darf maximal einmal vergeben werden.
     \item Die Funktionalitäten müssen eingehalten werden
-    \item Eine Erststimme kann nur einem Kandidaten gegeben werden, der in dem Wahlkreis des Wahlbezirkes der Stimme für ein Direktmandat kandidiert.
-    \item Eine Zweitstimme kann nur einer Partei gegeben werden, die eine Landesliste in dem Bundesland hat, in dem der Wahlkreis des Wahlbezirkes der Stimme liegt.
+    \item Eine Erststimme kann nur einem Kandidaten gegeben werden, der in dem zugehörigen Wahlkreis für ein Direktmandat kandidiert.
+    \item Eine Zweitstimme kann nur einer Partei gegeben werden, die eine Landesliste in dem zugehörigen Bundesland hat.
     \item Jede Partei darf in jedem Bundesland maximal eine Landesliste haben.
     \item Ein Kanditat, der Mitglied einer Partei ist, darf nicht für eine andere Partei kandidieren.
 \end{itemize}

@@ -1,7 +1,6 @@
 \section{Informationsstrukturanforderungen}
 
-Die Längenangaben sind jeweils in Byte.
-
+Im Folgenden werden die einzelnen Entities anhand ihrer Attribute näher beschrieben. Die Längenangaben sind jeweils in Byte.
 
 \newcommand{\StartTabelle}[2]{
 	\textbf{Objektbeschreibung:} #1
@@ -127,14 +126,24 @@ Die Längenangaben sind jeweils in Byte.
 	\DefAttribut{Jahr}{int}{4}{1900 ... 2100}{0}{100\%}{nein}
 \EndeTabelle
 
-Beziehungsbeschreibung: wählt (1. Stimme)\\
-- Beteiligte Objekte:\\
-    Stimme als Wähler\\
-    Kandidat als Empfänger der Stimme\\
-- Anzahl: 45.000.000\\
+Als Beispiel werden hier zwei Beziehungen näher beschrieben:
 
-Beziehungsbeschreibung: wählt (2. Stimme)\\
-- Beteiligte Objekte:\\
-    Stimme als Wähler\\
-    Partei als Empfänger der Stimme\\
-- Anzahl: 45.000.000\\
+\textbf{Beziehungsbeschreibung}: wählt (1. Stimme)
+\begin{itemize}
+	\item Beteiligte Objekte
+		\begin{itemize}
+			\item Stimme als Wähler
+			\item Kandidat als Empfänger der Stimme
+		\end{itemize}
+	\item Anzahl: 45.000.000
+\end{itemize}
+
+\textbf{Beziehungsbeschreibung}: wählt (2. Stimme)
+\begin{itemize}
+	\item Beteiligte Objekte
+		\begin{itemize}
+			\item Stimme als Wähler
+			\item Partei als Empfänger der Stimme
+		\end{itemize}
+	\item Anzahl: 45.000.000
+\end{itemize}
