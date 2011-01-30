@@ -6,7 +6,7 @@ import java.util.Map;
 public class Kartendeck<T> {
 	
 	public enum KartendeckType {
-		DEBUG, DEBUG2, Q1_Q6, Q7, Q1_Q6WITH
+		DEBUG, DEBUG2, Q1_Q6_TEMP, Q1_Q6_WITH, Q1_Q6_BEST, Q7
 	};
 	
 	public static Kartendeck<Karte> createKartendeckByType(KartendeckType type) {
@@ -18,7 +18,7 @@ public class Kartendeck<T> {
 			deck.addKarte(new Karte("Q3"), 1);
 			deck.addKarte(new Karte("Q4"), 1);
 		}
-		else if (type == KartendeckType.Q1_Q6) {
+		else if (type == KartendeckType.Q1_Q6_TEMP) {
 			deck.addKarte(new Karte("Q1"), 5);
 			deck.addKarte(new Karte("Q2"), 2);
 			deck.addKarte(new Karte("Q3"), 5);
@@ -26,7 +26,7 @@ public class Kartendeck<T> {
 			deck.addKarte(new Karte("Q5"), 2);
 			deck.addKarte(new Karte("Q6"), 4);
 		}
-		else if (type == KartendeckType.Q1_Q6WITH) {
+		else if (type == KartendeckType.Q1_Q6_WITH) {
 			deck.addKarte(new Karte("Q1.WITH"), 5);
 			deck.addKarte(new Karte("Q2.WITH"), 2);
 			deck.addKarte(new Karte("Q3.WITH"), 5);
@@ -35,7 +35,8 @@ public class Kartendeck<T> {
 			deck.addKarte(new Karte("Q6"), 4);
 		}
 		else if (type == KartendeckType.Q7) {
-			deck.addKarte(new Karte("Q7"), 1);
+			deck.addKarte(new Karte("Q7"), 5);
+			deck.addKarte(new Karte("Q7.WITH"), 5);
 		}
 		
 		return deck;
