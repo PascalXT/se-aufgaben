@@ -16,7 +16,7 @@ public class BenchmarkDiagram {
 
 	private final static int xAxisStep = 1;
 
-	private final static int yAxisMaxValue = 7000;
+	private final static int yAxisMaxValue = 5000;
 
 	private final static int yAxisStep = 1000;
 
@@ -36,7 +36,7 @@ public class BenchmarkDiagram {
 		colorMapping.put("Q6", "FF00FF");
 		colorMapping.put("Q6.WITH", "FF00FF");
 		colorMapping.put("Q7", "000000");
-		colorMapping.put("Q7.WITH", "000000");
+		colorMapping.put("Q7.WITH", "CCCCCC");
 	}
 
 	private Map<Integer, BenchmarkResult> results;
