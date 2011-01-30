@@ -312,11 +312,11 @@ public class DB {
 	  	result = result.replaceAll(" (" + kSelectEtc + ")(" + kAtMostNBrackets + "*" + endSign + ")", "\n$1$2");
   	}
 	
-  	result = result.replaceAll(" ([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "\n$1 $2");
-  	result = result.replaceAll("\\(([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "(\n$1 $2");
+  	result = result.replaceAll(" ([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "\n\t$1 $2");
+  	result = result.replaceAll("\\(([A-Za-z]*) (BIGINT|VARCHAR|INTEGER)", "(\n\t$1 $2");
   	result = result.replaceAll("CREATE", "\n\nCREATE");
-  	result = result.replaceAll(" CONSTRAINT", "\nCONSTRAINT");
-  	result = result.replaceAll(" ORGANIZE", "\nORGANIZE");
+  	result = result.replaceAll(" CONSTRAINT", "\n\tCONSTRAINT");
+  	result = result.replaceAll(" ORGANIZE", "\n\tORGANIZE");
   	
   	result = result.replaceAll(schemaName + "\\.", "");
   	result = result.replaceAll("  ", " ");
