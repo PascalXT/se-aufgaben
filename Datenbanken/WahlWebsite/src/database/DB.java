@@ -298,7 +298,7 @@ public class DB {
   		kAtMostNBrackets = "(?:" + kAtMostNBrackets + "|\\(" + kAtMostNBrackets + "*\\))";
   	}
   	
-  	result = result.replaceAll("([A-Za-z]+ AS \\(" + kAtMostNBrackets + "*\\))", "\n\n$1");
+  	result = result.replaceAll("([A-Za-z]+(|\\([A-Za-z, ]+\\)) AS \\(" + kAtMostNBrackets + "*\\))", "\n\n$1");
   	
   	String kSelectEtc = "SELECT|FROM|WHERE|GROUP BY|HAVING|UNION|ORDER BY";
   	// Indent Sub Select clauses

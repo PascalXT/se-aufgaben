@@ -2,21 +2,19 @@ WITH
 
 MaxZweitStimmenNachWahlkreis AS (
 	SELECT we.WahlkreisID, MAX(we.Anzahl) AS MaxStimmen
-	FROM zweitStimmenNachWahlkreis we
+	FROM ZweitStimmenNachWahlkreis we
 	WHERE we.Jahr = 2009
 	GROUP BY WahlkreisID), 
 
 MaxErststimmenNachWahlkreis AS (
-	SELECT k.DMWahlkreisID AS WahlkreisID, MAX(v.Anzahl) AS
-		MaxStimmen
-	FROM erstStimmenNachWahlkreis v, Kandidat k
-	WHERE v.KandidatID = k.ID 
-		AND v.Jahr = 2009
-	GROUP BY k.DMWahlkreisID), 
+	SELECT v.WahlkreisID, MAX(v.Anzahl) AS MaxStimmen
+	FROM ErstStimmenNachWahlkreis v
+	WHERE v.Jahr = 2009
+	GROUP BY v.WahlkreisID), 
 
 GewinnerZweitstimmen AS (
 	SELECT we.WahlkreisID, we.ParteiID
-	FROM zweitStimmenNachWahlkreis we,
+	FROM ZweitStimmenNachWahlkreis we,
 		MaxZweitStimmenNachWahlkreis ms
 	WHERE we.WahlkreisID = ms.WahlkreisID 
 		AND we.Anzahl = ms.MaxStimmen 
@@ -24,7 +22,7 @@ GewinnerZweitstimmen AS (
 
 GewinnerErststimmen AS (
 	SELECT we.WahlkreisID, we.KandidatID
-	FROM erstStimmenNachWahlkreis we, MaxErststimmenNachWahlkreis ms
+	FROM ErstStimmenNachWahlkreis we, MaxErststimmenNachWahlkreis ms
 	WHERE we.WahlkreisID = ms.WahlkreisID 
 		AND we.Anzahl = ms.MaxStimmen 
 		AND we.Jahr = 2009), 
