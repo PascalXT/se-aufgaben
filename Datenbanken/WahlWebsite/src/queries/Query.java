@@ -119,12 +119,11 @@ public abstract class Query {
 	
 	protected String stmtMaxErststimmenNachWahlkreis(String erstStimmenNachWahlkreisTable) {
 		return "" +
-  	"SELECT k." + DB.kKandidatDMWahlkreisID + " AS " + DB.kForeignKeyWahlkreisID + ", " + 
+  	"SELECT v." + DB.kForeignKeyWahlkreisID + ", " + 
   				 "MAX(v." + DB.kAnzahl + ") AS " + DB.kMaxStimmen + " " + 
-  	"FROM " + erstStimmenNachWahlkreisTable + " v, " + db.kandidat() + " k " + 
-  	"WHERE v." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
-  		"AND v." + DB.kJahr + " = " + kCurrentElectionYear + " " +
-  	"GROUP BY k." + DB.kKandidatDMWahlkreisID;
+  	"FROM " + erstStimmenNachWahlkreisTable + " v " + 
+  	"WHERE v." + DB.kJahr + " = " + kCurrentElectionYear + " " +
+  	"GROUP BY v." + DB.kForeignKeyWahlkreisID;
 	}
 	
 	protected String stmtDirektmandateNummer(String maxErstStimmenNachWahlkreisTable,
@@ -380,5 +379,59 @@ public abstract class Query {
 				+ db.gewinnerErststimmen() + " AS (" + stmtGewinnerErststimmen(db.maxErststimmenNachWahlkreis()) + ") "
 				+ stmtWahlkreissieger(db.gewinnerErststimmen(), db.gewinnerZweitstimmen()));
 		return db.wahlkreisSieger();
+	}
+	
+	public String stmtParteiloseDirektmandate(String direktmandateTable) {
+		return ""
+			+ "SELECT k." + DB.kID + " "
+			+ "FROM " + db.kandidat() + " k, " + db.direktmandate() + " d, " + db.wahlkreis() + " wk "
+			+ "WHERE k." + DB.kID + " = d." + DB.kForeignKeyKandidatID + " "
+				+ "AND k." + DB.kKandidatDMWahlkreisID + " = wk." + DB.kID + " "
+				+ "AND NOT EXISTS ("
+					+ "SELECT * FROM " + db.kandidat() + " ku "
+					+ "WHERE ku." + DB.kForeignKeyParteiID + " = k." + DB.kKandidatDMParteiID + " "
+					+ "AND ku." + DB.kForeignKeyBundeslandID + " = wk." + DB.kForeignKeyBundeslandID + " "
+					+ "AND ku." + DB.kKandidatListenplatz + " IS NOT NULL)";
+	}
+	
+	public String stmtZweitstimmenNachWahlkreis(String parteiLoseDirektmandateTable) {
+		return ""
+		+ "SELECT s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
+		+ "FROM " + db.stimme() + " s "
+		+ "WHERE " + DB.kForeignKeyParteiID + " IS NOT NULL "
+			+ "AND " + DB.kForeignKeyKandidatID + " NOT IN " + parteiLoseDirektmandateTable
+		+ "GROUP BY s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr;
+	}
+  
+	public String stmtErststimmenNachWahlkreis() {
+		return ""
+		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
+		+ "FROM " + db.stimme() + " s "
+		+ "WHERE " + DB.kForeignKeyKandidatID + " IS NOT NULL "
+		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr;
+	}
+  
+	public String updateZweitstimmenNachWahlkreisTable(String erstStimmenNachWahlkreisTable) throws SQLException {
+		db.createFilledTemporaryTable(db.zweitStimmenNachWahlkreis(), DB.kForeignKeyParteiID + " BIGINT, "
+				+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " INTEGER, " + DB.kAnzahl + " INTEGER" , 
+				"WITH "
+        	+ db.maxErststimmenNachWahlkreis() + " AS ( "
+        		+ stmtMaxErststimmenNachWahlkreis(erstStimmenNachWahlkreisTable) + "), "
+					+ db.direktMandateNummer() + " AS ( "
+						+ stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), erstStimmenNachWahlkreisTable) + "), "
+					+ db.direktMandateMaxNummer() + " AS ( "
+						+ stmtDirektmandateMaxNummer(db.direktMandateNummer()) + "), "
+					+ db.direktmandate() + " AS ( "
+		  			+	stmtDirektmandate(db.direktMandateNummer(), db.direktMandateMaxNummer()) + "), "
+		  	  + db.parteiloseDirektmandate() + " AS ( " + stmtParteiloseDirektmandate(db.direktmandate()) + ") "
+		  	  + stmtZweitstimmenNachWahlkreis(db.parteiloseDirektmandate()));
+		return db.zweitStimmenNachWahlkreis();
+	}
+	
+	public String updateErststimmenNachWahlkreisTable() throws SQLException {
+		db.createFilledTemporaryTable(db.erstStimmenNachWahlkreis(), DB.kForeignKeyKandidatID + " BIGINT, "
+				+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " INTEGER, " + DB.kAnzahl + " INTEGER" , 
+				stmtErststimmenNachWahlkreis());
+		return db.erstStimmenNachWahlkreis();
 	}
 }

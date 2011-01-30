@@ -207,6 +207,10 @@ public class DB {
   	return tabellenName("DirektmandateMaxNummer");
   }
   
+  public String parteiloseDirektmandate() {
+  	return tabellenName("ParteiloseDirektmandate");
+  }
+  
   public boolean isBaseTable(String kurzname) {
   	for (String table : TableDef.baseTables()) {
   		if (table.equalsIgnoreCase(kurzname)) {
@@ -545,34 +549,4 @@ public class DB {
   		+ "DISABLE QUERY OPTIMIZATION "
   		+ "MAINTAINED BY USER");
   }
-  
-	public String stmtZweitstimmenNachWahlkreis() {
-		return ""
-		+ "SELECT s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
-		+ "FROM " + stimme() + " s "
-		+ "WHERE " + DB.kForeignKeyParteiID + " IS NOT NULL "
-		+ "GROUP BY s." + DB.kForeignKeyParteiID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr;
-	}
-  
-	public String stmtErststimmenNachWahlkreis() {
-		return ""
-		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
-		+ "FROM " + stimme() + " s "
-		+ "WHERE " + DB.kForeignKeyKandidatID + " IS NOT NULL "
-		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr;
-	}
-  
-	public String updateZweitstimmenNachWahlkreisTable() throws SQLException {
-		createFilledTemporaryTable(zweitStimmenNachWahlkreis(), DB.kForeignKeyParteiID + " BIGINT, "
-				+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " INTEGER, " + DB.kAnzahl + " INTEGER" , 
-				stmtZweitstimmenNachWahlkreis());
-		return zweitStimmenNachWahlkreis();
-	}
-	
-	public String updateErststimmenNachWahlkreisTable() throws SQLException {
-		createFilledTemporaryTable(erstStimmenNachWahlkreis(), DB.kForeignKeyKandidatID + " BIGINT, "
-				+ DB.kForeignKeyWahlkreisID + " BIGINT, " + DB.kJahr + " INTEGER, " + DB.kAnzahl + " INTEGER" , 
-				stmtErststimmenNachWahlkreis());
-		return erstStimmenNachWahlkreis();
-	}
 }

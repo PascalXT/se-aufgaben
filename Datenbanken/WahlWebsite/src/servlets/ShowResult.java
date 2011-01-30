@@ -25,6 +25,7 @@ import queries.Q6;
 import queries.Q7;
 import queries.Q7_WITH;
 import queries.Query;
+import queries.RefreshVotes;
 import database.DB;
 import flags.FlagDefinition;
 import flags.FlagErrorException;
@@ -115,14 +116,7 @@ public class ShowResult extends HttpServlet {
 			}
 			query = new Q7_WITH("Q7 - Wahlkreisinfo (Einzelstimmen)", randomWahlkreis);
 		} else if (queryParam.equalsIgnoreCase("RefreshVotes")) {
-			try {
-				response.getWriter().write("Refreshing...");
-				database.updateErststimmenNachWahlkreisTable();
-				database.updateZweitstimmenNachWahlkreisTable();
-				response.getWriter().write("Done.");
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			query = new RefreshVotes("Aggregiere Stimmen auf Wahlkreisebene.");
 		}
 		if (query != null) {
 			query.setDatabase(database);
