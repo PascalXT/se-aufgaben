@@ -2,22 +2,64 @@
 
 Die Längenangaben sind jeweils in Byte.
 
+
 \newcommand{\StartTabelle}[2]{
-	\begin{table}[htbp]
-		\centering
-			\begin{tabular}{llllllll}
-		\textbf{Objektbeschreibung:} & #1\\
-		\textbf{Anzahl:} & #2\\
-		\textbf{Attribute:} \\
-		\textbf{Attributname} & \textbf{type} & \textbf{Länge} & \textbf{Wertebereich} & \textbf{\#Wdh.} & \textbf{Def'heit} & \textbf{Id.} \\
+	\textbf{Objektbeschreibung:} #1
+	\begin{itemize}
+		\item Anzahl: #2
+		\item Attribute:
+			\begin{itemize}
 }
 
-\newcommand{\DefAttribut}[7]{#1 & #2 & #3 & #4 & #5 & #6 & #7 \\}
+\newcommand{\DefAttribut}[7]{
+	\item Attributname: #1
+		\begin{itemize}
+			\item Länge: #2
+			\item Wertebereich: #3
+			\item Wiederholungen: #4
+			\item Definiertheit: #5
+			\item Identifizierend: #6
+		\end{itemize}
+}
 
 \newcommand{\EndeTabelle}{
-	\end{tabular}
-	\end{table}
+	\end{itemize}
+	\end{itemize}
 }
+
+
+%Objektbeschreibung: T1
+%\begin{itemize}
+%	\item Anzahl: T2
+%	\item Attribute:
+%		\begin{itemize}
+%			\item Attributname: T3
+%			\begin{itemize}
+%				\item Länge: T4
+%				\item Wertebereich: T5
+%				\item Wiederholungen: T6
+%				\item Definiertheit: T7
+%				\item Identifizierend: T8
+%			\end{itemize}
+%		\end{itemize}
+%\end{itemize}
+%
+%\newcommand{\StartTabelle}[2]{
+%	\begin{table}[htbp]
+%		\centering
+%			\begin{tabular}{llllllll}
+%		\textbf{Objektbeschreibung:} & #1\\
+%		\textbf{Anzahl:} & #2\\
+%		\textbf{Attribute:} \\
+%		\textbf{Attributname} & \textbf{type} & \textbf{Länge} & \textbf{Wertebereich} & \textbf{\#Wdh.} & \textbf{Def'heit} & \textbf{Id.} \\
+%}
+%
+%\newcommand{\DefAttribut}[7]{#1 & #2 & #3 & #4 & #5 & #6 & #7 \\}
+%
+%\newcommand{\EndeTabelle}{
+%	\end{tabular}
+%	\end{table}
+%}
 
 \newcommand{\DefIDTabelle}[2]{
 	\StartTabelle{#1}{#2}
