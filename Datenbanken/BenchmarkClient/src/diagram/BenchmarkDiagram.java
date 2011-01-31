@@ -1,5 +1,7 @@
 package diagram;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,18 +58,22 @@ public class BenchmarkDiagram {
 			String scales = "";
 			String labels = "";
 			String colors = "";
+			
+			List<Integer> sortedKeys = new ArrayList<Integer>(results.keySet());
+			Collections.sort(sortedKeys);
+			
 			for (String query : usedQueries) {
 				labels += query + "|";
 				colors += colorMapping.get(query) + ",";
 
 				String xValues = "";
-				for (Integer x : results.keySet()) {
+				for (Integer x : sortedKeys) {
 					xValues += x + ",";
 				}
 				xValues = xValues.substring(0, xValues.length() - 1);
 
 				String yValues = "";
-				for (Integer x : results.keySet()) {
+				for (Integer x : sortedKeys) {
 					BenchmarkResult result = results.get(x);
 					yValues += result.getAverageResponseTimeForQuery(query) + ",";
 				}
