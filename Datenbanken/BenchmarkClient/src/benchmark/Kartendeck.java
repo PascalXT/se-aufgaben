@@ -37,7 +37,15 @@ public class Kartendeck<T> {
 		else if (type == KartendeckType.Q7) {
 			deck.addKarte(new Karte("Q7"), 5);
 			deck.addKarte(new Karte("Q7.WITH"), 5);
-		}
+		} 
+    else if (type == KartendeckType.Q1_Q6_BEST) {
+      deck.addKarte(new Karte("Q1.WITH"), 5);
+      deck.addKarte(new Karte("Q2.WITH"), 2);
+      deck.addKarte(new Karte("Q3.WITH"), 5);
+      deck.addKarte(new Karte("Q4.WITH"), 2);
+      deck.addKarte(new Karte("Q5.WITH"), 2);
+      deck.addKarte(new Karte("Q6"), 4);
+    }
 		
 		return deck;
 	}

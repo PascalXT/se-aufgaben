@@ -59,6 +59,7 @@ public abstract class Query {
 	
 	private String getNavigation() {
 		String navigation = "<h3>Navigation</h3>";
+
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1\">Q1: Sitzverteilung</a> (<a href=\"/WahlWebsite/ShowResult?query=Q1.with\">with</a>)<br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2\">Q2: Abgeordnete</a> (<a href=\"/WahlWebsite/ShowResult?query=Q2.with\">with</a>)<br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3\">Q3: Wahlkreisinfo</a> (<a href=\"/WahlWebsite/ShowResult?query=Q3.with\">with</a>)<br/>";
@@ -66,6 +67,7 @@ public abstract class Query {
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5\">Q5: Überhangsmandate</a> (<a href=\"/WahlWebsite/ShowResult?query=Q5.with\">with</a>)<br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q6\">Q6: Knappste Sieger</a><br/><br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q7\">Wahllokal Admin</a><br/>";
+
 		return navigation;
 	}
 

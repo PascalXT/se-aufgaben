@@ -35,6 +35,10 @@ public class Q2_WITH extends Query {
 					db.parteienImBundestag(), db.zweitStimmenNachPartei(), db.divisoren()) + "), "
 			+ db.sitzeNachPartei() + " AS (" + stmtSitzeNachParteiTable(
 					db.zweitStimmenNachPartei(), db.parteienImBundestag(), db.zugriffsreihenfolgeSitzeNachPartei()) + "), "
+			+ db.zugriffsreihenfolgeSitzeNachLandeslisten() + " AS (" + stmtZugriffsreihenfolgeSitzeNachLandeslisten(
+					db.parteienImBundestag(), db.zweitStimmenNachBundesland(), db.divisoren()) + "), "
+			+ db.sitzeNachLandeslisten() + " AS (" + stmtSitzeNachLandeslisten(db.parteienImBundestag(),
+					db.zweitStimmenNachBundesland(), db.sitzeNachPartei(), db.zugriffsreihenfolgeSitzeNachLandeslisten()) + "), "
 					
 			+ "ListenKandidaten AS (" +
 		  		"SELECT " + DB.kID + " FROM " + db.kandidat() + " WHERE " + DB.kForeignKeyBundeslandID + " IS NOT NULL " + 
@@ -48,23 +52,30 @@ public class Q2_WITH extends Query {
 		  		"WHERE lk." + DB.kID + " = k." + DB.kID + " " + 
 		  		"AND k." + DB.kForeignKeyBundeslandID + " = b." + DB.kID + " " + 
 		  	"), " +
-		  	"Abgeordnete AS ( " + 
-		  		"SELECT " + DB.kForeignKeyKandidatID + " FROM " + db.direktmandate() + " " + 
-		  		"UNION " +
-		  		"SELECT lkr." + DB.kID + " FROM ListenKandidatenMitRang lkr, " + db.sitzeNachLandeslisten() + " s " + 
-		  		"WHERE s." + DB.kForeignKeyParteiID + " = lkr." + DB.kForeignKeyParteiID + " " + 
-		  		"AND s." + DB.kForeignKeyBundeslandID + " = lkr." + DB.kForeignKeyBundeslandID + " " + 
-		  		"AND lkr.Rang <= s." + DB.kAnzahlSitze + " - (" +
-		  			"SELECT COUNT(*) FROM " + db.direktmandate() + " dm, " + db.wahlkreis() + " w " +
-		  			"WHERE dm." + DB.kForeignKeyParteiID + " = lkr." + DB.kForeignKeyParteiID + " " + 
-		  			"AND dm." + DB.kKandidatDMWahlkreisID + " = w." + DB.kID + " " +
-		  			"AND w." + DB.kForeignKeyBundeslandID + " = lkr." + DB.kForeignKeyBundeslandID + " " +
-		  		") " +
-		  	") " +
+
+		  	"BundeslandParteiZuDirektmandate AS ( " +
+  			"SELECT w." + DB.kForeignKeyBundeslandID + ", d." + DB.kForeignKeyParteiID + ", " + 
+  				"Count(d." + DB.kForeignKeyKandidatID + ") as " + DB.kAnzahl + " " +
+  			"FROM " + db.direktmandate() + " d, " + db.wahlkreis() + " w " +
+  			"WHERE d." + DB.kKandidatDMWahlkreisID + " = w." + DB.kID + " " +
+  			"GROUP BY w." + DB.kForeignKeyBundeslandID + ", d." + DB.kForeignKeyParteiID + "), " +
+  	
+  	"Abgeordnete AS ( " + 
+  		"SELECT " + DB.kForeignKeyKandidatID + " FROM " + db.direktmandate() + " " + 
+  		
+  		"UNION " +
+  		
+  		"SELECT lkr." + DB.kID + " " +
+  		"FROM ListenKandidatenMitRang lkr LEFT OUTER JOIN BundeslandParteiZuDirektmandate b ON lkr." + DB.kForeignKeyBundeslandID + " = b." + DB.kForeignKeyBundeslandID + " AND lkr." + DB.kForeignKeyParteiID + " = b." + DB.kForeignKeyParteiID + ", " + db.sitzeNachLandeslisten() + " s " + 
+  		"WHERE s." + DB.kForeignKeyParteiID + " = lkr." + DB.kForeignKeyParteiID + " " + 
+  		"AND s." + DB.kForeignKeyBundeslandID + " = lkr." + DB.kForeignKeyBundeslandID + " " + 
+  		"AND lkr.Rang <= s." + DB.kAnzahlSitze + " - COALESCE(b." + DB.kAnzahl + ", 0)" +
+  	") " +
+		  	
 			  "SELECT k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + ", p." + DB.kParteiKuerzel + " " +
-			  "FROM Abgeordnete a, " + db.kandidat() + " k, " + db.partei() + " p " +
+			  "FROM Abgeordnete a, " + db.kandidat() + " k LEFT OUTER JOIN " + db.partei() +
+			  " p ON k." + DB.kForeignKeyParteiID + " = p." + DB.kID + " " +
 			  "WHERE a." + DB.kForeignKeyKandidatID + " = k." + DB.kID + " " +
-			  "AND (k." + DB.kForeignKeyParteiID + " IS NULL OR k." + DB.kForeignKeyParteiID + " = p." + DB.kID + ") " +
 			  "ORDER BY k." + DB.kKandidatVorname + ", k." + DB.kKandidatNachname + "";
 			
 	  return db.executeSQL(query);

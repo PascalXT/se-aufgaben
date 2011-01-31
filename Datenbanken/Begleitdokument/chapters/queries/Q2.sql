@@ -122,7 +122,8 @@ Abgeordnete AS (
 		AND dm.DMWahlkreisID = w.ID 
 		AND w.BundeslandID = lkr.BundeslandID ) )
 SELECT k.Vorname, k.Nachname, p.Kuerzel
-FROM Abgeordnete a, Kandidat k, Partei p
-WHERE a.KandidatID = k.ID 
-	AND (k.ParteiID IS NULL OR k.ParteiID = p.ID)
+FROM Abgeordnete a, Kandidat k LEFT OUTER JOIN Partei p ON
+	k.ParteiID = p.ID
+WHERE a.KandidatID = k.ID
 ORDER BY k.Vorname, k.Nachname
+
