@@ -12,11 +12,11 @@ public class BenchmarkDiagram {
 
 	private final static int chartHeight = 450;
 
-	private final static int xAxisMaxValue = 10;
+	private final static int xAxisMaxValue = 50;
 
 	private final static int xAxisStep = 1;
 
-	private final static int yAxisMaxValue = 5000;
+	private final static int yAxisMaxValue = 20000;
 
 	private final static int yAxisStep = 1000;
 
