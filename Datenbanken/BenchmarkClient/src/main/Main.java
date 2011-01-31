@@ -13,7 +13,7 @@ public class Main {
 		
 		final int sleepTime = 2000;
 		
-		final int[] clientDistribution = new int[] { 1, 2, 5, 7, 10 };
+		final int[] clientDistribution = new int[] { 1, 5, 10 };
 		
 		BenchmarkDiagram diagram = new BenchmarkDiagram();
 		

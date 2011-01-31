@@ -3,6 +3,8 @@ package diagram;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import benchmark.BenchmarkResult;
 
@@ -56,6 +58,9 @@ public class BenchmarkDiagram {
 			String scales = "";
 			String labels = "";
 			String colors = "";
+			
+			SortedSet<Integer> sortedSet = new TreeSet<Integer>(results.keySet());
+			
 			for (String query : usedQueries) {
 				labels += query + "|";
 				colors += colorMapping.get(query) + ",";
@@ -67,7 +72,7 @@ public class BenchmarkDiagram {
 				xValues = xValues.substring(0, xValues.length() - 1);
 
 				String yValues = "";
-				for (Integer x : results.keySet()) {
+				for (Integer x : (Integer[]) sortedSet.toArray()) {
 					BenchmarkResult result = results.get(x);
 					yValues += result.getAverageResponseTimeForQuery(query) + ",";
 				}
