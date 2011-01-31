@@ -3,7 +3,10 @@ package benchmark;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import benchmark.Kartendeck.KartendeckType;
 
@@ -23,11 +26,12 @@ public class SimulatedBrowser implements Runnable {
 
   public void sleep() {
     try {
-      Thread.sleep(sleepTime);
+      Thread.sleep((int) (sleepTime * ((new Random()).nextDouble() + 0.5)));
     } catch (InterruptedException e) {
     }
   }
   
+  int computationTime = -1;
   private int visitPage(String page) {
   	
     System.out.println(Thread.currentThread().getName() + " loads " + page);
@@ -35,9 +39,16 @@ public class SimulatedBrowser implements Runnable {
     try {
     	URL url = new URL(page);
     	final long startLoadingTime = System.currentTimeMillis();
-    	new Scanner(url.openStream()).useDelimiter("\\Z").next();
+    	String content = (new Scanner(url.openStream()).useDelimiter("\\Z").next());
+    	
+    	Pattern MY_PATTERN = Pattern.compile("Die Berechnung hat (\\d+) Millisekunden gedauert.");
+    	Matcher m = MY_PATTERN.matcher(content);
+    	m.find();
+    	computationTime = Integer.parseInt(m.group(1));
+    	System.out.println(m.group(1));
+    	
     	responseTime = (int) (System.currentTimeMillis() - startLoadingTime);
-    	System.out.println(Thread.currentThread().getName() + " loading complete in " + (responseTime / 1000.0) + " seconds.");
+    	System.out.println(Thread.currentThread().getName() + " loading complete in " + (responseTime / 1000.0) + " seconds. Computation time: " + (computationTime / 1000.0) + " seconds.");
 
     } catch (MalformedURLException e) {
       e.printStackTrace();
@@ -58,7 +69,8 @@ public class SimulatedBrowser implements Runnable {
       new Thread() {
       	@Override
       	public void run() {
-      		benchmark.addResponseTime(nextKarte.getQuery(), responseTime);
+      		benchmark.addResponseTime(nextKarte.getQuery(), responseTime, computationTime);
+      		computationTime = -1;
       	};
       }.start();
       sleep();

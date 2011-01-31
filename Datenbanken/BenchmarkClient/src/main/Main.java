@@ -15,7 +15,8 @@ public class Main {
 		
 		final int[] clientDistribution = new int[] { 1, 2, 5, 10, 15, 20, 40, 60, 80, 100 };
 		
-		BenchmarkDiagram diagram = new BenchmarkDiagram();
+    BenchmarkDiagram diagram = new BenchmarkDiagram();
+    BenchmarkDiagram computationTimeDiagram = new BenchmarkDiagram();
 		
 		for (int clients : clientDistribution) {
 			Benchmark benchmark = new Benchmark(clients, sleepTime, KartendeckType.Q1_Q6_BEST);
@@ -25,6 +26,7 @@ public class Main {
 				tpexc.awaitTermination(3600, TimeUnit.SECONDS); // 3600 = timeout
 				
 				diagram.addBenchmark(clients, benchmark.getBenchmarkResult());
+				computationTimeDiagram.addBenchmark(clients, benchmark.getComputationTimeResult());
 				
 				System.out.println("benchmark " + clients + " finished.");
 			} catch (InterruptedException e) {
@@ -33,7 +35,8 @@ public class Main {
 			}
 		}
 		
-		System.out.println(diagram.generateGoogleCharApiUrl());
+    System.out.println(diagram.generateGoogleCharApiUrl());
+    System.out.println(computationTimeDiagram.generateGoogleCharApiUrl());
 	}
 
 }

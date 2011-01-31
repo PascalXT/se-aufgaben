@@ -345,7 +345,7 @@ public class DB {
   public ResultSet executeSQL(String sql_statement) throws SQLException {
   	logSQL(sql_statement);
   	
-    System.out.println(prettyPrintSQL(sql_statement));
+    //System.out.println(prettyPrintSQL(sql_statement));
     if (statement != null)
       statement.close();
     statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -385,7 +385,7 @@ public class DB {
   public void executeUpdate(String sql_statement) throws SQLException {
   	logSQL(sql_statement);
 
-    System.out.println(prettyPrintSQL(sql_statement));
+    //System.out.println(prettyPrintSQL(sql_statement));
     if (!Flags.isTrue(FlagDefinition.kFlagSimulateSQLUpdate)) {
 	    Statement statement = connection.createStatement();
 	    statement.executeUpdate(sql_statement);
@@ -407,7 +407,7 @@ public class DB {
       file_writer = new FileWriter(file);
       file_writer.write("CONNECT TO " + datenbank_kurzname + ";\n" + db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
-      System.out.println("cmd: " + prettyPrintSQL(db2_statement));
+      //System.out.println("cmd: " + prettyPrintSQL(db2_statement));
       String cmd = "db2cmd.exe " + dbCommandFlags + " " + db2_command_file;
       Process p = Runtime.getRuntime().exec(cmd);
       p.waitFor();

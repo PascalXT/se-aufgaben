@@ -17,11 +17,14 @@ public class Benchmark {
 	
 	private BenchmarkResult benchmarkResult;
 	
+	private BenchmarkResult computationTimeResult;
+	
 	public Benchmark(int numSimulatedBrowsers, int sleepTime, KartendeckType deckType) {
 		this.numSimulatedBrowsers = numSimulatedBrowsers;
 		this.sleepTime = sleepTime;
 		this.deckType = deckType;
 		benchmarkResult = new BenchmarkResult();
+		computationTimeResult = new BenchmarkResult();
 	}
 	
 	public ThreadPoolExecutor run() {
@@ -39,12 +42,17 @@ public class Benchmark {
     return texc;
 	}
 
-  public synchronized void addResponseTime(String query, int responseTime) {
-  	benchmarkResult.addData(query, responseTime);
+  public synchronized void addResponseTime(String query, int responseTime, int computationTime) {
+    benchmarkResult.addData(query, responseTime);
+    computationTimeResult.addData(query, computationTime);
   }
   
   public BenchmarkResult getBenchmarkResult() {
   	return benchmarkResult;
+  }
+  
+  public BenchmarkResult getComputationTimeResult() {
+    return computationTimeResult;
   }
   
 }
