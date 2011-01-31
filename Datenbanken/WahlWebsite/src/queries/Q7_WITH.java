@@ -72,4 +72,13 @@ public class Q7_WITH extends Q3_WITH {
 	 			+ "FROM (VALUES(" + kCurrentElectionYear + "), (" + kPreviousElectionYear + ")) tmp(" + DB.kJahr + ")");
     return tempWahlkreisDatenTable();
 	}
+	
+	@Override
+	protected ResultSet doQuery() throws SQLException {
+		// Aggregate Wahlkreis data.	
+		//TODO: WahlkreisDaten Tabelle muss ebenfalls dynamisch erstellt werden können.
+		return doQuery(createTempErstStimmenNachWahlkreisTable(wahlkreisID),
+				createTempZweitStimmenNachWahlkreisTable(wahlkreisID),
+				createTempWahlkreisDatenTable(wahlkreisID));
+	}
 }

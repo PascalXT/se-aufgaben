@@ -60,13 +60,14 @@ public abstract class Query {
 	private String getNavigation() {
 		String navigation = "<h3>Navigation</h3>";
 
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1\">Q1: Sitzverteilung</a> (<a href=\"/WahlWebsite/ShowResult?query=Q1.with\">with</a>)<br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2\">Q2: Abgeordnete</a> (<a href=\"/WahlWebsite/ShowResult?query=Q2.with\">with</a>)<br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3\">Q3: Wahlkreisinfo</a> (<a href=\"/WahlWebsite/ShowResult?query=Q3.with\">with</a>)<br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q4\">Q4: Wahlkreisergebnisse</a> (<a href=\"/WahlWebsite/ShowResult?query=Q4.with\">with</a>)<br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5\">Q5: Überhangsmandate</a> (<a href=\"/WahlWebsite/ShowResult?query=Q5.with\">with</a>)<br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q6\">Q6: Knappste Sieger</a><br/><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q7\">Wahllokal Admin</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1.WITH\">Q1: Sitzverteilung</a> (<a href=\"/WahlWebsite/ShowResult?query=Q1\">tmp</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2.WITH\">Q2: Abgeordnete</a> (<a href=\"/WahlWebsite/ShowResult?query=Q2\">tmp</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3.WITH\">Q3: Wahlkreisinfo</a> (<a href=\"/WahlWebsite/ShowResult?query=Q3\">tmp</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q4.WITH\">Q4: Wahlkreisergebnisse</a> (<a href=\"/WahlWebsite/ShowResult?query=Q4\">tmp</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5.WITH\">Q5: Überhangsmandate</a> (<a href=\"/WahlWebsite/ShowResult?query=Q5\">tmp</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q6\">Q6: Knappste Sieger</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q7.WITH\">Q7: Wahlkreisinfo Einzelstimmen</a> (<a href=\"/WahlWebsite/ShowResult?query=Q7\">tmp</a>)<br/><br/>";
+		navigation += "<a href=\"/WahlWebsite/ChooseWahllokal.jsp\">Wahllokal Admin</a><br/>";
 
 		return navigation;
 	}
