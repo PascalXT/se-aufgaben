@@ -59,13 +59,13 @@ public abstract class Query {
 	
 	private String getNavigation() {
 		String navigation = "<h3>Navigation</h3>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1\">Q1: Sitzverteilung</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2\">Q2: Abgeordnete</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3\">Q3: Wahlkreisinfo</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q4\">Q4: Wahlkreisergebnisse</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5\">Q5: Überhangsmandate</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q6\">Q6: Knappste Sieger</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q7\">Q7: Wahlkreisinfo (Einzelstimmen)</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1\">Q1: Sitzverteilung</a> (<a href=\"/WahlWebsite/ShowResult?query=Q1.with\">with</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2\">Q2: Abgeordnete</a> (<a href=\"/WahlWebsite/ShowResult?query=Q2.with\">with</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3\">Q3: Wahlkreisinfo</a> (<a href=\"/WahlWebsite/ShowResult?query=Q3.with\">with</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q4\">Q4: Wahlkreisergebnisse</a> (<a href=\"/WahlWebsite/ShowResult?query=Q4.with\">with</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5\">Q5: Überhangsmandate</a> (<a href=\"/WahlWebsite/ShowResult?query=Q5.with\">with</a>)<br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q6\">Q6: Knappste Sieger</a><br/><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q7\">Wahllokal Admin</a><br/>";
 		return navigation;
 	}
 
