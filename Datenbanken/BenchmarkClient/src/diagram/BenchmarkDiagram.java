@@ -1,10 +1,10 @@
 package diagram;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import benchmark.BenchmarkResult;
 
@@ -59,20 +59,21 @@ public class BenchmarkDiagram {
 			String labels = "";
 			String colors = "";
 			
-			SortedSet<Integer> sortedSet = new TreeSet<Integer>(results.keySet());
+			List<Integer> sortedKeys = new ArrayList<Integer>(results.keySet());
+			Collections.sort(sortedKeys);
 			
 			for (String query : usedQueries) {
 				labels += query + "|";
 				colors += colorMapping.get(query) + ",";
 
 				String xValues = "";
-				for (Integer x : results.keySet()) {
+				for (Integer x : sortedKeys) {
 					xValues += x + ",";
 				}
 				xValues = xValues.substring(0, xValues.length() - 1);
 
 				String yValues = "";
-				for (Integer x : (Integer[]) sortedSet.toArray()) {
+				for (Integer x : sortedKeys) {
 					BenchmarkResult result = results.get(x);
 					yValues += result.getAverageResponseTimeForQuery(query) + ",";
 				}
