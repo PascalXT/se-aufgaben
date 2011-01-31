@@ -92,6 +92,25 @@ SitzeNachPartei AS (
 	WHERE Rang <= 2*( SELECT COUNT(*) FROM Wahlkreis)
 	GROUP BY ParteiID), 
 
+ZugriffsreihenfolgeSitzeNachLandeslisten AS (
+	SELECT p.ParteiID, z.BundeslandID, z.AnzahlStimmen,
+		(z.AnzahlStimmen / d.wert) as DivWert, ROW_NUMBER() OVER
+		(PARTITION BY p.ParteiID ORDER BY (z.AnzahlStimmen / d.wert)
+		DESC, rnd.Zahl DESC) as Rang
+	FROM ParteienImBundestag p, ZweitStimmenNachBundesland z,
+		Divisoren d, ZufallsZahlenSitzeNachLandeslisten rnd
+	WHERE p.ParteiID = z.ParteiID 
+		AND rnd.Zeile = MOD(p.ParteiID + ( SELECT COUNT(*) FROM
+			Partei)*(z.BundeslandID + ( SELECT COUNT(*) FROM Bundesland)*(d.wert / 1)), ( SELECT COUNT(*) FROM ZufallsZahlenSitzeNachLandeslisten))), 
+
+SitzeNachLandeslisten AS (
+	SELECT z.ParteiID, BundeslandID, COUNT(Rang) as AnzahlSitze
+	FROM ZugriffsreihenfolgeSitzeNachLandeslisten z,
+		SitzeNachPartei s
+	WHERE z.ParteiID = s.ParteiID 
+		AND z.Rang <= s.AnzahlSitze
+	GROUP BY z.ParteiID, z.BundeslandID, s.ParteiID), 
+
 ListenKandidaten AS (
 	SELECT ID
 	FROM Kandidat
@@ -107,6 +126,13 @@ ListenKandidatenMitRang AS (
 	WHERE lk.ID = k.ID 
 		AND k.BundeslandID = b.ID ), 
 
+BundeslandParteiZuDirektmandate AS (
+	SELECT w.BundeslandID, d.ParteiID, Count(d.KandidatID) as
+		Anzahl
+	FROM Direktmandate d, Wahlkreis w
+	WHERE d.DMWahlkreisID = w.ID
+	GROUP BY w.BundeslandID, d.ParteiID), 
+
 Abgeordnete AS (
 	SELECT KandidatID
 	FROM Direktmandate
@@ -114,13 +140,13 @@ Abgeordnete AS (
 	UNION
 
 	SELECT lkr.ID
-	FROM ListenKandidatenMitRang lkr, SitzeNachLandeslisten s
+	FROM ListenKandidatenMitRang lkr LEFT OUTER JOIN
+		BundeslandParteiZuDirektmandate b ON lkr.BundeslandID =
+		b.BundeslandID AND lkr.ParteiID = b.ParteiID,
+		SitzeNachLandeslisten s
 	WHERE s.ParteiID = lkr.ParteiID 
 		AND s.BundeslandID = lkr.BundeslandID 
-		AND lkr.Rang <= s.AnzahlSitze - ( SELECT COUNT(*) FROM
-			Direktmandate dm, Wahlkreis w WHERE dm.ParteiID = lkr.ParteiID 
-		AND dm.DMWahlkreisID = w.ID 
-		AND w.BundeslandID = lkr.BundeslandID ) )
+		AND lkr.Rang <= s.AnzahlSitze - COALESCE(b.Anzahl, 0))
 SELECT k.Vorname, k.Nachname, p.Kuerzel
 FROM Abgeordnete a, Kandidat k LEFT OUTER JOIN Partei p ON
 	k.ParteiID = p.ID
