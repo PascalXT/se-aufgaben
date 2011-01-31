@@ -16,7 +16,7 @@ public class BenchmarkDiagram {
 
 	private final static int xAxisMaxValue = 50;
 
-	private final static int xAxisStep = 1;
+	private final static int xAxisStep = 5;
 
 	private final static int yAxisMaxValue = 20000;
 

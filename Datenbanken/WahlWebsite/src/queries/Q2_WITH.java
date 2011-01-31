@@ -35,6 +35,10 @@ public class Q2_WITH extends Query {
 					db.parteienImBundestag(), db.zweitStimmenNachPartei(), db.divisoren()) + "), "
 			+ db.sitzeNachPartei() + " AS (" + stmtSitzeNachParteiTable(
 					db.zweitStimmenNachPartei(), db.parteienImBundestag(), db.zugriffsreihenfolgeSitzeNachPartei()) + "), "
+			+ db.zugriffsreihenfolgeSitzeNachLandeslisten() + " AS (" + stmtZugriffsreihenfolgeSitzeNachLandeslisten(
+					db.parteienImBundestag(), db.zweitStimmenNachBundesland(), db.divisoren()) + "), "
+			+ db.sitzeNachLandeslisten() + " AS (" + stmtSitzeNachLandeslisten(db.parteienImBundestag(),
+					db.zweitStimmenNachBundesland(), db.sitzeNachPartei(), db.zugriffsreihenfolgeSitzeNachLandeslisten()) + "), "
 					
 			+ "ListenKandidaten AS (" +
 		  		"SELECT " + DB.kID + " FROM " + db.kandidat() + " WHERE " + DB.kForeignKeyBundeslandID + " IS NOT NULL " + 

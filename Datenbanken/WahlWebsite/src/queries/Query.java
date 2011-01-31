@@ -60,7 +60,7 @@ public abstract class Query {
 	private String getNavigation() {
 		String navigation = "<h3>Navigation</h3>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q1.with\">Q1: Sitzverteilung</a><br/>";
-		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2\">Q2: Abgeordnete</a><br/>";
+		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q2.with\">Q2: Abgeordnete</a><br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q3.with\">Q3: Wahlkreisinfo</a><br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q4.with\">Q4: Wahlkreisergebnisse</a><br/>";
 		navigation += "<a href=\"/WahlWebsite/ShowResult?query=Q5.with\">Q5: Überhangsmandate</a><br/>";

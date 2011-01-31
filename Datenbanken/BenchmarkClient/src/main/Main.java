@@ -11,9 +11,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		final int sleepTime = 1000;
+		final int sleepTime = 7000;
 		
-		final int[] clientDistribution = new int[] { 1, 5, 10, 25, 50 };
+		final int[] clientDistribution = new int[] { 1, 2, 5, 10, 15, 20, 40, 60, 80, 100 };
 		
 		BenchmarkDiagram diagram = new BenchmarkDiagram();
 		
