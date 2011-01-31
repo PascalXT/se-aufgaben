@@ -132,3 +132,20 @@ Datenbank geladen.
  \end{figure}
 
  Auch Q7 ist mit \texttt{WITH}-Tables performanter als ohne.
+ 
+ \subsection{Interpretation der Ergebnisse}
+Auf die Laufzeit der Queries wirken sich mehrere Faktoren aus. Wichtige Faktoren sind:
+\begin{itemize}
+	\item Effizienze Gestaltung der Queries (z.B. korrelierte Unterabfragen vermeiden)
+	\item Optimierung des Anfragebaumes
+	\item Leistungsfähigkeit der Hardware
+	\item Caching von Ergebnissen durch das DBMS
+	\item Vorhandensein von geeigneten Index-Strukturen
+\end{itemize}
+
+Bei der Durchführung der Queries ist aufgefallen, dass die erste Anfrage oft um Größenordnungen länger für die Ausführung braucht, als die folgenden Abfragen. Der Grund hierfür ist, dass das DBMS Ergebnisse von zeitnah durchgeführten Anfragen oft Speichert um spätere Anfragen schneller durchführen zu können. Im Extremfall wird also das Endergebnis gespeichert und nicht neu berechnet. In der vorliegenden Arbeit würde also das DBMS am besten abschneiden, dass exakt die Ergebnistabellen der letzten Anfragen zwischenspeichert. Den stärksten Effekt auf die Laufzeit haben Optimierungen, die das DBMS dazu bringen mehr von der Endergebnistabelle zu cachen. Dies ist im vorliegenden Benchmark wohl der Hauptgrund für Performanzunterschiede zwischen SQL-Abfragen basierend auf ``WITH''-Befehlen und SQL-Abfragen basierend auf Global Temporary Tables. Der Grund dafür, dass die Anfragen unter Verwendung von ``WITH''-Befehlen teilweise auch deutlich langsamer sind, als die Anfragen mit temporary tables ist dementsprechend vermutlich ebenfalls auf andere Caching Eigenschaften zurückzuführen. In einer realen Implementierung sollte der Entwickler das Caching selber übernehmen und bei jeder Browser Anfrage nur die minimal nötigen Informationen neu berechnen.
+
+Zusätzlich hat die Verwendung von ``WITH'' Befehlen auch den Effekt, dass das DBMS die Anfrage besser optimieren kann, da alle Teiltabellen auf einmal zur Verfügung stehen.
+
+
+
