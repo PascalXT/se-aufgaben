@@ -58,5 +58,5 @@ Stimme(\underline{ID}, gültig, Jahr, KandidatID, ParteiID, WahlkreisID, Wahlbezi
 \\
 Zusammen mit ihrem Fremdschlüssel erhalten die beiden Wahlkreis-aggregierten Stimm-Relationen ihren Schlüssel:
 \\
-ErstStimmenNachWahlkreis(\underline{KandidatID}, \underline{\#Stimmen}, \underline{Jahr})\\
-ZweitStimmenNachWahlkreis(\underline{ParteiID,} \underline{\#Stimmen}, \underline{Jahr})\\
+ErstStimmenNachWahlkreis(\underline{WahlkreisID}, \underline{KandidatID}, \#Stimmen, \underline{Jahr})\\
+ZweitStimmenNachWahlkreis(\underline{WahlkreisID}, \underline{ParteiID,} \#Stimmen, \underline{Jahr})\\

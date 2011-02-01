@@ -10,7 +10,7 @@ Person eine Stimme abgeben kann. Der Wahlhelfer vor Ort gibt die Personalausweis
 \label{fig:wahlraum-screenshot}
 \end{figure}
 
-Das System prüft ob die Personalausweisnummer ein stimmberechtigter Wähler ist (Aus\-weis\-num\-mer ist berechtiger Wähler in Wahlkreis und Wahlbezirk). 
+Das System prüft ob die Personalausweisnummer zu einem stimmberechtigten Wähler gehört (Aus\-weis\-num\-mer ist berechtiger Wähler in Wahlkreis und Wahlbezirk). 
 Wenn ja, wird geprüft ob dieser nicht bereits seine Stimme abgegeben hat (Flag \emph{gewählt} muss auf \emph{false} gesetzt sein). 
 Hat er noch nicht gewählt, generiert das System ein zufälliges, zentral auf dem Server gespeichertes Wählpasswort, das der Wahlhelfer dem 
 Wähler beispielsweise auf einem Datenträger übergibt. Durch die Generierung des Wählpassworts wird das Flag \emph{gewählt} auf \emph{true} gesetzt. 
@@ -33,7 +33,7 @@ Durch die Indirektion über das anonyme Wählpasswort wird maximaler Datenschutz g
 
 Es gibt keinerlei Verbindung zwischen Personalausweisnummer und Wählpasswort. Genauso wenig wie zwischen Wählpasswort
 und abgegebenen Stimmen. Das Wählpasswort ist allerdings mit seinem Wahlkreis und Wahlbezirk verbunden. Dadurch wird der
-Fall verhindert, dass der Wähler sein erhaltenes Wählpasswort in einem anderen Wahllokal abgeben kann und so die 
+Fall verhindert, dass der Wähler sein erhaltenes Wählpasswort in einem anderen Wahllokal verwenden kann und so die 
 Statistik verfälscht.
 
 Alle Übertragungen vom Wahllokal zum Server müssen gesichert sein. Da sichere Ver\-bin\-dung\-en nicht Thema dieses Projektes sind, 
