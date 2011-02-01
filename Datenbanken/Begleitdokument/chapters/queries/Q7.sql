@@ -31,9 +31,11 @@ Direktmandate AS (
 		ZufallsZahlenDirektmandate z, Kandidat k
 	WHERE n.WahlkreisID = mn.WahlkreisID 
 		AND k.ID = n.KandidatID 
-		AND z.Zeile = mod(n.WahlkreisID, ( SELECT COUNT(*) FROM
-			ZufallsZahlenDirektmandate)) 
-		AND n.Nummer = mod(z.Zahl, mn.kMaxNummer) + 1)
+		AND z.Zeile = mod(n.WahlkreisID,
+			(SELECT COUNT(*) 
+			 FROM ZufallsZahlenDirektmandate)) 
+		AND n.Nummer = mod(z.Zahl, mn.kMaxNummer) + 1), 
+
 SELECT k.Vorname, k.Nachname, p.Kuerzel
 FROM Direktmandate dm, Kandidat k, Partei p
 WHERE dm.KandidatID = k.ID 
@@ -68,13 +70,14 @@ SummeZweitStimmenWahlkreis2005 AS (
 	
 SELECT p.Kuerzel, COALESCE(w2009.Anzahl, 0) AS Absolut2009,
 	CAST(COALESCE(w2009.Anzahl, 0) AS FLOAT) /
-		( SELECT Summe FROM SummeZweitStimmenWahlkreis2009)
+		(SELECT Summe FROM SummeZweitStimmenWahlkreis2009)
 		AS Prozentual2009,
 	COALESCE(w2005.Anzahl, 0) AS Absolut2005,
 	CAST(COALESCE(w2005.Anzahl, 0) AS FLOAT) /
 		(SELECT Summe FROM SummeZweitStimmenWahlkreis2005)
 		AS Prozentual2005,
-	(COALESCE(w2009.Anzahl, 0) - COALESCE(w2005.Anzahl, 0)) as Aenderung
+	(COALESCE(w2009.Anzahl, 0) - 
+		COALESCE(w2005.Anzahl, 0)) as Aenderung
 FROM ZweitStimmenWahlkreis2009 w2009 FULL OUTER JOIN
 		ZweitStimmenWahlkreis2005 w2005 
 		ON w2009.ParteiID =	w2005.ParteiID 

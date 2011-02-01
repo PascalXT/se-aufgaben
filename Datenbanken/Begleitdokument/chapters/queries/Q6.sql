@@ -7,8 +7,10 @@ MaxStimmen(WahlkreisID, Anzahl) AS (
 	GROUP BY we.WahlkreisID ), 
 
 Erster(WahlkreisID, KandidatID, ParteiID, Anzahl) AS (
-	SELECT we.WahlkreisID, we.KandidatID, k.ParteiID, we.Anzahl
-	FROM ErstStimmenNachWahlkreis we, MaxStimmen ms, Kandidat k
+	SELECT we.WahlkreisID, we.KandidatID, k.ParteiID,
+		we.Anzahl
+	FROM ErstStimmenNachWahlkreis we, MaxStimmen ms,
+		Kandidat k
 	WHERE we.WahlkreisID = ms.WahlkreisID 
 		AND we.Jahr = 2009 
 		AND we.KandidatID = k.ID 
@@ -49,8 +51,8 @@ KnappsteSiegerRang(Rang, GewinnerID, Differenz, VerliererID,
 WahlkreisID) AS (
 	SELECT ROW_NUMBER() OVER (PARTITION
 	BY kn.GewinnerID ORDER BY
-		kn.Differenz), kn.GewinnerID, kn.Differenz, kn.VerliererID,
-		kn.WahlkreisID
+		kn.Differenz), kn.GewinnerID, kn.Differenz,
+		kn.VerliererID, kn.WahlkreisID
 	FROM KnappsteSieger kn ), 
 
 ParteienOhneSieg(ParteiID) AS (
@@ -61,8 +63,8 @@ ParteienOhneSieg(ParteiID) AS (
 
 KnappsteSiegerOutput(Rang, Vorname, Nachname, Partei,
 Wahlkreis, Differenz, Typ) AS (
-	SELECT knr.Rang, k.Vorname, k.Nachname, p.Kuerzel, wk.Name,
-		knr.Differenz, 'Gewinner'
+	SELECT knr.Rang, k.Vorname, k.Nachname, p.Kuerzel,
+		wk.Name, knr.Differenz, 'Gewinner'
 	FROM KnappsteSiegerRang knr, Partei p, Kandidat k,
 		Wahlkreis wk
 	WHERE Rang <= 10 
@@ -85,15 +87,15 @@ WahlkreisID) AS (
 
 KnappsteVerliererRang(Rang, ParteiID, KandidatID,
 AbstandZumErsten, WahlkreisID) AS (
-	SELECT ROW_NUMBER() OVER (PARTITION BY kv.ParteiID ORDER BY
-		kv.AbstandZumErsten ASC), kv.ParteiID, kv.KandidatID,
-		kv.AbstandZumErsten, kv.WahlkreisID
+	SELECT ROW_NUMBER() OVER (PARTITION BY kv.ParteiID 
+		ORDER BY kv.AbstandZumErsten ASC), kv.ParteiID,
+		kv.KandidatID, kv.AbstandZumErsten, kv.WahlkreisID
 	FROM KnappsteVerlierer kv ), 
 
 KnappsteVerliererOutput(Rang, Vorname, Nachname, Partei,
 Wahlkreis, Differenz, Typ) AS (
-	SELECT kvr.Rang, k.Vorname, k.Nachname, p.Kuerzel, wk.Name,
-		kvr.AbstandZumErsten, 'Verlierer'
+	SELECT kvr.Rang, k.Vorname, k.Nachname, p.Kuerzel,
+		wk.Name, kvr.AbstandZumErsten, 'Verlierer'
 	FROM KnappsteVerliererRang kvr, Partei p, Kandidat k,
 		Wahlkreis wk
 	WHERE Rang <= 10 
