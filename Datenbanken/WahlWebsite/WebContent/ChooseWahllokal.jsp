@@ -42,9 +42,10 @@ try {
 <div>
 	<label for="wahlkreis">Wahlkreis:</label>
 	<select name="wahlkreis">
+	<option value=""></option>
 	<% 
 	String wk = request.getParameter("wk");
-	ResultSet resultSetWahlkreise = db.executeSQL("SELECT * FROM " + db.wahlkreis());
+	ResultSet resultSetWahlkreise = db.executeSQL("SELECT * FROM " + db.wahlkreis() + " ORDER BY " + DB.kID);
 	while (resultSetWahlkreise.next()) { 
 		String id = resultSetWahlkreise.getString(DB.kID);
 	%>
@@ -63,6 +64,7 @@ if (wk != null) {
 <div>
 	<label for="wahlbezirk">Wahlbezirk:</label>
 	<select name="wahlbezirk">
+	<option value=""></option>
 	<% 
 		String qry = "SELECT * FROM " + db.wahlbezirk() + " WHERE " + DB.kForeignKeyWahlkreisID + " = " + wk;
 		ResultSet resultSetWahlbezirke = db.executeSQL(qry);

@@ -45,7 +45,7 @@ public class Q7_WITH extends Q3_WITH {
     		+ "SELECT s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", " + DB.kJahr + ", COUNT(*) "
     		+ "FROM " + db.stimme() + " s "
     		+ "WHERE " + DB.kForeignKeyKandidatID + " is not null "
-    			+ "AND s." + DB.kForeignKeyKandidatID + "=" + wahlkreisID + " "
+    			+ "AND s." + DB.kForeignKeyWahlkreisID + "=" + wahlkreisID + " "
     		+ "GROUP BY s." + DB.kForeignKeyKandidatID + ", s." + DB.kForeignKeyWahlkreisID + ", s." + DB.kJahr);
     return tempErstStimmenNachWahlkreis();
 	}
