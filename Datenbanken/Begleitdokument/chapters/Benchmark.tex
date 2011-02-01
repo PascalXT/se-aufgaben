@@ -40,7 +40,7 @@ Datenbank geladen.
  
  \subsection{Temporäre Tabellen}
  
- Alle Quieres benutzen für die Berechnung von Zwischenergebnissen temporäre Tabellen. In DB2 gibt es dafür im Wesentlichen zwei Ansätze:
+ Alle Queries benutzen für die Berechnung von Zwischenergebnissen temporäre Tabellen. In DB2 gibt es dafür im Wesentlichen zwei Ansätze:
  Das explizite Erstellen temporärer Tabellen mittels \texttt{CREATE GLOBAL TEMPORARY TABLE} oder die Verwendung von Tables, die mittels dem 
  SQL-Befehl \texttt{WITH} erstellt wurden. Die wesentlichen Unterschiede der beiden Methoden liegen in ihrer Lebensdauer \footnote{DB2 Temporary Tables: 
  \url{http://www.cs.newpaltz.edu/~pletcha/DB/db2_TempTables.html}}.
@@ -71,7 +71,7 @@ Datenbank geladen.
  \newpage
  \section{Ergebnisse}
  
- Folgende Diagramme zeigen die Performance der einzelnen Quieres unter steigender Anzahl von parallelen Zugriffen.
+ Folgende Diagramme zeigen die Performance der einzelnen Queries unter steigender Anzahl von parallelen Zugriffen.
  Auf der x-Achse befindet sich die Anzahl der parallel aktiven Browser und auf der
  y-Achse die dazugehörige durchschnittliche response time in Millisekunden. 
  
@@ -145,7 +145,7 @@ Datenbank geladen.
 
  \subsection{Interpretation}
  
-Beim Durchschauen der Benchmark-Ergebisse fällt auf, dass die erste Anfrage oft um Größenordnungen länger für die Ausführung braucht, 
+Beim Durchschauen der Benchmark-Ergebnisse fällt auf, dass die erste Anfrage oft um Größenordnungen länger für die Ausführung braucht, 
 als die folgenden Abfragen. Der Grund hierfür ist, dass das DBMS Ergebnisse von zeitnah durchgeführten Anfragen oft speichert um spätere 
 Anfragen schneller durchführen zu können. Im Extremfall wird also das Endergebnis gespeichert und nicht neu berechnet. 
 In der vorliegenden Arbeit würde also das DBMS am besten abschneiden, dass exakt die Ergebnistabellen der letzten Anfragen zwischenspeichert. 

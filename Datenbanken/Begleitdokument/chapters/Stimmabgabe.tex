@@ -37,7 +37,7 @@ Fall verhindert, dass der Wähler sein erhaltenes Wählpasswort in einem anderen W
 Statistik verfälscht.
 
 Alle Übertragungen vom Wahllokal zum Server müssen gesichert sein. Da sichere Ver\-bin\-dung\-en nicht Thema dieses Projektes sind, 
-wird in der Implementierung davon ausgangen, dass die Sicherung der Verbindung außerhalb erfolgt.
+wird in der Implementierung davon ausgegangen, dass die Sicherung der Verbindung außerhalb erfolgt.
 
 \section{Auswertung}
 Durch einen bestimmten Befehl im Webinterface kann die Auszählung der Stimmen auf Wahlkreisebene angestoßen werden. Es wird davon ausgegangen, dass der Befehl nur dem Organisator bekannt ist und nur von physisch geschützten Orten aus gegeben werden kann. In unserer Implementierung wird die Auszählung durch \url{http://localhost:8080/WahlWebsite/ShowResult?query=refreshvotes} ausgelöst. Der Begriff refreshvotes steht dabei als Beispiel für einen möglichen geheimen Befehl. Tatsächlich sollte dieser Befehl einem langen Passwort entsprechen. Die Auszählung darf erst nach Schließ\-ung des letzten Wahllokales ausgelöst werden. Die Sicherung der Auswertungsfunktion ist nötig, um zu verhindern, dass ständig hochaktuelle Ergebnisse verfügbar sind. Hochaktuelle Ergebnisse würden es in Einzelfällen möglich machen, auf die Stimmabgabe von Einzelpersonen zu schließen, indem das Ergebnis vor der Stimmabgabe mit dem Ergebnis nach der Stimmabgabe verglichen wird.
