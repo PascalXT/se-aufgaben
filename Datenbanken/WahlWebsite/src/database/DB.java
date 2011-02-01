@@ -330,10 +330,10 @@ public class DB {
   	
   	// Line breaks of full lines (More than 63 characters)  	
   	for (int i = 5; i < 30; i += 5)
-  		result = result.replaceAll("\n(\t?)(\t?)((?:" + kSelectEtc + "|AND)[^\n\t]{" + (55 - i) + ",55}) ([^\n]{" + i + ",})",
+  		result = result.replaceAll("\n(\t?)(\t?)((?:" + kSelectEtc + "|AND)[^\n\t]{" + (52 - i) + ",52}) ([^\n]{" + i + ",})",
   				"\n$1$2$3\n\t$1$2$4");
   	for (int i = 5; i < 30; i += 5)
-  		result = result.replaceAll("\n(\t?)(\t?)([^\n\t]{" + (60 - i) + ",60}) ([^\n]{" + i + ",})",
+  		result = result.replaceAll("\n(\t?)(\t?)([^\n\t]{" + (57 - i) + ",57}) ([^\n]{" + i + ",})",
   				"\n$1$2$3\n$1$2$4");
   	
   	result = result.replaceAll("\n\n\n", "\n\n");
@@ -407,7 +407,7 @@ public class DB {
       file_writer = new FileWriter(file);
       file_writer.write("CONNECT TO " + datenbank_kurzname + ";\n" + db2_statement + ";\nCONNECT RESET;");
       file_writer.flush();
-      //System.out.println("cmd: " + prettyPrintSQL(db2_statement));
+      System.out.println("cmd: " + prettyPrintSQL(db2_statement));
       String cmd = "db2cmd.exe " + dbCommandFlags + " " + db2_command_file;
       Process p = Runtime.getRuntime().exec(cmd);
       p.waitFor();
