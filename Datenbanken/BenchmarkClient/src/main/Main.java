@@ -13,13 +13,13 @@ public class Main {
 		
 		final int sleepTime = 7000;
 		
-		final int[] clientDistribution = new int[] { 1, 2, 5, 10, 15, 20, 40, 60, 80, 100 };
+		final int[] clientDistribution = new int[] { 1, 2, 5, 10, 15, 20, 40, 60, 80 };
 		
     BenchmarkDiagram diagram = new BenchmarkDiagram();
     BenchmarkDiagram computationTimeDiagram = new BenchmarkDiagram();
 		
 		for (int clients : clientDistribution) {
-			Benchmark benchmark = new Benchmark(clients, sleepTime, KartendeckType.Q1_Q6_BEST);
+			Benchmark benchmark = new Benchmark(clients, sleepTime, KartendeckType.Q7);
 			ThreadPoolExecutor tpexc = benchmark.run();
 			System.out.println("Benchmark started with " + clients + " clients and " + sleepTime + " ms sleeptime");
 			try {

@@ -68,7 +68,7 @@ public class Q3_WITH extends Query {
     		db.maxErststimmenNachWahlkreis() + " AS (" + 
     			stmtMaxErststimmenNachWahlkreis("ErstStimmenEinWahlkreis") + "), " +
     		db.direktMandateNummer() + " AS ( " +
-  				stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), db.erstStimmenNachWahlkreis()) + "), " +
+  				stmtDirektmandateNummer(db.maxErststimmenNachWahlkreis(), "ErstStimmenEinWahlkreis") + "), " +
   			db.direktMandateMaxNummer() + " AS ( " +
   				stmtDirektmandateMaxNummer(db.direktMandateNummer()) + "), " +
   			db.direktmandate() + " AS (" +

@@ -385,7 +385,7 @@ public class DB {
   public void executeUpdate(String sql_statement) throws SQLException {
   	logSQL(sql_statement);
 
-    //System.out.println(prettyPrintSQL(sql_statement));
+    System.out.println(prettyPrintSQL(sql_statement));
     if (!Flags.isTrue(FlagDefinition.kFlagSimulateSQLUpdate)) {
 	    Statement statement = connection.createStatement();
 	    statement.executeUpdate(sql_statement);

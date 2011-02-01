@@ -48,12 +48,12 @@ if (rs.next() == false) {
 		db.executeUpdate("DELETE FROM " + db.sessionIDs() + " WHERE " + DB.kID + " = '" + sessionID + "'");
 		
 		// 1583559
-		db.executeUpdate("INSERT INTO " + db.stimme() + " " + 
+		/**db.executeUpdate("INSERT INTO " + db.stimme() + " " + 
 			"(" + DB.kForeignKeyKandidatID + ", " + DB.kForeignKeyParteiID + ", " +
           	DB.kForeignKeyWahlbezirkID + ", " + DB.kForeignKeyWahlkreisID + ") " + 
           	"VALUES " + 
           	"(" + erststimme + ", " + zweitstimme + ", " + wb + ", " + wk + ")"
-		);
+		);*/
 		
 		json.put("success", true);
 	}
