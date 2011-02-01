@@ -69,17 +69,23 @@ public class Q4 extends Query {
 			"GewinnerZweitStimmen(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
 				"SELECT BundeslandID, P2, COUNT(*) FROM " + db.wahlkreisSieger() + " GROUP BY BundeslandID, P2 " + 
 			"), " + 
-			"GewinnerGesamt(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
-				"SELECT g1.BundeslandID, g1.Partei, g1.GewonneneWahlkreise + g2.GewonneneWahlkreise " + 
-				"FROM GewinnerErststimmen g1, GewinnerZweitStimmen g2 " + 
-			") " + 
-			"SELECT g.BundeslandID, g.Partei " + 
-			"FROM GewinnerGesamt g WHERE NOT EXISTS ( " + 
-				"SELECT * FROM GewinnerGesamt g0 " + 
-				"WHERE g0.BundeslandID = g.BundeslandID " + 
-			 	"AND g0.GewonneneWahlkreise > g.GewonneneWahlkreise " + 
-			") "
-		);
+		"GewinnerGesamt(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
+			"SELECT g1.BundeslandID, g1.Partei, g1.GewonneneWahlkreise + g2.GewonneneWahlkreise " + 
+			"FROM GewinnerErststimmen g1, GewinnerZweitStimmen g2 " + 
+			"WHERE g1.BundeslandID = g2.BundeslandID AND g1.Partei = g2.Partei" +
+		"), " + 
+		
+		"MaxBundeslandGewonneneWahlkreise AS (" +
+		"SELECT BundeslandID, Max(GewonneneWahlkreise) As MaxWk " +
+		"FROM GewinnerGesamt " +
+		"GROUP BY BundeslandID" +
+	  ") " +
+
+	  "SELECT g.BundeslandID, g.Partei " +
+	  "FROM GewinnerGesamt g, MaxBundeslandGewonneneWahlkreise m " +
+	  "WHERE g.GewonneneWahlkreise = m.MaxWk AND g.BundeslandID = m.BundeslandID"
+		
+	);
 		
 		List<String> labels = new ArrayList<String>(); 
 		List<String> colors = new ArrayList<String>(); 
