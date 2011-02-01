@@ -2,7 +2,7 @@
 
 \section{Übersetzung der Entities}
 
-Wahlberechtigter(\underline{ID}, Gewählt)\\
+Wahlberechtigter(\underline{ID}, \underline{WahlkreisID}, \underline{WahlbezirkID},  Gewählt)\\
 Wahlkreis(\underline{ID}, Name)\\
 WahlkreisDaten(\underline{ID}, \#Wahlberechtigter, \#UngültigeErststimmen, \#UngültigeZweitstimmen, Jahr)\\
 Kandidat(\underline{ID}, Vorname, Nachname, Geburtsdatum, Geburtsort, Anschrift, Beruf)\\
@@ -23,8 +23,8 @@ Die Entity \emph{StimmenNachWahlkreis} ist eine Generalisierung von \emph{ErstSt
 Um Joins zu sparen, haben wir daraus zwei anstatt drei Relationen modelliert:
 \\
 \\
-ErstStimmenNachWahlkreis(\#Stimmen, Jahr)\\
-ZweitStimmenNachWahlkreis(\#Stimmen, Jahr)\\
+ErstStimmenNachWahlkreis(\underline{WahlkreisID}, \#Stimmen, Jahr)\\
+ZweitStimmenNachWahlkreis(\underline{WahlkreisID}, \#Stimmen, Jahr)\\
 
 \section{Initial-Entwurf Beziehungen}
 
