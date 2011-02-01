@@ -30,7 +30,7 @@ allerdings Einzelstimmen für die Berechnung zugrunde liegen:
  
 \end{itemize}
 
-Da Q7 über 62 Millionen Tupel aggregieren muss, wurden für den Benchmark aus Laufzeitgründen nur die Stimmen der Wahlkreise 213 - 217 in die
+Da Q7 über 62 Millionen Tupel aggregieren muss, wurden für den Benchmark aus Lauf\-zeit\-grün\-den nur die Stimmen der Wahlkreise 213 - 217 in die
 Datenbank geladen. 
 
 \section{Messverfahren und Ziele}
@@ -154,8 +154,8 @@ Dies ist im vorliegenden Benchmark wohl der Hauptgrund für Performanzunterschied
 SQL-Abfragen basierend auf \texttt{GOBAL TEMPORARY}. 
 
 Der Grund dafür, dass die Anfragen unter Verwendung von \texttt{WITH} tables teilweise auch deutlich langsamer sind, als die Anfragen mit 
-\texttt{GOBAL TEMPORARY} tables ist dementsprechend vermutlich ebenfalls auf andere Caching Eigenschaften zurückzuführen. 
-In einer realen Implementierung sollte der Entwickler das Caching selber übernehmen und bei jeder Browser Anfrage nur die minimal 
+\texttt{GOBAL TEMPORARY} tables ist dem\-ent\-sprech\-end vermutlich ebenfalls auf andere Caching Eigenschaften zurückzuführen. 
+In einer realen Implementierung sollte der Entwickler das Caching selber übernehmen und bei jeder Brow\-ser Anfrage nur die minimal 
 nötigen Informationen neu berechnen.
 
 Zusätzlich hat die Verwendung von \texttt{WITH} tables auch den Effekt, dass das DBMS die Anfrage besser optimieren kann, 

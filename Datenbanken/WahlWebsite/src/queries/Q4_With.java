@@ -17,15 +17,7 @@ public class Q4_With extends Query {
 
 	@Override
 	protected ResultSet doQuery() throws SQLException {
-		return db.executeSQL("WITH "
-				+ db.maxZweitStimmenNachWahlkreis() + " AS (" + stmtMaxZweitStimmenNachWahlkreis() + "), "
-				+ db.maxErststimmenNachWahlkreis() + " AS ("
-					+ stmtMaxErststimmenNachWahlkreis(db.erstStimmenNachWahlkreis()) + "), "
-				+ db.gewinnerZweitstimmen() + " AS (" + stmtGewinnerZweitStimmen(db.maxZweitStimmenNachWahlkreis()) + "), "
-				+ db.gewinnerErststimmen() + " AS (" + stmtGewinnerErststimmen(db.maxErststimmenNachWahlkreis()) + "), "
-				+ db.wahlkreisSieger() + " AS ("
-					+ stmtWahlkreissieger(db.gewinnerErststimmen(), db.gewinnerZweitstimmen()) + ")"
-				+ "SELECT * FROM " + db.wahlkreisSieger());
+		return db.executeSQL("SELECT * FROM " + createWahlkreissiegerTable());
 	}
 
 	@Override
@@ -80,13 +72,19 @@ public class Q4_With extends Query {
 			"GewinnerGesamt(BundeslandID, Partei, GewonneneWahlkreise) AS ( " + 
 				"SELECT g1.BundeslandID, g1.Partei, g1.GewonneneWahlkreise + g2.GewonneneWahlkreise " + 
 				"FROM GewinnerErststimmen g1, GewinnerZweitStimmen g2 " + 
-			") " + 
-			"SELECT g.BundeslandID, g.Partei " + 
-			"FROM GewinnerGesamt g WHERE NOT EXISTS ( " + 
-				"SELECT * FROM GewinnerGesamt g0 " + 
-				"WHERE g0.BundeslandID = g.BundeslandID " + 
-			 	"AND g0.GewonneneWahlkreise > g.GewonneneWahlkreise " + 
-			") "
+				"WHERE g1.BundeslandID = g2.BundeslandID AND g1.Partei = g2.Partei" +
+			"), " + 
+			
+			"MaxBundeslandGewonneneWahlkreise AS (" +
+			"SELECT BundeslandID, Max(GewonneneWahlkreise) As MaxWk " +
+			"FROM GewinnerGesamt " +
+			"GROUP BY BundeslandID" +
+		  ") " +
+	
+		  "SELECT g.BundeslandID, g.Partei " +
+		  "FROM GewinnerGesamt g, MaxBundeslandGewonneneWahlkreise m " +
+		  "WHERE g.GewonneneWahlkreise = m.MaxWk AND g.BundeslandID = m.BundeslandID"
+			
 		);
 		
 		List<String> labels = new ArrayList<String>(); 

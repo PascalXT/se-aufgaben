@@ -39,16 +39,18 @@ Direktmandate AS (
 		ZufallsZahlenDirektmandate z, Kandidat k
 	WHERE n.WahlkreisID = mn.WahlkreisID 
 		AND k.ID = n.KandidatID 
-		AND z.Zeile = mod(n.WahlkreisID, ( SELECT COUNT(*) FROM
-			ZufallsZahlenDirektmandate)) 
+		AND z.Zeile = mod(n.WahlkreisID,
+			(SELECT COUNT(*) 
+			 FROM ZufallsZahlenDirektmandate)) 
 		AND n.Nummer = mod(z.Zahl, mn.kMaxNummer) + 1), 
 
 FuenfProzentParteien AS (
 	SELECT z.ParteiID
 	FROM ZweitStimmenNachPartei z
 	GROUP BY z.ParteiID
-	HAVING CAST(SUM(z.AnzahlStimmen) AS FLOAT) / ( SELECT
-		SUM(AnzahlStimmen) FROM ZweitStimmenNachPartei) >= 0.05), 
+	HAVING CAST(SUM(z.AnzahlStimmen) AS FLOAT) / 
+		(SELECT	SUM(AnzahlStimmen) 
+		 FROM ZweitStimmenNachPartei) >= 0.05), 
 
 DreiDirektMandatParteien AS (
 	SELECT dm.ParteiID
@@ -77,14 +79,18 @@ Divisoren AS (
 	FROM Wahlkreis w), 
 
 ZugriffsreihenfolgeSitzeNachPartei AS (
-	SELECT p.ParteiID, z.AnzahlStimmen, (z.AnzahlStimmen /
-		d.wert) as DivWert, ROW_NUMBER() OVER (ORDER BY
-		(z.AnzahlStimmen / d.wert) DESC, rnd.Zahl DESC) as Rang
+	SELECT p.ParteiID, z.AnzahlStimmen, 
+		(z.AnzahlStimmen / d.wert) as DivWert,
+		ROW_NUMBER() OVER (ORDER BY
+			(z.AnzahlStimmen / d.wert) DESC,
+			rnd.Zahl DESC) as Rang
 	FROM ParteienImBundestag p, ZweitStimmenNachPartei z,
 		Divisoren d, ZufallsZahlenSitzeNachPartei rnd
 	WHERE p.ParteiID = z.ParteiID 
-		AND rnd.Zeile = MOD(p.ParteiID + (d.wert / 1)*( SELECT
-			COUNT(*) FROM Partei), ( SELECT COUNT(*) FROM ZufallsZahlenSitzeNachPartei))), 
+		AND rnd.Zeile = MOD(p.ParteiID + (d.wert / 1)*
+			(SELECT COUNT(*) FROM Partei), 
+			(SELECT COUNT(*)
+			 FROM ZufallsZahlenSitzeNachPartei))), 
 
 SitzeNachPartei AS (
 	SELECT ParteiID, COUNT(Rang) as AnzahlSitze
@@ -94,14 +100,20 @@ SitzeNachPartei AS (
 
 ZugriffsreihenfolgeSitzeNachLandeslisten AS (
 	SELECT p.ParteiID, z.BundeslandID, z.AnzahlStimmen,
-		(z.AnzahlStimmen / d.wert) as DivWert, ROW_NUMBER() OVER
-		(PARTITION BY p.ParteiID ORDER BY (z.AnzahlStimmen / d.wert)
-		DESC, rnd.Zahl DESC) as Rang
+		(z.AnzahlStimmen / d.wert) as DivWert,
+		ROW_NUMBER() OVER (PARTITION BY p.ParteiID 
+			ORDER BY (z.AnzahlStimmen / d.wert) DESC,
+			rnd.Zahl DESC) as Rang
 	FROM ParteienImBundestag p, ZweitStimmenNachBundesland z,
-		Divisoren d, ZufallsZahlenSitzeNachLandeslisten rnd
+		Divisoren d,
+		ZufallsZahlenSitzeNachLandeslisten rnd
 	WHERE p.ParteiID = z.ParteiID 
-		AND rnd.Zeile = MOD(p.ParteiID + ( SELECT COUNT(*) FROM
-			Partei)*(z.BundeslandID + ( SELECT COUNT(*) FROM Bundesland)*(d.wert / 1)), ( SELECT COUNT(*) FROM ZufallsZahlenSitzeNachLandeslisten))), 
+		AND rnd.Zeile = MOD(p.ParteiID + 
+			(SELECT COUNT(*) FROM Partei) *
+			(z.BundeslandID + 
+			(SELECT COUNT(*) FROM Bundesland) * 
+			(d.wert / 1)),(SELECT COUNT(*) FROM
+			ZufallsZahlenSitzeNachLandeslisten))), 
 
 SitzeNachLandeslisten AS (
 	SELECT z.ParteiID, BundeslandID, COUNT(Rang) as AnzahlSitze
@@ -119,9 +131,9 @@ ListenKandidaten AS (
 	FROM Direktmandate ), 
 
 ListenKandidatenMitRang AS (
-	SELECT lk.ID, k.ParteiID, b.ID AS BundeslandID, ROW_NUMBER()
-		OVER (PARTITION BY b.ID, k.ParteiID ORDER BY k.Listenplatz)
-		AS Rang
+	SELECT lk.ID, k.ParteiID, b.ID AS BundeslandID, 
+		ROW_NUMBER() OVER (PARTITION BY b.ID, k.ParteiID
+			ORDER BY k.Listenplatz)	AS Rang
 	FROM ListenKandidaten lk, Bundesland b, Kandidat k
 	WHERE lk.ID = k.ID 
 		AND k.BundeslandID = b.ID ), 
@@ -141,12 +153,14 @@ Abgeordnete AS (
 
 	SELECT lkr.ID
 	FROM ListenKandidatenMitRang lkr LEFT OUTER JOIN
-		BundeslandParteiZuDirektmandate b ON lkr.BundeslandID =
-		b.BundeslandID AND lkr.ParteiID = b.ParteiID,
+			BundeslandParteiZuDirektmandate b
+			ON lkr.BundeslandID = b.BundeslandID
+			AND lkr.ParteiID = b.ParteiID,
 		SitzeNachLandeslisten s
 	WHERE s.ParteiID = lkr.ParteiID 
 		AND s.BundeslandID = lkr.BundeslandID 
-		AND lkr.Rang <= s.AnzahlSitze - COALESCE(b.Anzahl, 0))
+		AND lkr.Rang <= 
+		    s.AnzahlSitze - COALESCE(b.Anzahl, 0))
 SELECT k.Vorname, k.Nachname, p.Kuerzel
 FROM Abgeordnete a, Kandidat k LEFT OUTER JOIN Partei p ON
 	k.ParteiID = p.ID
