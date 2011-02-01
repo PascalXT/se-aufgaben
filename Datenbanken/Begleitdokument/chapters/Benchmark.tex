@@ -1,5 +1,8 @@
 \chapter{Benchmark}
 
+Im Folgenden wird zunächst die Vorgehensweise beim Benchmark-Test erläutert. Anschließend werden
+die Ergebnisse anhand von Diagrammen dargestellt und interpretiert.
+
 \section{Queries}
 
 Zur Durchführung des Benchmarks wurde ein Transaktionsmix von sechs Queries und zugehöriger Aufrufhäufigkeit betrachtet:
@@ -41,13 +44,21 @@ Datenbank geladen.
  Das explizite Erstellen temporärer Tabellen mittels \texttt{CREATE GLOBAL TEMPORARY TABLE} oder die Verwendung von Tables, die mittels dem 
  SQL-Befehl \texttt{WITH} erstellt wurden. Die wesentlichen Unterschiede der beiden Methoden liegen in ihrer Lebensdauer \footnote{DB2 Temporary Tables: 
  \url{http://www.cs.newpaltz.edu/~pletcha/DB/db2_TempTables.html}}.
- Um die Performanz der beiden Methoden zu testen wurde der Benchmark für Q1-Q5 einmal unter Verwendung von \texttt{GLOBAL TEMPORARY TABLE}s und
- einmal mittels \texttt{WITH} durchgeführt.
+ Um die Performanz der beiden Methoden zu testen wurde der Benchmark für Q1-Q5 und Q7 einmal unter Verwendung von \texttt{GLOBAL TEMPORARY TABLE}s 
+ und einmal mittels \texttt{WITH} durchgeführt.
  
  \subsection{Testen der Skalierfähigkeit}
 
- Die Messung wurde mit 1, 2, 5, 7 und 10 parallel aktiven simulierten Browsern durchgeführt. Für die Queries Q1 - Q6 wurde der Benchmark
- einmal mit zwei Sekunden und einmal mit vier Sekunden Wartezeit zwischen den Queries durchgeführt.
+ Die Messung wurde mit 1, 2, 5, 10, 15, 20, 40, 60 und 80 parallel aktiven simulierten Browsern durchgeführt. Die Wartezeit zwischen den 
+ einzelnen Anfragen pro Browser war zufällig zwischen 3,5 und 10,5 Sekunden (durchschnittlich 7).
+ 
+ \subsection{Zwei verschiedene Zeitmetriken}
+
+ In den Benchmarks wurden zwei Arten von Antwortzeiten gemessen. Einmal die Ausgabe-Berechnungszeit des Webservers (\emph{computed response time}) und 
+ einmal die Antwortzeit aus der Sicht des simulierter Browsers (\emph{HTTP response time}). Die \emph{computed response time} ist die Zeit, die der 
+ Webserver benötigt um seine Antwort zu berechnen. Darunter fällt im Wesentlichen die Berechnungszeit der DB2-Anfrage
+ sowie die Erstellung eines HTML-Outputs. Die \emph{HTTP response time} ist die \emph{computed response time} plus die Zeit die durch 
+ Verbindungsaufbau und Daten-Übertragung benötigt wird.
  
  \subsection{Technisches}
  
@@ -55,97 +66,100 @@ Datenbank geladen.
  lokalen Tomcat-Server.
  Auf dem Server lief ebenfalls Java-Code der die entsprechenden SQL-Statements generierte und an einen lokalen DB2-Server weiterleitete. 
  Aus der DB2-Antwort wurde dann mittels Servlets eine HTML-Seite generiert und an den simulierten Browser gesendet, der die Zeit
- zwischen Anfrage und Antwort stoppte. Der Benchmark wurde auf einem Intel Core 2 Duo mit 1.50 GHz und 2.00 GB RAM durchgeführt. 
+ zwischen Anfrage und Antwort stoppte. Der Benchmark wurde auf einem Intel Core i7 720QM (1.6GHz, 6MB Cache) mit 4 GB RAM durchgeführt. 
  
  \newpage
  \section{Ergebnisse}
  
  Folgende Diagramme zeigen die Performance der einzelnen Quieres unter steigender Anzahl von parallelen Zugriffen.
  Auf der x-Achse befindet sich die Anzahl der parallel aktiven Browser und auf der
- y-Achse die dazugehörige durchschnittliche Server-Responsetime in Millisekunden. 
+ y-Achse die dazugehörige durchschnittliche response time in Millisekunden. 
  
- \subsection{Q1 - Q6 mit 4 Sekunden Wartezeit}
+ \subsection{Benchmark von Q1 - Q6}
  
- Das Benchmark-Ergebnis mit einer Wartezeit von jeweils \emph{vier} Sekunden pro Browser zwischen den Queries:
+ Das Benchmark-Ergebnis \ref{fig:benchmark1} zeigt die HTTP response times der Queries Q1 bis Q6 unter Verwendung 
+ von \texttt{TEMPORARY} tables:
  
  \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=0.85\textwidth]{figures/benchmark-4000.png}
-	\caption{Durchschnittliche Response-Time bei einer Wartezeit von 4 Sekunden}
-	\label{fig:benchmark-4000}
+		\includegraphics[width=0.85\textwidth]{figures/benchmark_Q1-Q6_browser_TMP.png}
+	\caption{Durchschnittliche HTTP response time mit \texttt{TEMPORARY} tables}
+	\label{fig:benchmark1}
 \end{figure}
  
- Man sieht dass die Berechnung von Q3 (Detailergebnisse Wahlkreis) am schnellsten ist, während die Berechnung von Q2 (Abgeordneten)
- am längsten dauert.
- 
+ Man sieht dass die Berechnungen von Q1, Q2 (Sitzverteilung und Abgeordnetenliste) und Q5 (Überhangsmandate) am verhältnismäßig langsamsten sind. 
  \newpage
- \subsection{Q1 - Q6 mit 2 Sekunden Wartezeit}
- 
- Das Benchmark-Ergebnis mit einer reduzierten Wartezeit von jeweils \emph{zwei} Sekunden pro Browser zwischen den Queries:
+ \ref{fig:benchmark2} zeigt den gleichen Benchmark, nur diesmal unter Verwendung von \texttt{WITH} tables zum Ablegen von Zwischenergebnissen:
  
  \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=0.85\textwidth]{figures/benchmark-2000.png}
-	\caption{Durchschnittliche Response-Time bei einer Wartezeit von 2 Sekunden}
-	\label{fig:benchmark-2000}
+		\includegraphics[width=0.85\textwidth]{figures/benchmark_Q1-Q6_browser_WITH.png}
+	\caption{Durchschnittliche HTTP response time mit \texttt{TEMPORARY} tables}
+	\label{fig:benchmark2}
  \end{figure}
 	
- Bei noch höherer Server-Belastung benötigen die Queries Q1, Q2 und Q5 bei 10 parallelen Browsern schon durchschnittlich mehr als 7 Sekunden
- um zu antworten.
-	
+ Man kann schön sehen dass vor allem Q3 (Detailinfo Wahlkreis) dadurch profitiert hat und nun schneller
+ als alle anderen Queries geworden ist. 
+
  \newpage
- \subsection{Q1 - Q6 mit 4 Sekunden Wartezeit und \texttt{WITH}-Tables}
- 
- Das Benchmark-Ergebnis mit einer Wartezeit von vier Sekunden unter der Verwendung von \texttt{WITH}-Tables:
+ Lassen wir den Overhead des Verbindungsaufbaus weg und betrachten wir nur die computed response time ergibt sich 
+ wie erwartet ein ähnliches Bild minus einer Zeitkonstante. \ref{fig:benchmark3} zeigt das entsprechende 
+ Benchmark-Ergbnis \texttt{TEMPORARY} tables und \ref{fig:benchmark4} mit \texttt{WITH} tables:
  
  \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=0.85\textwidth]{figures/benchmark-WITH-4000.png}
-	\caption{Durchschnittliche Response-Time bei einer Wartezeit von 4 Sekunden unter Verwendung von \texttt{WITH}-Tables}
+		\includegraphics[width=0.85\textwidth]{figures/benchmark_Q1-Q6_computed_TMP.png}
+	\caption{Durchschnittliche computed response time mit \texttt{TEMPORARY} tables}
+	\label{fig:benchmark3}
  \end{figure}
  
- Man sieht sofort dass Q2 durch \texttt{WITH}-Tables deutlich langsamer geworden ist. Die anderen Queries sind dadurch
- im Allgemeinen etwas schneller geworden, insbesondere Q3.
+ \newpage
+ \begin{figure}[htbp]
+	\centering
+		\includegraphics[width=0.85\textwidth]{figures/benchmark_Q1-Q6_computed_WITH.png}
+	\caption{Durchschnittliche computed response time mit \texttt{WITH} tables}
+	\label{fig:benchmark4}
+ \end{figure}
  
  \newpage
- \subsection{Q1 - Q6 mit 2 Sekunden Wartezeit und \texttt{WITH}-Tables}
+ \subsection{Q7}
  
- Das Benchmark-Ergebnis mit einer Wartezeit von zwei Sekunden unter der Verwendung von \texttt{WITH}-Tables:
+ Bei Q7 fällt der Unterschied zwischen \texttt{TEMPORARY} tables und \texttt{WITH} tables wesentlich geringer aus.
+ \ref{fig:benchmark5} zeigt die HTTP response time und \ref{fig:benchmark6} die computed response time:
+ 
  
  \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=0.85\textwidth]{figures/benchmark-WITH-2000.png}
-	\caption{Durchschnittliche Response-Time bei einer Wartezeit von 2 Sekunden unter Verwendung von \texttt{WITH}-Tables}
+		\includegraphics[width=0.85\textwidth]{figures/benchmark_Q7_browser.png}
+	\caption{Durchschnittliche HTTP response time der beiden Q7 Varianten}
+	\label{fig:benchmark5}
  \end{figure}
- 
- Bei noch höherer Server-Belastung skalieren Q3 und Q5 mit \texttt{WITH}-Tables besser als ohne.
  
  \newpage
- \subsection{Q7 mit 2 Sekunden Wartezeit}
- 
- Das Benchmark-Ergebnis von Q7 mit einer Wartezeit von zwei Sekunden einmal mit temporären Tabellen und einmal mit \texttt{WITH}-Tables:
- 
  \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=0.85\textwidth]{figures/benchmark-Q7-2000.png}
-	\caption{Durchschnittliche Response-Time bei einer Wartezeit von 2 Sekunden}
+		\includegraphics[width=0.85\textwidth]{figures/benchmark_Q7_computed.png}
+	\caption{Durchschnittliche computed response time der beiden Q7 Varianten}
+	\label{fig:benchmark6}
  \end{figure}
 
- Auch Q7 ist mit \texttt{WITH}-Tables performanter als ohne.
+ \subsection{Interpretation}
  
- \subsection{Interpretation der Ergebnisse}
-Auf die Laufzeit der Queries wirken sich mehrere Faktoren aus. Wichtige Faktoren sind:
-\begin{itemize}
-	\item Effizienze Gestaltung der Queries (z.B. korrelierte Unterabfragen vermeiden)
-	\item Optimierung des Anfragebaumes
-	\item Leistungsfähigkeit der Hardware
-	\item Caching von Ergebnissen durch das DBMS
-	\item Vorhandensein von geeigneten Index-Strukturen
-\end{itemize}
+Beim Durchschauen der Benchmark-Ergebisse fällt auf, dass die erste Anfrage oft um Größenordnungen länger für die Ausführung braucht, 
+als die folgenden Abfragen. Der Grund hierfür ist, dass das DBMS Ergebnisse von zeitnah durchgeführten Anfragen oft speichert um spätere 
+Anfragen schneller durchführen zu können. Im Extremfall wird also das Endergebnis gespeichert und nicht neu berechnet. 
+In der vorliegenden Arbeit würde also das DBMS am besten abschneiden, dass exakt die Ergebnistabellen der letzten Anfragen zwischenspeichert. 
+Den stärksten Effekt auf die Laufzeit haben Optimierungen, die das DBMS dazu bringen mehr von der Endergebnistabelle zu cachen. 
+Dies ist im vorliegenden Benchmark wohl der Hauptgrund für Performanzunterschiede zwischen SQL-Abfragen basierend auf \texttt{WITH} tables und 
+SQL-Abfragen basierend auf \texttt{GOBAL TEMPORARY}. 
 
-Bei der Durchführung der Queries ist aufgefallen, dass die erste Anfrage oft um Größenordnungen länger für die Ausführung braucht, als die folgenden Abfragen. Der Grund hierfür ist, dass das DBMS Ergebnisse von zeitnah durchgeführten Anfragen oft Speichert um spätere Anfragen schneller durchführen zu können. Im Extremfall wird also das Endergebnis gespeichert und nicht neu berechnet. In der vorliegenden Arbeit würde also das DBMS am besten abschneiden, dass exakt die Ergebnistabellen der letzten Anfragen zwischenspeichert. Den stärksten Effekt auf die Laufzeit haben Optimierungen, die das DBMS dazu bringen mehr von der Endergebnistabelle zu cachen. Dies ist im vorliegenden Benchmark wohl der Hauptgrund für Performanzunterschiede zwischen SQL-Abfragen basierend auf ``WITH''-Befehlen und SQL-Abfragen basierend auf Global Temporary Tables. Der Grund dafür, dass die Anfragen unter Verwendung von ``WITH''-Befehlen teilweise auch deutlich langsamer sind, als die Anfragen mit temporary tables ist dementsprechend vermutlich ebenfalls auf andere Caching Eigenschaften zurückzuführen. In einer realen Implementierung sollte der Entwickler das Caching selber übernehmen und bei jeder Browser Anfrage nur die minimal nötigen Informationen neu berechnen.
+Der Grund dafür, dass die Anfragen unter Verwendung von \texttt{WITH} tables teilweise auch deutlich langsamer sind, als die Anfragen mit 
+\texttt{GOBAL TEMPORARY} tables ist dementsprechend vermutlich ebenfalls auf andere Caching Eigenschaften zurückzuführen. 
+In einer realen Implementierung sollte der Entwickler das Caching selber übernehmen und bei jeder Browser Anfrage nur die minimal 
+nötigen Informationen neu berechnen.
 
-Zusätzlich hat die Verwendung von ``WITH'' Befehlen auch den Effekt, dass das DBMS die Anfrage besser optimieren kann, da alle Teiltabellen auf einmal zur Verfügung stehen.
+Zusätzlich hat die Verwendung von \texttt{WITH} tables auch den Effekt, dass das DBMS die Anfrage besser optimieren kann, 
+da alle Teiltabellen auf einmal zur Verfügung stehen.
 
 
 
