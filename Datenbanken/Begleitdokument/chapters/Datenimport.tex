@@ -1,0 +1,20 @@
+\chapter{Datenimport}
+
+Das System wurde mit Original-Daten der Bundestagswahlen 2009 und 2005 befüllt. 
+Kandidaten, Parteien, Bundesländer und Wahlkreise stammen aus vordefinierten Listen. Die Wahlergbnisse (Erst- und Zweitstimmen) stammen von
+der offiziellen Webseite des Bundeswahlleiters\footnote{\url{www.bundeswahlleiter.de/de/bundestagswahlen/BTW_BUND_09/veroeffentlichungen/engueltige/kerg.csv }}. Die Daten wurden zunächst geparst und 
+anschließend für den DB2-Bulkloader in CSV-Dateien geschrieben. Diese wurden dann mittels dem Befehl
+
+\lstset{language=SQL}
+\begin{lstlisting}
+LOAD FROM <csv-file> OF DEL MODIFIED BY COLDEL; 
+METHOD P <columnNumbers> SAVECOUNT 10000 
+MESSAGES <logfile> INSERT INTO <table> (<columnString>)
+\end{lstlisting}
+
+in die DB2-Datenbank geladen. Alle Import-Methoden sind so geschrieben, dass sie die Tabelle zuerst leert und eventuell aktuell laufende 
+Importvorgänge abbricht. Dadurch können die Daten auf einfache Weise beliebig oft neu geladen werden. 
+
+Beim Import der Stimmen wird sowohl die Summe der gültigen und die Summe der ungültigen Stimmen validiert.
+Um das sicherzustellen, wird eine passende Kombination von Erst- und Zweitstimme generiert, anstatt jeden Stimmzettel nur einer Partei
+zuzuordnen. 
