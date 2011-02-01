@@ -1,0 +1,28 @@
+\chapter{Datenbankkonfiguration}
+
+In diesem Kapitel wird zunächst detailliert beschrieben wie die Tables des Systems erzeugt werden.
+Anschließend wird kurz auf die Verwendung von Indizes und Table-Statistiken eingegangen.
+
+\section{SQL-Befehle zur Tabellenerstellung}
+
+Die SQL-Tabellen können jederzeit neu erzeugt werden durch Verwendung der folgenden Befehle:
+
+\lstset{language=SQL}
+\lstinputlisting{chapters/queries/CreateTables.sql}
+
+\section{Indizes und Statistiken}
+
+Um Abfragen zu beschleunigen wurden außerdem folgende Indizes auf häufig verwendete Fremdschlüssel angelegt:
+
+\lstset{language=SQL}
+\lstinputlisting{chapters/queries/CreateIndexes.sql}
+
+Dadurch konnte beispielsweise in einem Testlauf die Laufzeit von Query Q1 von 800ms auf 450ms gesenkt werden.
+Nach Importieren der Daten sollte der Statistik-Befehl 
+
+\lstset{language=SQL}
+\begin{lstlisting}
+RUNSTATS ON TABLE <table> ON ALL COLUMNS ALLOW WRITE ACCESS;
+\end{lstlisting}
+
+auf allen Tables ausgeführt werden. Dadurch wird die Laufzeit aller Queries nochmal deutlich verbessert.
