@@ -1,5 +1,5 @@
 \chapter{Stimmabgabe}
-Die Stimmabgabe im Wahlinformationssystem läuft folgendermaßen ab. Der Wähler erscheint im Wahllokal seines Wahlbezirkes. 
+Die Stimmabgabe im Wahlinformationssystem läuft wie folgt ab. Der Wähler erscheint im Wahllokal seines Wahlbezirkes. 
 Dort legt er seinen Personalausweis vor. Durch die Vorlage des Personalausweises wird verhindert dass eine nicht-autorisierte
 Person eine Stimme abgeben kann. Der Wahlhelfer vor Ort gibt die Personalausweisnummer in der vorgesehenen Weboberfläche ein: 
 
@@ -10,16 +10,15 @@ Person eine Stimme abgeben kann. Der Wahlhelfer vor Ort gibt die Personalausweis
 \label{fig:wahlraum-screenshot}
 \end{figure}
 
-Das System prüft ob die Personalausweisnummer ein stimmberechtigter Wähler ist (Ausweisnummer vorhanden). Wenn ja, wird geprüft ob dieser nicht 
-bereits seine Stimme abgegeben hat (Flag \emph{gewählt} muss auf \emph{false} gesetzt sein). Hat er noch nicht gewählt, generiert das System ein 
-zufälliges, zentral auf dem Server gespeichertes Wählpasswort, das der Wahlhelfer dem Wähler auf einem Zettel übergibt. 
-Durch die Generierung des Wählpassworts wird das Flag \emph{gewählt} auf \emph{true} gesetzt. Dadurch wird verhindert dass der gleiche 
-Wähler mehrfach wählen kann. 
-
+Das System prüft ob die Personalausweisnummer ein stimmberechtigter Wähler ist (Ausweisnummer ist berechtiger Wähler in Wahlkreis und Wahlbezirk). 
+Wenn ja, wird geprüft ob dieser nicht bereits seine Stimme abgegeben hat (Flag \emph{gewählt} muss auf \emph{false} gesetzt sein). 
+Hat er noch nicht gewählt, generiert das System ein zufälliges, zentral auf dem Server gespeichertes Wählpasswort, das der Wahlhelfer dem 
+Wähler beispielsweise auf einem Datenträger übergibt. Durch die Generierung des Wählpassworts wird das Flag \emph{gewählt} auf \emph{true} gesetzt. 
+Dadurch wird verhindert dass der gleiche Wähler mehrfach wählen kann. 
 
 \section{Wahlzettel}
 
-Das Wählpasswort berechtigt den Wähler an einem Wahlcomputer seine Stimme abzugeben:
+Das Wählpasswort berechtigt den Wähler an einem Wahlcomputer (der sich idealerweise im Wahlraum befindet) seine Stimme abzugeben:
 
 \begin{figure}[htbp]
 \centering
@@ -29,7 +28,13 @@ Das Wählpasswort berechtigt den Wähler an einem Wahlcomputer seine Stimme abzuge
 \end{figure}
 
 Sobald der Wähler seine Kreuze gemacht hat, überprüft das
-System das eingegebene Wählpasswort. Wenn es korrekt ist, wird die Stimme gezählt und das Wählpasswort erlischt. Durch die Indirektion über das anonyme Wählpasswort wird maximaler Datenschutz gewährleistet. 
+System das eingegebene Wählpasswort. Wenn es korrekt ist, wird die Stimme gezählt und das Wählpasswort erlischt. 
+Durch die Indirektion über das anonyme Wählpasswort wird maximaler Datenschutz gewährleistet. 
+
+Es gibt keinerlei Verbindung zwischen Personalausweisnummer und Wählpasswort. Genauso wenig wie zwischen Wählpasswort
+und abgegebenen Stimmen. Das Wählpasswort ist allerdings mit seinem Wahlkreis und Wahlbezirk verbunden. Dadurch wird der
+Fall verhindert, dass der Wähler sein erhaltenes Wählpasswort in einem anderen Wahllokal abgeben kann und so die 
+Statistik verfälscht.
 
 Alle Übertragungen vom Wahllokal zum Server müssen gesichert sein. Da sichere Verbindungen nicht Thema dieses Projektes sind, 
 wird in der Implementierung davon ausgangen, dass die Sicherung der Verbindung außerhalb erfolgt.
